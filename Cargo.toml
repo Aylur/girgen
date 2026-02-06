@@ -1,0 +1,23 @@
+[package]
+name = "gnim-types"
+version = "0.1.1"
+edition = "2024"
+license = "MIT"
+description = "GObject Introspection tool to generate type annotations"
+homepage = "https://gnim.aylur.dev/"
+repository = "https://github.com/aylur/gnim"
+exclude = ["/flake.nix", "/flake.lock", "/package.json"]
+
+[dependencies]
+quick-xml = "0"
+rayon = "1"
+minijinja = { version = "2", features = ["builtins"] }
+serde = { version = "1", features = ["derive"] }
+regex = "1"
+stringcase = "0"
+twox-hash = "2"
+clap = { version = "4", features = ["derive"] }
+colored = "3"
+
+[lib]
+path = "lib/mod.rs"
