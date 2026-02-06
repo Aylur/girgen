@@ -1,11 +1,10 @@
 [package]
-name = "gnim-types"
-version = "0.1.1"
+name = "girgen"
+version = "0.1.0"
 edition = "2024"
 license = "MIT"
-description = "GObject Introspection tool to generate type annotations"
-homepage = "https://gnim.aylur.dev/"
-repository = "https://github.com/aylur/gnim"
+description = "GObject Introspection tool that generates type annotations for scripting languages from GIR files"
+repository = "https://github.com/aylur/girgen"
 exclude = ["/flake.nix", "/flake.lock", "/package.json"]
 
 [dependencies]
@@ -18,6 +17,3 @@ stringcase = "0"
 twox-hash = "2"
 clap = { version = "4", features = ["derive"] }
 colored = "3"
-
-[lib]
-path = "lib/mod.rs"

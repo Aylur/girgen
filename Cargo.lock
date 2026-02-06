@@ -166,8 +166,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "gnim-types"
-version = "0.1.1"
+name = "girgen"
+version = "0.1.0"
 dependencies = [
  "clap",
  "colored",

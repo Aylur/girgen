@@ -1,3 +1,4 @@
 # GIR Generator
 
-Generate type annotations for scripting languages from GIR files.
+GObject Introspection tool that generates type annotations for scriptings
+language from GIR files.
