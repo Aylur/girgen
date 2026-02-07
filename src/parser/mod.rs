@@ -1,5 +1,3 @@
-mod element;
-mod error;
-mod parse_gir;
-
-pub use parse_gir::parse;
+pub mod element;
+pub mod error;
+pub mod parse_gir;

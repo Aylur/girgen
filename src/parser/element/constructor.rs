@@ -3,8 +3,8 @@ use super::{AnyElement, Attrs, CallableAttrs, InfoElement, ParseError};
 pub struct Constructor {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameters: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
 }
 
 impl super::Element for Constructor {
@@ -14,8 +14,8 @@ impl super::Element for Constructor {
         Ok(Self {
             attrs: CallableAttrs::new(attrs)?,
             info_elements: Vec::new(),
-            params: None,
-            r#return: None,
+            parameters: None,
+            return_value: None,
         })
     }
 
@@ -30,11 +30,11 @@ impl super::Element for Constructor {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(

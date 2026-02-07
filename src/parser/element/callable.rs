@@ -1,4 +1,4 @@
-use super::{AnyElement, AnyType, Attrs, DocElement, InfoAttrs, ParseError, Required};
+use super::{AnyElement, AnyType, Attrs, DocElement, InfoAttrs, ParseError};
 
 pub struct CallableAttrs {
     pub info: InfoAttrs,
@@ -27,7 +27,7 @@ pub struct InstanceParameter {
     pub direction: Option<String>, // "out" | "in" | "inout"
     pub caller_allocates: Option<bool>,
 
-    pub r#type: Required<AnyType>,
+    pub r#type: Option<AnyType>,
     pub doc_elements: Vec<DocElement>,
 }
 
@@ -61,7 +61,7 @@ pub struct ReturnValue {
 
     pub doc_elements: Vec<DocElement>,
     pub annotations: Vec<super::Attribute>,
-    pub r#type: Required<AnyType>,
+    pub r#type: Option<AnyType>,
 }
 
 impl CallableAttrs {
@@ -127,7 +127,7 @@ impl super::Element for InstanceParameter {
             allow_none: attrs.get_boolean("allow-none").ok(),
             direction: attrs.get_string("direction").ok(),
             caller_allocates: attrs.get_boolean("caller-allocates").ok(),
-            r#type: Required::Missing,
+            r#type: None,
             doc_elements: Vec::new(),
         })
     }
@@ -221,7 +221,7 @@ impl super::Element for ReturnValue {
             allow_none: attrs.get_boolean("allow-none").ok(),
             doc_elements: Vec::new(),
             annotations: Vec::new(),
-            r#type: Required::Missing,
+            r#type: None,
         })
     }
 
@@ -237,7 +237,7 @@ impl super::Element for ReturnValue {
         let element = match AnyType::try_from_element(element) {
             Err(ele) => ele,
             Ok(ok) => {
-                self.r#type = Required::Ok(ok);
+                self.r#type = Some(ok);
                 return Ok(());
             }
         };

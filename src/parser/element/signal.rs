@@ -11,8 +11,8 @@ pub struct Signal {
     pub emitter: Option<String>,
 
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameters: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
 }
 
 impl super::Element for Signal {
@@ -29,8 +29,8 @@ impl super::Element for Signal {
             no_recurse: attrs.get_boolean("no_recurse").ok(),
             emitter: attrs.get_string("emitter").ok(),
             info_elements: Vec::new(),
-            params: None,
-            r#return: None,
+            parameters: None,
+            return_value: None,
         })
     }
 
@@ -45,11 +45,11 @@ impl super::Element for Signal {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(

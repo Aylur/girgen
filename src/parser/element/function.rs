@@ -3,21 +3,21 @@ use super::{AnyElement, Attrs, CallableAttrs, DocElement, InfoElement, ParseErro
 pub struct Function {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameters: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
 }
 
 pub struct FunctionInline {
     pub attrs: CallableAttrs,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameters: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
     pub doc_elements: Vec<DocElement>,
 }
 
 pub struct FunctionMacro {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
+    pub parameters: Option<super::Parameters>,
 }
 
 impl super::Element for Function {
@@ -27,8 +27,8 @@ impl super::Element for Function {
         Ok(Self {
             attrs: CallableAttrs::new(attrs)?,
             info_elements: Vec::new(),
-            params: None,
-            r#return: None,
+            parameters: None,
+            return_value: None,
         })
     }
 
@@ -43,11 +43,11 @@ impl super::Element for Function {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(
@@ -65,8 +65,8 @@ impl super::Element for FunctionInline {
     fn new(attrs: &Attrs) -> Result<Self, ParseError> {
         Ok(Self {
             attrs: CallableAttrs::new(attrs)?,
-            params: None,
-            r#return: None,
+            parameters: None,
+            return_value: None,
             doc_elements: Vec::new(),
         })
     }
@@ -82,11 +82,11 @@ impl super::Element for FunctionInline {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(
@@ -105,7 +105,7 @@ impl super::Element for FunctionMacro {
         Ok(Self {
             attrs: CallableAttrs::new(attrs)?,
             info_elements: Vec::new(),
-            params: None,
+            parameters: None,
         })
     }
 
@@ -120,7 +120,7 @@ impl super::Element for FunctionMacro {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(

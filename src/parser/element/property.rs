@@ -1,4 +1,4 @@
-use super::{AnyType, Attrs, InfoAttrs, InfoElement, ParseError, Required};
+use super::{AnyType, Attrs, InfoAttrs, InfoElement, ParseError};
 
 pub struct Property {
     pub info: InfoAttrs,
@@ -11,7 +11,7 @@ pub struct Property {
     pub getter: Option<String>,
     pub default_value: Option<String>,
 
-    pub r#type: Required<AnyType>,
+    pub r#type: Option<AnyType>,
     pub info_elements: Vec<InfoElement>,
 }
 
@@ -29,7 +29,7 @@ impl super::Element for Property {
             setter: attrs.get_string("setter").ok(),
             getter: attrs.get_string("getter").ok(),
             default_value: attrs.get_string("default-value").ok(),
-            r#type: Required::Missing,
+            r#type: None,
             info_elements: Vec::new(),
         })
     }
@@ -46,7 +46,7 @@ impl super::Element for Property {
         let element = match AnyType::try_from_element(element) {
             Err(ele) => ele,
             Ok(ok) => {
-                self.r#type = Required::Ok(ok);
+                self.r#type = Some(ok);
                 return Ok(());
             }
         };

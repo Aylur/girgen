@@ -5,23 +5,23 @@ pub struct Method {
     pub glib_set_property: Option<String>,
     pub glib_get_property: Option<String>,
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameters: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
 }
 
 pub struct MethodInline {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameters: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
 }
 
 pub struct VirtualMethod {
     pub attrs: CallableAttrs,
     pub invoker: Option<String>,
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameters: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
 }
 
 impl super::Element for Method {
@@ -33,8 +33,8 @@ impl super::Element for Method {
             glib_set_property: attrs.get_string("glib:set-property").ok(),
             glib_get_property: attrs.get_string("glib:get-property").ok(),
             info_elements: Vec::new(),
-            params: None,
-            r#return: None,
+            parameters: None,
+            return_value: None,
         })
     }
 
@@ -49,11 +49,11 @@ impl super::Element for Method {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(
@@ -72,8 +72,8 @@ impl super::Element for MethodInline {
         Ok(Self {
             attrs: CallableAttrs::new(attrs)?,
             info_elements: Vec::new(),
-            params: None,
-            r#return: None,
+            parameters: None,
+            return_value: None,
         })
     }
 
@@ -88,11 +88,11 @@ impl super::Element for MethodInline {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(
@@ -112,8 +112,8 @@ impl super::Element for VirtualMethod {
             attrs: CallableAttrs::new(attrs)?,
             invoker: attrs.get_string("invoker").ok(),
             info_elements: Vec::new(),
-            params: None,
-            r#return: None,
+            parameters: None,
+            return_value: None,
         })
     }
 
@@ -128,11 +128,11 @@ impl super::Element for VirtualMethod {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameters = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(

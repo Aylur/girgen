@@ -7,8 +7,8 @@ pub struct Callback {
     pub throws: Option<bool>,
 
     pub info_elements: Vec<InfoElement>,
-    pub params: Option<super::Parameters>,
-    pub r#return: Option<super::ReturnValue>,
+    pub parameter: Option<super::Parameters>,
+    pub return_value: Option<super::ReturnValue>,
 }
 
 impl super::Element for Callback {
@@ -21,8 +21,8 @@ impl super::Element for Callback {
             c_type: attrs.get_string("c:type").ok(),
             throws: attrs.get_boolean("throws").ok(),
             info_elements: Vec::new(),
-            params: None,
-            r#return: None,
+            parameter: None,
+            return_value: None,
         })
     }
 
@@ -37,11 +37,11 @@ impl super::Element for Callback {
 
         match element {
             AnyElement::Parameters(p) => {
-                self.params = Some(p);
+                self.parameter = Some(p);
                 Ok(())
             }
             AnyElement::ReturnValue(r) => {
-                self.r#return = Some(r);
+                self.return_value = Some(r);
                 Ok(())
             }
             ele => Err(ParseError::UnexpectedElement(format!(

@@ -1,5 +1,5 @@
-use girgen::hello;
+use girgen::default_dirs;
 
 fn main() {
-    hello();
+    println!("{}", default_dirs());
 }

@@ -55,12 +55,7 @@ pub use signal::*;
 pub use r#type::*;
 pub use union::*;
 
-pub struct Attrs(pub std::collections::HashMap<String, String>);
-
-pub enum Required<T> {
-    Ok(T),
-    Missing,
-}
+pub(super) struct Attrs(pub std::collections::HashMap<String, String>);
 
 impl Attrs {
     fn get_string(&self, key: &str) -> Result<String, ParseError> {
