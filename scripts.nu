@@ -7,7 +7,7 @@ def "main build" [--os: string, --cpu: string, --target: string] {
     let version = open Cargo.toml | get package | get version
 
     let package = {
-        name: $"@gir-gen/($name)",
+        name: $"@girgen/($name)",
         version: $version,
         os: [$os]
         cpu: [$cpu]
