@@ -133,6 +133,14 @@ impl super::Element for InstanceParameter {
     }
 
     fn end(&mut self, element: AnyElement) -> Result<(), ParseError> {
+        let element = match AnyType::try_from_element(element) {
+            Err(ele) => ele,
+            Ok(ok) => {
+                self.r#type = Some(ok);
+                return Ok(());
+            }
+        };
+
         match DocElement::try_from_element(element) {
             Ok(ok) => {
                 self.doc_elements.push(ok);

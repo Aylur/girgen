@@ -19,12 +19,13 @@ fn override_parameter_type(name: &str) -> String {
     }
 }
 
-fn filter_keyword<'a>(name: &'a str) -> &'a str {
+fn filter_keyword(name: Option<&str>) -> &str {
     match name {
-        "in" => "in_",
-        "break" => "break_",
-        "function" => "func",
-        _ => name,
+        None => "arg",
+        Some("in") => "in_",
+        Some("break") => "break_",
+        Some("function") => "func",
+        Some(name) => name,
     }
 }
 
@@ -40,7 +41,94 @@ pub struct CallableArgs<'a> {
 }
 
 pub fn render(args: &CallableArgs) -> Result<String, String> {
-    todo!()
+    let env = minijinja::Environment::new();
+
+    let (p_returns, p_parameters): (Vec<_>, Vec<_>) =
+        gtype::filter_parameters(args.parameters, args.returns)
+            .into_iter()
+            .partition(|p| matches!(p.direction.as_deref(), Some("inout" | "out")));
+
+    let parameter_results: Vec<Result<Parameter, String>> = p_parameters
+        .into_iter()
+        .map(|p| -> Result<Parameter, String> {
+            let t = gtype::tstype(p.r#type.as_ref(), p.nullable.is_some_and(|n| n))?;
+            Ok(Parameter {
+                name: filter_keyword(p.name.as_deref()),
+                tstype: override_parameter_type(t.as_str()),
+            })
+        })
+        .collect();
+
+    let return_results: Vec<Result<String, String>> = args
+        .returns
+        .filter(|r| {
+            r.r#type.as_ref().is_some_and(|t| {
+                matches!(t, element::AnyType::Type(t) if t.name.as_deref() != Some("none"))
+                    || matches!(t, element::AnyType::Array(_))
+            })
+        })
+        .into_iter()
+        .map(|r| gtype::tstype(r.r#type.as_ref(), r.nullable.is_some_and(|n| n)))
+        .chain(
+            p_returns
+                .into_iter()
+                .filter(|p| p.optional.is_none_or(|o| !o))
+                .map(|p| gtype::tstype(p.r#type.as_ref(), p.nullable.is_some_and(|n| n))),
+        )
+        .collect();
+
+    let return_errs = return_results.iter().filter_map(|r| {
+        r.as_ref()
+            .err()
+            .map(|err| format!("failed to render callable 'return': {}", err))
+    });
+
+    let param_errs = parameter_results.iter().filter_map(|p| {
+        p.as_ref()
+            .err()
+            .map(|err| format!("failed to render callable 'parameter': {}", err))
+    });
+
+    let errs: Vec<String> = return_errs.chain(param_errs).collect();
+
+    if !errs.is_empty() {
+        return Err(errs.join(","));
+    }
+
+    let returns: Vec<String> = return_results.into_iter().map(|r| r.unwrap()).collect();
+
+    let parameters: Vec<Parameter> = parameter_results.into_iter().map(|p| p.unwrap()).collect();
+
+    let jsdoc = {
+        let args = doc::DocArgs {
+            info_elements: args.info_elements,
+            info: args.info,
+            parameters: args.parameters,
+            returns: args.returns,
+            throws: args.throws,
+            overrides: args.overrides,
+            default_value: None,
+        };
+        doc::jsdoc_with_args(&args)?
+    };
+
+    let name = args.name.map(|name| match name {
+        "new" => "\"new\"",
+        n => n,
+    });
+
+    let ctx = minijinja::context! {
+        jsdoc,
+        prefix => args.prefix,
+        name,
+        parameters,
+        returns,
+    };
+
+    match env.render_str(TEMPLATE, ctx) {
+        Ok(res) => Ok(res),
+        Err(err) => Err(format!("failed to render callable: {:?}", err)),
+    }
 }
 
 macro_rules! callable_args {

@@ -16,7 +16,7 @@ impl render::Renderable for element::Constant {
 
     fn ctx(&self, _: &render::Context) -> Result<minijinja::Value, String> {
         let anytype = self.r#type.as_ref().ok_or("Missing type")?;
-        let t = gtype::resolve_anytype(&anytype)?;
+        let t = gtype::resolve_anytype(anytype)?;
 
         let value = match t.as_str() {
             "boolean" | "number" => &self.value,

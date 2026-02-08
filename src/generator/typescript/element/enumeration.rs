@@ -1,5 +1,5 @@
 use super::super::render;
-use super::doc;
+use super::{callable, doc};
 use crate::{element, generator::Event};
 
 const TEMPLATE: &str = include_str!("../templates/enumeration.jinja");
@@ -38,10 +38,22 @@ macro_rules! render_functions {
                         .functions
                         .iter()
                         .filter_map(|f| {
-                            let mut func = f.clone();
-                            func.attrs.name = remove_prefix(&func.attrs.name, &ns_prefixes);
-                            match func.render($ctx) {
-                                Ok(res) => Some(res.content),
+                            if !f.introspectable($ctx) {
+                                return None;
+                            }
+                            let args = callable::CallableArgs {
+                                info_elements: &f.info_elements,
+                                info: &f.attrs.info,
+                                throws: f.attrs.throws,
+                                overrides: f.attrs.shadows.is_some(),
+                                prefix: Some("function "),
+                                name: Some(&remove_prefix(&f.attrs.name, &ns_prefixes)),
+                                parameters: f.parameters.as_ref(),
+                                returns: f.return_value.as_ref(),
+                            };
+
+                            match callable::render(&args) {
+                                Ok(res) => Some(res),
                                 Err(err) => {
                                     ($ctx.event)(Event::Failed {
                                         repo: None,

@@ -1,4 +1,4 @@
-use super::{Attrs, ParseError};
+use super::{AnyElement, Attrs, ParseError};
 
 pub struct Repository {
     pub version: Option<String>,
@@ -42,6 +42,24 @@ impl super::Element for Repository {
             namespaces: Vec::new(),
             doc_formats: Vec::new(),
         })
+    }
+
+    fn end(&mut self, element: super::AnyElement) -> Result<(), ParseError> {
+        match element {
+            AnyElement::Include(include) => self.includes.push(include),
+            AnyElement::CInclude(cinclude) => self.c_includes.push(cinclude),
+            AnyElement::Package(package) => self.packages.push(package),
+            AnyElement::Namespace(namespace) => self.namespaces.push(namespace),
+            AnyElement::DocFormat(doc_format) => self.doc_formats.push(doc_format),
+            ele => {
+                return Err(ParseError::UnexpectedElement(format!(
+                    "{}:{}",
+                    Self::KIND,
+                    ele.kind()
+                )));
+            }
+        }
+        Ok(())
     }
 }
 

@@ -64,7 +64,7 @@ fn collect_properties(
                 parameters: None,
                 returns: None,
                 throws: None,
-                overrides: None,
+                overrides: false,
                 default_value: p.default_value.as_deref(),
             };
 
@@ -128,7 +128,7 @@ impl render::Renderable for element::Class {
         let overrides = overrides::OVERRIDES
             .iter()
             .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version)
-            .and_then(|o| o.classes.iter().find(|c| c.name == &self.name));
+            .and_then(|o| o.classes.iter().find(|c| c.name == self.name));
 
         let methods = callable::render_callable_elements(
             ctx,
@@ -266,10 +266,10 @@ impl render::Renderable for element::Interface {
         let overrides = overrides::OVERRIDES
             .iter()
             .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version)
-            .and_then(|o| o.classes.iter().find(|c| c.name == &self.name));
+            .and_then(|o| o.classes.iter().find(|c| c.name == self.name));
 
         let methods = callable::render_callable_elements(
-            &ctx,
+            ctx,
             "",
             &self
                 .methods
@@ -280,7 +280,7 @@ impl render::Renderable for element::Interface {
         );
 
         let constructors = callable::render_callable_elements(
-            &ctx,
+            ctx,
             "",
             &self
                 .constructors
@@ -290,7 +290,7 @@ impl render::Renderable for element::Interface {
         );
 
         let functions = callable::render_callable_elements(
-            &ctx,
+            ctx,
             "",
             &self
                 .functions
@@ -300,7 +300,7 @@ impl render::Renderable for element::Interface {
         );
 
         let virtual_methods = callable::render_callable_elements(
-            &ctx,
+            ctx,
             "vfunc_",
             &self
                 .virtual_methods

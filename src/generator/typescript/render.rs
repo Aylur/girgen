@@ -91,25 +91,19 @@ fn render<T: Renderable + Sync>(items: &[T], ctx: &Context) -> Vec<RenderedEleme
                     });
                     None
                 }
-                Ok(elem) => {
-                    if elem.content.is_none() {
-                        return None;
+                Ok(elem) => match elem.name.as_str() {
+                    "enum" | "function" | "false" | "true" | "break" | "void" => {
+                        (ctx.event)(Event::Failed {
+                            repo: None,
+                            err: &format!(
+                                "failed to include {}-{}.{} due to invalid name",
+                                ctx.namespace.name, ctx.namespace.version, elem.name,
+                            ),
+                        });
+                        None
                     }
-
-                    match elem.name.as_str() {
-                        "enum" | "function" | "false" | "true" | "break" | "void" => {
-                            (ctx.event)(Event::Failed {
-                                repo: None,
-                                err: &format!(
-                                    "failed to include {}-{}.{} due to invalid name",
-                                    ctx.namespace.name, ctx.namespace.version, elem.name,
-                                ),
-                            });
-                            None
-                        }
-                        _ => Some(elem),
-                    }
-                }
+                    _ => Some(elem),
+                },
             }
         })
         .collect()
@@ -186,7 +180,7 @@ struct Import<'a> {
 
 impl element::Repository {
     fn find_imports(&self, repos: &[&element::Repository]) -> Vec<element::Include> {
-        let mut includes = self.find_includes(&repos);
+        let mut includes = self.find_includes(repos);
 
         let namespace = self
             .namespaces
@@ -227,15 +221,10 @@ impl element::Repository {
         let namespaces = self
             .namespaces
             .par_iter()
-            .map(|ns| {
-                render_namespace(Context {
-                    namespace: &ns,
-                    event,
-                })
-            })
+            .map(|namespace| render_namespace(Context { namespace, event }))
             .collect::<Vec<_>>();
 
-        let includes = self.find_imports(&repos);
+        let includes = self.find_imports(repos);
         let imports: Vec<Import> = includes
             .iter()
             .map(|inc| Import {
@@ -251,7 +240,7 @@ impl element::Repository {
 
         match res {
             Ok(res) => Ok(res),
-            Err(err) => Err(format!("{:?}", err).into()),
+            Err(err) => Err(format!("{:?}", err)),
         }
     }
 }

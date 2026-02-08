@@ -73,7 +73,7 @@ fn resolve_primitive(name: &str) -> Result<String, String> {
             if t.ends_with("_t") || t.starts_with("_") {
                 Ok("never".to_string())
             } else {
-                Err(format!("failed to resolve type '{t}'").into())
+                Err(format!("failed to resolve type '{t}'"))
             }
         }
     }
@@ -107,17 +107,15 @@ pub fn resolve_anytype(input: &AnyType) -> Result<String, String> {
                         Ok(name.clone())
                     }
                 }
-                _ if !t.elements.is_empty() => {
-                    Err(format!("unhandled generic type: {}", name).into())
-                }
-                _ => resolve_primitive(&name),
+                _ if !t.elements.is_empty() => Err(format!("unhandled generic type: {}", name)),
+                _ => resolve_primitive(name),
             }
         }
         AnyType::Array(arr) => {
             let ele = arr.elements.first().ok_or("missing array element")?;
 
             if arr.elements.len() > 1 {
-                return Err(format!("unhandled second element of array type").into());
+                return Err("unhandled second element of array type".to_string());
             }
 
             if let AnyType::Type(item) = ele

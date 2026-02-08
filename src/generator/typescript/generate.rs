@@ -1,63 +1,22 @@
-use super::{cache, gjs_lib};
-use crate::generator::{Error, Event};
-use crate::{element, parse};
+use super::{super::cache, gjs_lib};
+use crate::generator::{Error, Event, Gir};
 use rayon::prelude::*;
-use std::{fs, path};
+use std::fs;
 
-struct Gir<'a> {
-    name: &'a str,
-    contents: String,
-    repo: element::Repository,
-}
-
-pub fn generate(gir_paths: &[&path::Path], outdir: &str, event: fn(Event)) -> Result<(), Error> {
-    let girs: Vec<Gir> = gir_paths
-        .par_iter()
-        .filter(|gir| matches!(gir.extension().and_then(|ext| ext.to_str()), Some("gir")))
-        .filter_map(|path| {
-            let contents = match fs::read_to_string(path) {
-                Ok(ok) => ok,
-                Err(err) => {
-                    event(Event::ParseFailed {
-                        file_path: path,
-                        err: err.to_string().as_str(),
-                    });
-                    return None;
-                }
-            };
-
-            match parse(&contents) {
-                Ok(repo) => {
-                    event(Event::Parsed { file_path: path });
-                    Some(Gir {
-                        name: path.file_stem().and_then(|f| f.to_str()).unwrap(),
-                        repo,
-                        contents,
-                    })
-                }
-                Err(err) => {
-                    event(Event::ParseFailed {
-                        file_path: path,
-                        err: err.to_string().as_str(),
-                    });
-                    None
-                }
-            }
-        })
-        .collect::<Vec<_>>();
-
+pub fn generate(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error> {
     if girs.is_empty() {
         return Err(Error::Empty);
     }
 
-    fs::create_dir_all(&outdir)?;
+    fs::create_dir_all(outdir)?;
 
     let repos = girs.iter().map(|gir| &gir.repo).collect::<Vec<_>>();
 
     let index = girs
         .par_iter()
         .filter_map(|gir| {
-            let (hash, cache_path) = cache::lookup_cache(gir.name, &gir.contents);
+            let hash = cache::hash("ts_", gir.name, &gir.contents);
+            let cache_path = cache::lookup_cache(&hash);
             let out_path = format!("{}/{}.d.ts", outdir, gir.name);
             let import = format!("import \"./{}.d.ts\"", gir.name);
 
@@ -119,13 +78,13 @@ pub fn generate(gir_paths: &[&path::Path], outdir: &str, event: fn(Event)) -> Re
             let path = format!("{}/{}.d.ts", outdir, lib.name);
             if let Err(err) = fs::write(&path, lib.content) {
                 event(Event::Failed {
-                    repo: Some(&lib.name),
+                    repo: Some(lib.name),
                     err: err.to_string().as_str(),
                 });
                 None
             } else {
                 event(Event::CacheHit {
-                    repo: &lib.name,
+                    repo: lib.name,
                     out_path: &path,
                 });
                 Some(format!("import \"./{}.d.ts\"", lib.name))

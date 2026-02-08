@@ -1,6 +1,10 @@
-pub(in crate::generator) mod cache;
-pub mod typescript;
+mod cache;
+mod typescript;
 
+pub use cache::{cache, hash, lookup_cache};
+pub use typescript::generate as typescript;
+
+use crate::element;
 use std::{io, path};
 
 pub enum Event<'a> {
@@ -10,6 +14,10 @@ pub enum Event<'a> {
     ParseFailed {
         file_path: &'a path::Path,
         err: &'a str,
+    },
+    Ignored {
+        file_path: &'a path::Path,
+        cause: &'a str,
     },
     Warning {
         warning: &'a str,
@@ -39,8 +47,10 @@ impl From<io::Error> for Error {
     }
 }
 
-pub trait Generator {
-    const NAME: &'static str;
+pub type Generator = fn(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error>;
 
-    fn generate(gir_paths: &[&path::Path], outdir: &str, event: fn(Event)) -> Result<(), Error>;
+pub struct Gir<'a> {
+    pub name: &'a str,
+    pub contents: String,
+    pub repo: element::Repository,
 }

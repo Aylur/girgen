@@ -22,7 +22,14 @@ fn attributes(e: &BytesStart) -> Result<Attrs, ParseError> {
 impl AnyElement {
     fn push(&mut self, e: &BytesStart) -> Result<Self, ParseError> {
         let attrs = attributes(e)?;
-        AnyElement::new(e.name().as_ref(), &attrs)
+        match AnyElement::new(e.name().as_ref(), &attrs) {
+            Ok(ok) => Ok(ok),
+            Err(err) => match err {
+                // TODO: impl ParseEvent and log invalid element
+                ParseError::MissingAttribute(_) => Ok(Self::Invalid),
+                err => Err(err),
+            },
+        }
     }
 }
 
@@ -65,7 +72,10 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
                         .last_mut()
                         .ok_or(ParseError::MalformedGir("failed to end: stack is empty"))?;
 
-                    second.end(top)?;
+                    if !matches!(second, AnyElement::Invalid) && !matches!(top, AnyElement::Invalid)
+                    {
+                        second.end(top)?;
+                    }
                 }
             },
             Ok(Event::Empty(e)) => {
