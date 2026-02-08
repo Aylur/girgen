@@ -9,11 +9,11 @@ static CACHE: sync::OnceLock<Cache> = sync::OnceLock::new();
 
 fn get_cache_dir() -> Option<path::PathBuf> {
     if let Ok(p) = env::var("XDG_CACHE_HOME") {
-        return Some(path::PathBuf::from(p).join("gnim"));
+        return Some(path::PathBuf::from(p).join("girgen"));
     }
 
     if let Ok(p) = env::var("HOME") {
-        return Some(path::PathBuf::from(p).join(".cache").join("gnim"));
+        return Some(path::PathBuf::from(p).join(".cache").join("girgen"));
     }
 
     match env::current_dir() {
@@ -21,7 +21,7 @@ fn get_cache_dir() -> Option<path::PathBuf> {
             eprintln!("{:?}", err);
             None
         }
-        Ok(dir) => Some(dir.join(".cache").join("gnim")),
+        Ok(dir) => Some(dir.join(".cache").join("girgen")),
     }
 }
 
