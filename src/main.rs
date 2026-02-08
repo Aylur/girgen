@@ -13,7 +13,7 @@ fn stem(path: &path::Path) -> &str {
 }
 
 fn on_event(event: Event) {
-    if !VERBOSE.get().unwrap_or(&false) {
+    if !VERBOSE.get().unwrap_or(&true) {
         return;
     }
 
@@ -67,9 +67,9 @@ fn on_event(event: Event) {
 #[derive(Parser)]
 #[command(version)]
 struct Cli {
-    /// Log debugging statements
+    /// Avoid logging debug statements
     #[arg(short, long, default_value_t = false)]
-    verbose: bool,
+    silent: bool,
 
     /// Lookup these directories for .gir files
     #[arg(short, long, value_name = "PATHS", default_value_t = default_dirs())]
@@ -96,8 +96,8 @@ enum Language {
 fn main() -> process::ExitCode {
     let cli = Cli::parse();
 
-    if cli.verbose {
-        VERBOSE.set(true).unwrap();
+    if cli.silent {
+        VERBOSE.set(false).unwrap();
     }
 
     let dirs: Vec<path::PathBuf> = cli.dirs.split(":").map(path::PathBuf::from).collect();
