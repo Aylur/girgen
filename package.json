@@ -1,7 +1,31 @@
 {
+    "name": "girgen",
+    "version": "0.1.0",
+    "author": "Aylur",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Aylur/girgen.git"
+    },
+    "funding": {
+        "type": "kofi",
+        "url": "https://ko-fi.com/aylur"
+    },
+    "bin": {
+        "girgen": "bin/girgen.js"
+    },
     "prettier": {
         "semi": false,
         "tabWidth": 4,
         "printWidth": 80
-    }
+    },
+    "devDependencies": {
+        "@types/node": "latest"
+    },
+    "optionalDependencies": {
+        "@gir-gen/linux-x64": "0.1.0"
+    },
+    "files": [
+        "bin"
+    ]
 }

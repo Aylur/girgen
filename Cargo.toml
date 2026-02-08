@@ -3,9 +3,9 @@ name = "girgen"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
-description = "GObject Introspection tool that generates type annotations for scripting languages from GIR files"
+description = "GIR Parser and type generator"
 repository = "https://github.com/aylur/girgen"
-exclude = ["/flake.nix", "/flake.lock", "/package.json"]
+exclude = ["/flake.nix", "/flake.lock", "/package.json", "/package-lock.json", "/bin"]
 
 [dependencies]
 quick-xml = "0"
