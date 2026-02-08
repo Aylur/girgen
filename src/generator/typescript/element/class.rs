@@ -73,9 +73,9 @@ fn collect_properties(
                     jsdoc => doc::jsdoc_with_args(&doc_args).ok(),
                     name => &p.name,
                     type => t,
-                    readable => p.readable,
-                    writable => p.writable,
-                    construct_only => p.construct_only,
+                    readable => p.readable.is_none_or(|r| r),
+                    writable => p.writable.is_none_or(|w| w),
+                    construct_only => p.construct_only.is_some_and(|co| co),
                 }),
                 Err(err) => {
                     (ctx.event)(Event::Failed {
