@@ -1087,4 +1087,22 @@ namespace GObject {
          */
         unset(): void
     }
+
+    /**
+     * A function to be called to transform `from_value` to `to_value`.
+     *
+     * If this is the `transform_to` function of a binding, then `from_value`
+     * is the `source_property` on the `source` object, and `to_value` is the
+     * `target_property` on the `target` object. If this is the
+     * `transform_from` function of a %G_BINDING_BIDIRECTIONAL binding,
+     * then those roles are reversed.
+     * @since 2.26
+     * @param binding a #GBinding
+     * @param from_value the #GValue containing the value to transform
+     * @returns tuple `%TRUE` if the transformation was successful, and `false` otherwise, the #GValue in which to store the transformed value
+     */
+    type BindingTransformFunc = (
+        binding: Binding,
+        from_value: Value,
+    ) => [success: boolean, to_value: Value]
 }

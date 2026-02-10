@@ -23,6 +23,7 @@ pub const OVERRIDES: &[Override] = &[
             "signal_handlers_disconnect_matched",
             "ParamSpec",
             "Value",
+            "BindingTransformFunc",
         ],
         classes: &[ClassOverride {
             name: "Object",
