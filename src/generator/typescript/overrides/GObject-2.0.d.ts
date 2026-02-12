@@ -223,6 +223,60 @@ namespace GObject {
          * @param detailedName Name of the signal to stop emission of
          */
         stop_emission_by_name(detailedName: string): void
+
+        /**
+         * Creates a binding between `source_property` on `source` and `target_property`
+         * on `target`, allowing you to set the transformation functions to be used by
+         * the binding.
+         *
+         * @since 2.26
+         * @param source_property the property on `source` to bind
+         * @param target the target #GObject
+         * @param target_property the property on `target` to bind
+         * @param flags flags to pass to #GBinding
+         * @param transform_to a #GClosure wrapping the transformation function
+            from the `source` to the `target`, or %NULL to use the default
+         * @param transform_from a #GClosure wrapping the transformation function
+            from the @target to the `source`, or %NULL to use the default
+         * @returns the #GBinding instance representing the     binding between the two #GObject instances. The binding is released     whenever the #GBinding reference count reaches zero.
+         */
+        bind_property_full(
+            source_property: string,
+            target: Object,
+            target_property: string,
+            flags: BindingFlags,
+            transform_to: BindingTransformFunc | null,
+            transform_from: BindingTransformFunc | null,
+        ): Binding
+    }
+
+    interface ObjectGroup {
+        /**
+         * Creates a binding between `source_property` on the source object and
+         * `target_property` on @target, allowing you to set the transformation
+         * functions to be used by the binding. The binding flag
+         * %G_BINDING_SYNC_CREATE is automatically specified.
+         *
+         * @since 2.72
+         * @param source_property the property on the source to bind
+         * @param target the target #GObject
+         * @param target_property the property on @target to bind
+         * @param flags the flags used to create the #GBinding
+         * @param transform_to a #GClosure wrapping the
+            transformation function from the source object to the @target,
+            or %NULL to use the default
+         * @param transform_from a #GClosure wrapping the
+            transformation function from the @target to the source object,
+            or %NULL to use the default
+         */
+        bind_full(
+            source_property: string,
+            target: Object,
+            target_property: string,
+            flags: BindingFlags,
+            transform_to: BindingTransformFunc | null,
+            transform_from: BindingTransformFunc | null,
+        ): void
     }
 
     function registerClass<Class extends GObjectConstructor>(

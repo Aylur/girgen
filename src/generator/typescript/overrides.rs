@@ -25,21 +25,28 @@ pub const OVERRIDES: &[Override] = &[
             "Value",
             "BindingTransformFunc",
         ],
-        classes: &[ClassOverride {
-            name: "Object",
-            methods: &[
-                "get_data",
-                "get_qdata",
-                "set_data",
-                "set_qdata",
-                "steal_data",
-                "steal_qdata",
-                "force_floating",
-                "ref",
-                "ref_sink",
-                "unref",
-            ],
-        }],
+        classes: &[
+            ClassOverride {
+                name: "BindingGroup",
+                methods: &["bind_full"],
+            },
+            ClassOverride {
+                name: "Object",
+                methods: &[
+                    "bind_property_full",
+                    "get_data",
+                    "get_qdata",
+                    "set_data",
+                    "set_qdata",
+                    "steal_data",
+                    "steal_qdata",
+                    "force_floating",
+                    "ref",
+                    "ref_sink",
+                    "unref",
+                ],
+            },
+        ],
     },
     Override {
         namespace: "Gio",
