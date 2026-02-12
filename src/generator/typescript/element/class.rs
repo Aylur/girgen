@@ -251,12 +251,14 @@ impl render::Renderable for element::Interface {
     }
 
     fn ctx(&self, ctx: &render::Context) -> Result<minijinja::Value, String> {
-        let extends: Vec<&String> = self
-            .prerequisites
-            .iter()
-            .map(|p| &p.name)
-            .chain(self.implements.iter().map(|i| &i.name))
-            .collect();
+        let prereqs: Vec<&str> = match self.prerequisites.len() {
+            0 => vec!["GObject.Object"],
+            _ => self.prerequisites.iter().map(|p| p.name.as_ref()).collect(),
+        };
+
+        let impls: Vec<&str> = self.implements.iter().map(|i| i.name.as_ref()).collect();
+
+        let extends: Vec<&str> = [prereqs, impls].concat();
 
         let signals = collect_signals(ctx, &self.signals);
         let properties = collect_properties(ctx, &self.properties, &self.methods);

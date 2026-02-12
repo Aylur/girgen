@@ -369,6 +369,13 @@ namespace GObject {
     const Type: PrimitiveConstructor<GType, string>
     const TYPE_GTYPE: GType<GType>
 
+    namespace ParamSpec {
+        interface SignalSignatures {}
+        interface ReadableProperties {}
+        interface WritableProperties {}
+        interface ConstructOnlyProperties {}
+    }
+
     /**
      * A GObject parameter specification that defines property characteristics.
      * See [gjs.guide](https://gjs.guide/guides/gobject/basics.html#properties).
