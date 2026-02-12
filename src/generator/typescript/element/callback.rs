@@ -27,7 +27,6 @@ impl render::Renderable for element::Callback {
             info_elements: &self.info_elements,
             info: &self.info,
             throws: self.throws,
-            overrides: false,
             prefix: Some(&format!("type {} = ", self.name)),
             name: None,
             parameters: self.parameter.as_ref(),

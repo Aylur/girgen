@@ -18,7 +18,6 @@ fn collect_signals(ctx: &render::Context, signals: &[element::Signal]) -> Vec<St
                 info_elements: &s.info_elements,
                 info: &s.info,
                 throws: None,
-                overrides: false,
                 prefix: None,
                 name: Some(&format!("\"{}{}\"", s.name, detail_suffix)),
                 parameters: s.parameters.as_ref(),
@@ -64,7 +63,6 @@ fn collect_properties(
                 parameters: None,
                 returns: None,
                 throws: None,
-                overrides: false,
                 default_value: p.default_value.as_deref(),
             };
 

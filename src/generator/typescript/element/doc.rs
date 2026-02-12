@@ -31,7 +31,6 @@ pub struct DocArgs<'a> {
     pub parameters: Option<&'a element::Parameters>,
     pub returns: Option<&'a element::ReturnValue>,
     pub throws: Option<bool>,
-    pub overrides: bool,
     pub default_value: Option<&'a str>,
 }
 
@@ -51,7 +50,6 @@ pub fn jsdoc(
         parameters: None,
         returns: None,
         throws: None,
-        overrides: false,
         default_value: None,
     };
     jsdoc_with_args(&args)
@@ -108,7 +106,6 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
     let ctx = minijinja::context! {
         text_lines => text_lines,
         throws => args.throws,
-        overrides => args.overrides,
         since => args.info.version,
         deprecated => args.info.deprecated,
         deprecated_since => args.info.deprecated_version,

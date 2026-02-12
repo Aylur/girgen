@@ -33,7 +33,6 @@ pub struct CallableArgs<'a> {
     pub info_elements: &'a [element::InfoElement],
     pub info: &'a element::InfoAttrs,
     pub throws: Option<bool>,
-    pub overrides: bool,
     pub prefix: Option<&'a str>,
     pub name: Option<&'a str>,
     pub parameters: Option<&'a element::Parameters>,
@@ -106,7 +105,6 @@ pub fn render(args: &CallableArgs) -> Result<String, String> {
             parameters: args.parameters,
             returns: args.returns,
             throws: args.throws,
-            overrides: args.overrides,
             default_value: None,
         };
         doc::jsdoc_with_args(&args)?
@@ -132,18 +130,38 @@ pub fn render(args: &CallableArgs) -> Result<String, String> {
 }
 
 macro_rules! callable_args {
-    ($callable:expr, $prefix:expr) => {
+    ($callable:expr, $prefix:expr, $name:expr) => {{
         CallableArgs {
             info_elements: &$callable.info_elements,
             info: &$callable.attrs.info,
             throws: $callable.attrs.throws,
-            overrides: $callable.attrs.shadows.is_some(),
             prefix: Some($prefix),
-            name: Some(&$callable.attrs.name),
+            name: Some($name),
             parameters: $callable.parameters.as_ref(),
             returns: $callable.return_value.as_ref(),
         }
-    };
+    }};
+}
+
+macro_rules! callable_name {
+    ($callable:expr) => {{
+        match &$callable.attrs.shadows {
+            Some(name) => name,
+            None => &$callable.attrs.name,
+        }
+    }};
+}
+
+macro_rules! callable_filter {
+    ($callable:expr) => {{
+        match &$callable.attrs.shadows {
+            Some(_) => true,
+            None => match &$callable.attrs.shadowed_by {
+                Some(_) => false,
+                None => $callable.attrs.info.introspectable.is_none_or(|i| i),
+            },
+        }
+    }};
 }
 
 pub enum CallableElement<'a> {
@@ -161,19 +179,12 @@ pub fn render_callable_elements(
     elements
         .iter()
         .filter(|i| match i {
-            CallableElement::Constructor(i) => i.attrs.info.introspectable.is_none_or(|i| i),
-            CallableElement::Function(i) => i.attrs.info.introspectable.is_none_or(|i| i),
-            CallableElement::Method(i) => i.attrs.info.introspectable.is_none_or(|i| i),
-            CallableElement::VirtualMethod(i) => i.attrs.info.introspectable.is_none_or(|i| i),
+            CallableElement::Constructor(i) => callable_filter!(i),
+            CallableElement::Function(i) => callable_filter!(i),
+            CallableElement::Method(i) => callable_filter!(i),
+            CallableElement::VirtualMethod(i) => callable_filter!(i),
         })
         .filter_map(|i| {
-            let args = match i {
-                CallableElement::Constructor(i) => callable_args!(i, prefix),
-                CallableElement::Function(i) => callable_args!(i, prefix),
-                CallableElement::Method(i) => callable_args!(i, prefix),
-                CallableElement::VirtualMethod(i) => callable_args!(i, prefix),
-            };
-
             let kind = match i {
                 CallableElement::Constructor(_) => "constructor",
                 CallableElement::Function(_) => "function",
@@ -182,10 +193,17 @@ pub fn render_callable_elements(
             };
 
             let name = match i {
-                CallableElement::Constructor(i) => &i.attrs.name,
-                CallableElement::Function(i) => &i.attrs.name,
-                CallableElement::Method(i) => &i.attrs.name,
-                CallableElement::VirtualMethod(i) => &i.attrs.name,
+                CallableElement::Constructor(i) => callable_name!(i),
+                CallableElement::Function(i) => callable_name!(i),
+                CallableElement::Method(i) => callable_name!(i),
+                CallableElement::VirtualMethod(i) => callable_name!(i),
+            };
+
+            let args = match i {
+                CallableElement::Constructor(i) => callable_args!(i, prefix, name),
+                CallableElement::Function(i) => callable_args!(i, prefix, name),
+                CallableElement::Method(i) => callable_args!(i, prefix, name),
+                CallableElement::VirtualMethod(i) => callable_args!(i, prefix, name),
             };
 
             match render(&args) {

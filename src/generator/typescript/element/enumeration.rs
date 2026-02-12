@@ -41,11 +41,11 @@ macro_rules! render_functions {
                             if !f.introspectable($ctx) {
                                 return None;
                             }
+
                             let args = callable::CallableArgs {
                                 info_elements: &f.info_elements,
                                 info: &f.attrs.info,
                                 throws: f.attrs.throws,
-                                overrides: f.attrs.shadows.is_some(),
                                 prefix: Some("function "),
                                 name: Some(&remove_prefix(&f.attrs.name, &ns_prefixes)),
                                 parameters: f.parameters.as_ref(),

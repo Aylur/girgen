@@ -27,9 +27,11 @@ impl render::Renderable for element::Function {
             info_elements: &self.info_elements,
             info: &self.attrs.info,
             throws: self.attrs.throws,
-            overrides: self.attrs.shadows.is_some(),
             prefix: Some("function "),
-            name: Some(&self.attrs.name),
+            name: Some(match &self.attrs.shadows {
+                Some(name) => name,
+                None => &self.attrs.name,
+            }),
             parameters: self.parameters.as_ref(),
             returns: self.return_value.as_ref(),
         };
