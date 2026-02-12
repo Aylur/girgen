@@ -1,5 +1,6 @@
 use super::{AnyElement, Attribute, Attrs, DocElement};
 
+#[derive(Debug, Clone)]
 pub struct InfoAttrs {
     pub introspectable: Option<bool>,
     pub deprecated: Option<bool>,
@@ -8,6 +9,7 @@ pub struct InfoAttrs {
     pub stability: Option<String>, // "Stable" | "Unstable" | "Private"
 }
 
+#[derive(Debug, Clone)]
 pub enum InfoElement {
     Annotation(Attribute),
     DocElement(DocElement),

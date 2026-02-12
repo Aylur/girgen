@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Namespace {
     pub name: String,
     pub version: String,

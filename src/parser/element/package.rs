@@ -1,5 +1,6 @@
 use super::{Attrs, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Package {
     pub name: String,
 }

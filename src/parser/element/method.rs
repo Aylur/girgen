@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, CallableAttrs, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Method {
     pub attrs: CallableAttrs,
     pub glib_set_property: Option<String>,
@@ -9,6 +10,7 @@ pub struct Method {
     pub return_value: Option<super::ReturnValue>,
 }
 
+#[derive(Debug, Clone)]
 pub struct MethodInline {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,
@@ -16,6 +18,7 @@ pub struct MethodInline {
     pub return_value: Option<super::ReturnValue>,
 }
 
+#[derive(Debug, Clone)]
 pub struct VirtualMethod {
     pub attrs: CallableAttrs,
     pub invoker: Option<String>,

@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, CallableAttrs, DocElement, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Function {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,
@@ -7,6 +8,7 @@ pub struct Function {
     pub return_value: Option<super::ReturnValue>,
 }
 
+#[derive(Debug, Clone)]
 pub struct FunctionInline {
     pub attrs: CallableAttrs,
     pub parameters: Option<super::Parameters>,
@@ -14,6 +16,7 @@ pub struct FunctionInline {
     pub doc_elements: Vec<DocElement>,
 }
 
+#[derive(Debug, Clone)]
 pub struct FunctionMacro {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,

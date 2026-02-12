@@ -1,5 +1,6 @@
 use super::{AnyElement, AnyType, Attrs, InfoAttrs, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Alias {
     pub info: InfoAttrs,
     pub name: String,

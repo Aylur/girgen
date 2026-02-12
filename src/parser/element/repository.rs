@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Repository {
     pub version: Option<String>,
     pub c_identifier_prefixes: Option<String>,
@@ -12,9 +13,25 @@ pub struct Repository {
     pub doc_formats: Vec<super::DocFormat>,
 }
 
+#[derive(Debug, Clone)]
 pub struct Include {
     pub name: String,
     pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct CInclude {
+    pub name: String,
+}
+
+impl super::Element for CInclude {
+    const KIND: &'static str = "c:include";
+
+    fn new(attrs: &Attrs) -> Result<Self, ParseError> {
+        Ok(Self {
+            name: attrs.get_string("name")?,
+        })
+    }
 }
 
 impl super::Element for Include {

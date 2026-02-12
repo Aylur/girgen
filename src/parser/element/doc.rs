@@ -1,10 +1,12 @@
 use super::{AnyElement, Attrs, DocElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct DocFormat {
     // Valid values are: gi-docgen, gtk-doc-docbook, gtk-doc-markdown, hotdoc, unknown.
     pub name: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct DocSection {
     pub name: String,
     pub elements: Vec<DocElement>,

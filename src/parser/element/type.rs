@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, DocElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Type {
     pub name: Option<String>,
     pub c_type: Option<String>,
@@ -9,6 +10,7 @@ pub struct Type {
     pub elements: Vec<AnyType>,
 }
 
+#[derive(Debug, Clone)]
 pub struct Array {
     pub name: Option<String>,
     pub c_type: Option<String>,
@@ -20,6 +22,7 @@ pub struct Array {
     pub elements: Vec<AnyType>,
 }
 
+#[derive(Debug, Clone)]
 pub enum AnyType {
     Type(Type),
     Array(Array),

@@ -1,5 +1,6 @@
 use super::{AnyElement, AnyType, Attrs, DocElement, InfoAttrs, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct CallableAttrs {
     pub info: InfoAttrs,
     pub name: String,
@@ -13,13 +14,16 @@ pub struct CallableAttrs {
     pub glib_finish_func: Option<String>,
 }
 
+#[derive(Debug, Clone)]
 pub struct VarArgs;
 
+#[derive(Debug, Clone)]
 pub struct Parameters {
     pub instance_parameter: Option<InstanceParameter>,
     pub parameters: Vec<Parameter>,
 }
 
+#[derive(Debug, Clone)]
 pub struct InstanceParameter {
     pub name: String,
     pub nullable: Option<bool>,
@@ -31,6 +35,7 @@ pub struct InstanceParameter {
     pub doc_elements: Vec<DocElement>,
 }
 
+#[derive(Debug, Clone)]
 pub struct Parameter {
     pub name: Option<String>,
     pub nullable: Option<bool>,
@@ -50,6 +55,7 @@ pub struct Parameter {
     pub annotations: Vec<super::Attribute>,
 }
 
+#[derive(Debug, Clone)]
 pub struct ReturnValue {
     pub introspectable: Option<bool>,
     pub nullable: Option<bool>,

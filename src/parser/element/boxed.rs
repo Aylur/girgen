@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, InfoAttrs, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Boxed {
     pub info: InfoAttrs,
     pub glib_name: String,

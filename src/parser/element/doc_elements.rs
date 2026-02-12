@@ -1,17 +1,20 @@
 use super::{AnyElement, Attrs, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct DocVersion {
     pub xml_space: Option<String>,
     pub xml_whitespace: Option<String>,
     pub text: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct DocStability {
     pub xml_space: Option<String>,
     pub xml_whitespace: Option<String>,
     pub text: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct Doc {
     pub xml_space: Option<String>,
     pub xml_whitespace: Option<String>,
@@ -21,18 +24,21 @@ pub struct Doc {
     pub text: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct DocDeprecated {
     pub xml_space: Option<String>,
     pub xml_whitespace: Option<String>,
     pub text: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct SourcePosition {
     pub filename: String,
     pub line: String,
     pub column: Option<String>,
 }
 
+#[derive(Debug, Clone)]
 pub enum DocElement {
     DocVersion(DocVersion),
     DocStability(DocStability),

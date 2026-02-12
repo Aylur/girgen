@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, InfoAttrs, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Member {
     pub info: InfoAttrs,
 

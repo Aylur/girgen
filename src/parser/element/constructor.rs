@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, CallableAttrs, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Constructor {
     pub attrs: CallableAttrs,
     pub info_elements: Vec<InfoElement>,

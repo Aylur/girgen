@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, InfoAttrs, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Interface {
     pub info: InfoAttrs,
     pub name: String,
@@ -25,6 +26,7 @@ pub struct Interface {
     pub constants: Vec<super::Constant>,
 }
 
+#[derive(Debug, Clone)]
 pub struct Prerequisite {
     pub name: String,
 }

@@ -1,5 +1,6 @@
 use super::{AnyElement, Attrs, InfoAttrs, InfoElement, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Class {
     pub info: InfoAttrs,
     pub name: String,
@@ -34,6 +35,7 @@ pub struct Class {
     pub callbacks: Vec<super::Callback>,
 }
 
+#[derive(Debug, Clone)]
 pub struct Implements {
     pub name: String,
 }

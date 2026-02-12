@@ -1,5 +1,6 @@
 use super::{Attrs, ParseError};
 
+#[derive(Debug, Clone)]
 pub struct Attribute {
     pub name: String,
     pub value: String,
