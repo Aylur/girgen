@@ -139,13 +139,31 @@ impl render::Renderable for element::Class {
                 .collect::<Vec<_>>(),
         );
 
+        let ctors = self
+            .constructors
+            .iter()
+            .map(|ctor| {
+                let mut c = ctor.clone();
+                c.return_value = ctor.return_value.as_ref().map(|r| element::ReturnValue {
+                    r#type: Some(element::AnyType::Type(element::Type {
+                        name: Some(self.name.clone()),
+                        c_type: None,
+                        introspectable: None,
+                        doc_elements: Vec::new(),
+                        elements: Vec::new(),
+                    })),
+                    ..r.clone()
+                });
+                c
+            })
+            .collect::<Vec<_>>();
+
         // TODO: consider overriding return value with self.name
         // example: currently `Adw.AboutDialog.new` returns `Adw.Dialog`
         let constructors = callable::render_callable_elements(
             ctx,
             "",
-            &self
-                .constructors
+            &ctors
                 .iter()
                 .map(callable::CallableElement::Constructor)
                 .collect::<Vec<_>>(),
