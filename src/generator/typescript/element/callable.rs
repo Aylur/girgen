@@ -11,11 +11,18 @@ struct Parameter<'a> {
     tstype: String,
 }
 
-// https://gitlab.gnome.org/GNOME/gjs/-/blob/master/doc/Mapping.md#gtype-objects
-fn override_parameter_type(name: &str) -> String {
+fn override_parameter_type(name: &str) -> &str {
     match name {
-        "GObject.GType" => "(GObject.GType | { $gtype: GObject.GType })".to_owned(),
-        _ => name.to_owned(),
+        "GObject.Value" => "(GObject.Value | unknown)",
+        "GObject.GType" => "(GObject.GType | { $gtype: GObject.GType })",
+        _ => name,
+    }
+}
+
+fn override_return_type(name: &str) -> &str {
+    match name {
+        "GObject.Value" => "unknown",
+        _ => name,
     }
 }
 
@@ -53,7 +60,7 @@ pub fn render(args: &CallableArgs) -> Result<String, String> {
             let t = gtype::tstype(p.r#type.as_ref(), p.nullable.is_some_and(|n| n))?;
             Ok(Parameter {
                 name: filter_keyword(p.name.as_deref()),
-                tstype: override_parameter_type(t.as_str()),
+                tstype: override_parameter_type(&t).to_owned(),
             })
         })
         .collect();
@@ -72,7 +79,10 @@ pub fn render(args: &CallableArgs) -> Result<String, String> {
             p_returns
                 .into_iter()
                 .filter(|p| p.optional.is_none_or(|o| !o))
-                .map(|p| gtype::tstype(p.r#type.as_ref(), p.nullable.is_some_and(|n| n))),
+                .map(|p| {
+                    gtype::tstype(p.r#type.as_ref(), p.nullable.is_some_and(|n| n))
+                        .map(|t| override_return_type(&t).to_owned())
+                }),
         )
         .collect();
 
@@ -95,20 +105,16 @@ pub fn render(args: &CallableArgs) -> Result<String, String> {
     }
 
     let returns: Vec<String> = return_results.into_iter().map(|r| r.unwrap()).collect();
-
     let parameters: Vec<Parameter> = parameter_results.into_iter().map(|p| p.unwrap()).collect();
 
-    let jsdoc = {
-        let args = doc::DocArgs {
-            info_elements: args.info_elements,
-            info: args.info,
-            parameters: args.parameters,
-            returns: args.returns,
-            throws: args.throws,
-            default_value: None,
-        };
-        doc::jsdoc_with_args(&args)?
-    };
+    let jsdoc = doc::jsdoc_with_args(&doc::DocArgs {
+        info_elements: args.info_elements,
+        info: args.info,
+        parameters: args.parameters,
+        returns: args.returns,
+        throws: args.throws,
+        default_value: None,
+    })?;
 
     let name = args.name.map(|name| match name {
         "new" => "\"new\"",
