@@ -158,8 +158,6 @@ impl render::Renderable for element::Class {
             })
             .collect::<Vec<_>>();
 
-        // TODO: consider overriding return value with self.name
-        // example: currently `Adw.AboutDialog.new` returns `Adw.Dialog`
         let constructors = callable::render_callable_elements(
             ctx,
             "",

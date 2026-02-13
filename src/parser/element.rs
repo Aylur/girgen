@@ -149,7 +149,6 @@ pub enum AnyElement {
     VirtualMethod(VirtualMethod),
 }
 
-// TODO: benchmark vs Box<dyn Element> to reduce these
 impl AnyElement {
     pub fn kind(&self) -> &'static str {
         match self {
