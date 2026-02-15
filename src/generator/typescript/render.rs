@@ -11,7 +11,7 @@ pub struct Context<'a> {
 #[derive(serde::Serialize)]
 pub struct RenderedElement {
     pub name: String,
-    pub content: Option<String>,
+    pub content: String,
 }
 
 pub trait Renderable {
@@ -33,13 +33,6 @@ pub trait Renderable {
     fn name(&self, _ctx: &Context) -> &str;
 
     fn render(&self, ctx: &Context) -> Result<RenderedElement, String> {
-        if !self.introspectable(ctx) {
-            return Ok(RenderedElement {
-                name: self.name(ctx).to_string(),
-                content: None,
-            });
-        }
-
         let jinja_ctx = match self.ctx(ctx) {
             Ok(ctx) => ctx,
             Err(err) => {
@@ -65,7 +58,7 @@ pub trait Renderable {
             )),
             Ok(res) => Ok(RenderedElement {
                 name: self.name(ctx).to_string(),
-                content: Some(res),
+                content: res,
             }),
         }
     }
@@ -79,6 +72,10 @@ fn render<T: Renderable + Sync>(items: &[T], ctx: &Context) -> Vec<RenderedEleme
     items
         .par_iter()
         .filter_map(|elem| {
+            if !elem.introspectable(ctx) {
+                return None;
+            }
+
             if overrides.is_some_and(|o| o.toplevel.iter().any(|n| *n == elem.name(ctx))) {
                 return None;
             }

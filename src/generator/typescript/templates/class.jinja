@@ -34,7 +34,9 @@ interface {{ name_class }}{% if parent_class %} extends Omit<{{ parent_class }},
     readonly $gtype: GObject.GType<{{ name }}>
     readonly prototype: {{ name }}
 
-    {%- if not is_abstract %}
+    {%- if is_abstract %}
+    [Symbol.hasInstance](instance: unknown): instance is {{ name }}
+    {%- else %}
     new (props?: Partial<GObject.ConstructorProps<{{ name }}>>): {{ name }}
     {%- endif %}
 
