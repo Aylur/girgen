@@ -1165,5 +1165,5 @@ namespace GObject {
     type BindingTransformFunc = (
         binding: Binding,
         from_value: Value,
-    ) => [success: boolean, to_value: Value]
+    ) => [success: boolean, to_value: Value | unknown]
 }
