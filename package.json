@@ -1,6 +1,6 @@
 {
     "name": "girgen",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "author": "Aylur",
     "license": "MIT",
     "repository": {
@@ -23,7 +23,7 @@
         "@types/node": "latest"
     },
     "optionalDependencies": {
-        "@girgen/linux-x64": "0.2.4"
+        "@girgen/linux-x64": "0.2.5"
     },
     "files": [
         "bin"
