@@ -73,7 +73,7 @@ impl super::Element for DocVersion {
     }
 
     fn text(&mut self, str: &str) -> Result<(), ParseError> {
-        self.text = String::from(str);
+        self.text.push_str(str);
         Ok(())
     }
 }
@@ -90,7 +90,7 @@ impl super::Element for DocStability {
     }
 
     fn text(&mut self, str: &str) -> Result<(), ParseError> {
-        self.text = String::from(str);
+        self.text.push_str(str);
         Ok(())
     }
 }
@@ -110,7 +110,7 @@ impl super::Element for Doc {
     }
 
     fn text(&mut self, str: &str) -> Result<(), ParseError> {
-        self.text = String::from(str);
+        self.text.push_str(str);
         Ok(())
     }
 }
@@ -127,7 +127,7 @@ impl super::Element for DocDeprecated {
     }
 
     fn text(&mut self, str: &str) -> Result<(), ParseError> {
-        self.text = String::from(str);
+        self.text.push_str(str);
         Ok(())
     }
 }

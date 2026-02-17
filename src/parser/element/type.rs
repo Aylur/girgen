@@ -66,11 +66,7 @@ impl super::Element for Type {
                 self.elements.push(ok);
                 Ok(())
             }
-            Err(ele) => Err(ParseError::UnhandledXmlTag(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            Err(ele) => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }
@@ -96,11 +92,7 @@ impl super::Element for Array {
                 self.elements.push(ok);
                 Ok(())
             }
-            Err(ele) => Err(ParseError::UnhandledXmlTag(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            Err(ele) => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }

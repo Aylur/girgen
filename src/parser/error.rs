@@ -2,12 +2,13 @@ use std::fmt;
 
 #[derive(Debug)]
 pub enum ParseError {
-    UnhandledXmlTag(String),
+    InvalidGirElement(String),
     MalformedGir(&'static str),
-    UnexpectedElement(String),
+    UnexpectedElement(&'static str, &'static str),
     MissingAttribute(String),
     XmlError(quick_xml::Error),
     EncodeError(quick_xml::encoding::EncodingError),
+    AttrError(quick_xml::events::attributes::AttrError),
     Utf8Error(std::string::FromUtf8Error),
 }
 
@@ -32,13 +33,16 @@ impl From<quick_xml::encoding::EncodingError> for ParseError {
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ParseError::UnhandledXmlTag(tag) => write!(f, "unhandled XML tag: {tag}"),
+            ParseError::InvalidGirElement(tag) => write!(f, "unknown GIR element: {tag}"),
             ParseError::MalformedGir(msg) => write!(f, "malformed GIR: {msg}"),
-            ParseError::UnexpectedElement(el) => write!(f, "unexpected element: {el}"),
+            ParseError::UnexpectedElement(parent, child) => {
+                write!(f, "unexpected element: {parent}>{child}")
+            }
             ParseError::MissingAttribute(attr) => write!(f, "missing attribute: {attr}"),
             ParseError::XmlError(err) => write!(f, "XML error: {err}"),
             ParseError::EncodeError(err) => write!(f, "encoding error: {err}"),
             ParseError::Utf8Error(err) => write!(f, "utf-8 error: {err}"),
+            ParseError::AttrError(err) => write!(f, "decoding error: {err}"),
         }
     }
 }

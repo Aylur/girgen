@@ -53,11 +53,7 @@ impl super::Element for Field {
                 self.callback = Some(c);
                 Ok(())
             }
-            ele => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            ele => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }

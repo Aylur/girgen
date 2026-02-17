@@ -279,96 +279,6 @@ namespace GObject {
         ): void
     }
 
-    function registerClass<Class extends GObjectConstructor>(
-        klass: Class,
-    ): Class
-
-    function registerClass<
-        Class extends GObjectConstructor,
-        Properties extends Record<string, ParamSpec>,
-        Interfaces extends Array<{ readonly $gtype: GType }>,
-        Signals extends Record<string, SignalHandlerOptions>,
-    >(
-        options: {
-            GTypeName?: string
-            GTypeFlags?: TypeFlags
-            Requires?: Array<{ $gtype: GType }>
-            Properties?: Properties
-            Signals?: Signals
-            Implements?: Interfaces
-            CssName?: string
-            Template?: string | GLib.Bytes | Uint8Array
-            Children?: string[]
-            InternalChildren?: string[]
-        },
-        klass: Class,
-    ): Class
-
-    /** @see {Object.$gtype} */
-    let gtypeNameBasedOnJSPath: boolean
-
-    const VoidType: PrimitiveConstructor<void>
-    const TYPE_NONE: GType<void>
-
-    const Char: PrimitiveConstructor<number>
-    const TYPE_CHAR: GType<number>
-
-    const UChar: PrimitiveConstructor<number>
-    const TYPE_UCHAR: GType<number>
-
-    // This is weird, GObject.type_from_name("gunichar") is `null`
-    // and why does GJS map them to a gint and String?
-    // const UniChar: PrimitiveConstructor<string>
-    // const TYPE_UNICHAR: GType<number>
-    const UniChar: PrimitiveConstructor<never>
-    const TYPE_UNICHAR: GType<never>
-
-    const Boolean: globalThis.BooleanConstructor
-    const TYPE_BOOLEAN: GType<boolean>
-
-    const Int: PrimitiveConstructor<number>
-    const TYPE_INT: GType<number>
-
-    const UInt: PrimitiveConstructor<number>
-    const TYPE_UINT: GType<number>
-
-    const Long: PrimitiveConstructor<number>
-    const TYPE_LONG: GType<number>
-
-    const ULong: PrimitiveConstructor<number>
-    const TYPE_ULONG: GType<number>
-
-    const Int64: PrimitiveConstructor<number>
-    const TYPE_INT64: GType<number>
-
-    const UInt64: PrimitiveConstructor<number>
-    const TYPE_UINT64: GType<number>
-
-    const TYPE_ENUM: GType<number>
-    const TYPE_FLAGS: GType<number>
-
-    const Float: PrimitiveConstructor<number>
-    const TYPE_FLOAT: GType<number>
-
-    const Double: globalThis.NumberConstructor
-    const TYPE_DOUBLE: GType<number>
-
-    const String: globalThis.StringConstructor
-    const TYPE_STRING: GType<string>
-
-    const JSObject: globalThis.ObjectConstructor
-    const TYPE_JSOBJECT: GType<object>
-
-    const TYPE_POINTER: GType<never>
-    const TYPE_BOXED: GType<unknown>
-    const TYPE_PARAM: GType<ParamSpec>
-    const TYPE_INTERFACE: GType<unknown> // should this be GObject.Interface?
-    const TYPE_OBJECT: GType<Object>
-    const TYPE_VARIANT: GType<GLib.Variant>
-
-    const Type: PrimitiveConstructor<GType, string>
-    const TYPE_GTYPE: GType<GType>
-
     namespace ParamSpec {
         interface SignalSignatures {}
         interface ReadableProperties {}
@@ -763,9 +673,7 @@ namespace GObject {
         ): ParamSpec<T>
     }
 
-    const ParamSpec: ParamSpecClass
-
-    export class Interface<T = unknown> extends Object {
+    interface InterfaceConstructor<T = unknown> {
         // TODO: come up with an API
     }
 
@@ -773,152 +681,40 @@ namespace GObject {
      * Use this to signify a function that must be overridden in an
      * implementation of the interface.
      */
-    class NotImplementedError extends globalThis.Error {
+    interface NotImplementedErrorConstructor
+        extends globalThis.ErrorConstructor {
+        new (
+            message?: string,
+            options?: globalThis.ErrorOptions,
+        ): NotImplementedError
+    }
+
+    interface NotImplementedError extends globalThis.Error {
         get name(): "NotImplementedError"
     }
 
-    const GTypeName: unique symbol
-    const requires: unique symbol
-    const interfaces: unique symbol
-    const properties: unique symbol
-    const signals: unique symbol
+    interface AccumulatorTypeEnum {
+        /**
+         * This is the default.
+         */
+        NONE: 0
+        /**
+         * This accumulator will use the return value of the first handler that is run.
+         * A signal with this accumulator may have a return of any type.
+         */
+        FIRST_WINS: 1
+        /**
+         * This accumulator will stop emitting once a handler returns `true`.
+         * A signal with this accumulator must have a return type of `GObject.TYPE_BOOLEAN`.
+         */
+        TRUE_HANDLED: 2
+    }
 
     /**
      * Signal accumulation behavior.
      * See {@link GObject.registerClass} and {@link SignalHandlerOptions}
      */
-    enum AccumulatorType {
-        /**
-         * This is the default.
-         */
-        NONE,
-        /**
-         * This accumulator will use the return value of the first handler that is run.
-         * A signal with this accumulator may have a return of any type.
-         */
-        FIRST_WINS,
-        /**
-         * This accumulator will stop emitting once a handler returns `true`.
-         * A signal with this accumulator must have a return type of `GObject.TYPE_BOOLEAN`.
-         */
-        TRUE_HANDLED,
-    }
-
-    /**
-     * Finds the first signal handler that matches certain selection criteria.
-     * The criteria are passed as properties of a match object.
-     * The match object has to be non-empty for successful matches.
-     * If no handler was found, a falsy value is returned.
-     *
-     * @param instance the instance owning the signal handler to be found.
-     * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
-     * @returns A valid non-0 signal handler ID for a successful match.
-     */
-    function signal_handler_find(
-        instance: Object,
-        match: SignalMatch,
-    ): number | bigint | object | null
-
-    /**
-     * Blocks all handlers on an instance that match certain selection criteria.
-     * The criteria are passed as properties of a match object.
-     * The match object has to have at least `func` for successful matches.
-     * If no handlers were found, 0 is returned, the number of blocked handlers
-     * otherwise.
-     *
-     * @param instance the instance owning the signal handler to be found.
-     * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
-     * @returns The number of handlers that matched.
-     */
-    function signal_handlers_block_matched(
-        instance: Object,
-        match: SignalMatch,
-    ): number
-
-    /**
-     * Unblocks all handlers on an instance that match certain selection
-     * criteria.
-     * The criteria are passed as properties of a match object.
-     * The match object has to have at least `func` for successful matches.
-     * If no handlers were found, 0 is returned, the number of unblocked
-     * handlers otherwise.
-     * The match criteria should not apply to any handlers that are not
-     * currently blocked.
-     *
-     * @param instance the instance owning the signal handler to be found.
-     * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
-     * @returns The number of handlers that matched.
-     */
-    function signal_handlers_unblock_matched(
-        instance: Object,
-        match: SignalMatch,
-    ): number
-
-    /**
-     * Disconnects all handlers on an instance that match certain selection
-     * criteria.
-     * The criteria are passed as properties of a match object.
-     * The match object has to have at least `func` for successful matches.
-     * If no handlers were found, 0 is returned, the number of disconnected
-     * handlers otherwise.
-     *
-     * @param instance the instance owning the signal handler to be found.
-     * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
-     * @returns The number of handlers that matched.
-     */
-    function signal_handlers_disconnect_matched(
-        instance: Object,
-        match: SignalMatch,
-    ): number
-
-    /**
-     * Blocks all handlers on an instance that match `func`.
-     *
-     * @param instance the instance to block handlers from.
-     * @param func the callback function the handler will invoke.
-     * @returns The number of handlers that matched.
-     */
-    function signal_handlers_block_by_func(
-        instance: Object,
-        func: Function,
-    ): number
-
-    /**
-     * Disconnects all handlers on an instance that match `func`.
-     *
-     * @param instance the instance to remove handlers from.
-     * @param func the callback function the handler will invoke.
-     * @returns The number of handlers that matched.
-     */
-    function signal_handlers_disconnect_by_func(
-        instance: Object,
-        func: Function,
-    ): number
-
-    function type_is_a<T extends Object>(
-        obj: Object,
-        is_a_type: T | GType<T>,
-    ): obj is T
-
-    /** @see Object.connect */
-    function signal_connect<T extends Object>(
-        object: T,
-        name: string,
-        handler: (source: T, ...args: unknown[]) => unknown,
-    ): number
-
-    /** @see Object.connect_after */
-    function signal_connect_after<T extends Object>(
-        object: T,
-        name: string,
-        handler: (source: T, ...args: unknown[]) => unknown,
-    ): number
-
-    /** @see Object.emit */
-    function signal_emit_by_name<T extends Object>(
-        object: T,
-        ...args: unknown[]
-    ): unknown
+    type AccumulatorType = AccumulatorTypeEnum[keyof AccumulatorTypeEnum]
 
     /**
      * A generic value container, usually only used to implement GObject Properties
@@ -930,15 +726,15 @@ namespace GObject {
      * will usually convert them automatically, but there are some situations
      * that require using `GObject.Value` directly.
      */
-    class Value<T = any> {
-        static readonly $gtype: GObject.GType<Value>
+    interface ValueStruct<T = any> {
+        readonly $gtype: GObject.GType<Value>
 
-        constructor()
+        new (): Value<T>
 
-        constructor(
+        new (
             type: GObject.GType<T> | { $gtype: GObject.GType<T> },
             value: T,
-        )
+        ): Value<T>
 
         /**
          * Returns whether a `Value` of type `src_type` can be copied into
@@ -947,10 +743,11 @@ namespace GObject {
          * @param dest_type destination type for copying.
          * @returns `true` if g_value_copy() is possible with `src_type` and `dest_type`.
          */
-        static type_compatible(
+        type_compatible(
             src_type: GObject.GType | { $gtype: GObject.GType },
             dest_type: GObject.GType | { $gtype: GObject.GType },
         ): boolean
+
         /**
          * Check whether g_value_transform() is able to transform values
          * of type `src_type` into values of type `dest_type`. Note that for
@@ -960,11 +757,13 @@ namespace GObject {
          * @param dest_type Target type.
          * @returns `true` if the transformation is possible, `false` otherwise.
          */
-        static type_transformable(
+        type_transformable(
             src_type: GObject.GType | { $gtype: GObject.GType },
             dest_type: GObject.GType | { $gtype: GObject.GType },
         ): boolean
+    }
 
+    interface Value<T = any> {
         /**
          * Copies the value of `src_value` into `dest_value`.
          * @param dest_value An initialized `GValue` structure of the same type as `src_value`.
@@ -1177,4 +976,215 @@ namespace GObject {
         binding: Binding,
         from_value: Value,
     ) => [success: boolean, to_value: Value | unknown]
+
+    interface $Exports {
+        Value: ValueStruct
+        NotImplementedError: NotImplementedErrorConstructor
+        AccumulatorType: AccumulatorTypeEnum
+        ParamSpec: ParamSpecClass
+        Interface: InterfaceConstructor
+
+        GTypeName: symbol
+        requires: symbol
+        interfaces: symbol
+        properties: symbol
+        signals: symbol
+
+        /**
+         * Finds the first signal handler that matches certain selection criteria.
+         * The criteria are passed as properties of a match object.
+         * The match object has to be non-empty for successful matches.
+         * If no handler was found, a falsy value is returned.
+         *
+         * @param instance the instance owning the signal handler to be found.
+         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
+         * @returns A valid non-0 signal handler ID for a successful match.
+         */
+        signal_handler_find(
+            instance: Object,
+            match: SignalMatch,
+        ): number | bigint | object | null
+
+        /**
+         * Blocks all handlers on an instance that match certain selection criteria.
+         * The criteria are passed as properties of a match object.
+         * The match object has to have at least `func` for successful matches.
+         * If no handlers were found, 0 is returned, the number of blocked handlers
+         * otherwise.
+         *
+         * @param instance the instance owning the signal handler to be found.
+         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
+         * @returns The number of handlers that matched.
+         */
+        signal_handlers_block_matched(
+            instance: Object,
+            match: SignalMatch,
+        ): number
+
+        /**
+         * Unblocks all handlers on an instance that match certain selection
+         * criteria.
+         * The criteria are passed as properties of a match object.
+         * The match object has to have at least `func` for successful matches.
+         * If no handlers were found, 0 is returned, the number of unblocked
+         * handlers otherwise.
+         * The match criteria should not apply to any handlers that are not
+         * currently blocked.
+         *
+         * @param instance the instance owning the signal handler to be found.
+         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
+         * @returns The number of handlers that matched.
+         */
+        signal_handlers_unblock_matched(
+            instance: Object,
+            match: SignalMatch,
+        ): number
+
+        /**
+         * Disconnects all handlers on an instance that match certain selection
+         * criteria.
+         * The criteria are passed as properties of a match object.
+         * The match object has to have at least `func` for successful matches.
+         * If no handlers were found, 0 is returned, the number of disconnected
+         * handlers otherwise.
+         *
+         * @param instance the instance owning the signal handler to be found.
+         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
+         * @returns The number of handlers that matched.
+         */
+        signal_handlers_disconnect_matched(
+            instance: Object,
+            match: SignalMatch,
+        ): number
+
+        /**
+         * Blocks all handlers on an instance that match `func`.
+         *
+         * @param instance the instance to block handlers from.
+         * @param func the callback function the handler will invoke.
+         * @returns The number of handlers that matched.
+         */
+        signal_handlers_block_by_func(instance: Object, func: Function): number
+
+        /**
+         * Disconnects all handlers on an instance that match `func`.
+         *
+         * @param instance the instance to remove handlers from.
+         * @param func the callback function the handler will invoke.
+         * @returns The number of handlers that matched.
+         */
+        signal_handlers_disconnect_by_func(
+            instance: Object,
+            func: Function,
+        ): number
+
+        type_is_a<T extends Object>(
+            obj: Object,
+            is_a_type: T | GType<T>,
+        ): obj is T
+
+        /** @see Object.connect */
+        signal_connect<T extends Object>(
+            object: T,
+            name: string,
+            handler: (source: T, ...args: unknown[]) => unknown,
+        ): number
+
+        /** @see Object.connect_after */
+        signal_connect_after<T extends Object>(
+            object: T,
+            name: string,
+            handler: (source: T, ...args: unknown[]) => unknown,
+        ): number
+
+        /** @see Object.emit */
+        signal_emit_by_name<T extends Object>(
+            object: T,
+            ...args: unknown[]
+        ): unknown
+
+        registerClass<Class extends GObjectConstructor>(klass: Class): Class
+
+        registerClass<
+            Class extends GObjectConstructor,
+            Properties extends Record<string, ParamSpec>,
+            Interfaces extends Array<{ readonly $gtype: GType }>,
+            Signals extends Record<string, SignalHandlerOptions>,
+        >(
+            options: {
+                GTypeName?: string
+                GTypeFlags?: TypeFlags
+                Requires?: Array<{ $gtype: GType }>
+                Properties?: Properties
+                Signals?: Signals
+                Implements?: Interfaces
+                CssName?: string
+                Template?: string | GLib.Bytes | Uint8Array
+                Children?: string[]
+                InternalChildren?: string[]
+            },
+            klass: Class,
+        ): Class
+
+        /** @see {Object.$gtype} */
+        gtypeNameBasedOnJSPath: boolean
+
+        VoidType: PrimitiveConstructor<void>
+        TYPE_NONE: GType<void>
+
+        Char: PrimitiveConstructor<number>
+        TYPE_CHAR: GType<number>
+
+        UChar: PrimitiveConstructor<number>
+        TYPE_UCHAR: GType<number>
+
+        UniChar: PrimitiveConstructor<never>
+        TYPE_UNICHAR: GType<never>
+
+        Boolean: globalThis.BooleanConstructor
+        TYPE_BOOLEAN: GType<boolean>
+
+        Int: PrimitiveConstructor<number>
+        TYPE_INT: GType<number>
+
+        UInt: PrimitiveConstructor<number>
+        TYPE_UINT: GType<number>
+
+        Long: PrimitiveConstructor<number>
+        TYPE_LONG: GType<number>
+
+        ULong: PrimitiveConstructor<number>
+        TYPE_ULONG: GType<number>
+
+        Int64: PrimitiveConstructor<number>
+        TYPE_INT64: GType<number>
+
+        UInt64: PrimitiveConstructor<number>
+        TYPE_UINT64: GType<number>
+
+        TYPE_ENUM: GType<number>
+        TYPE_FLAGS: GType<number>
+
+        Float: PrimitiveConstructor<number>
+        TYPE_FLOAT: GType<number>
+
+        Double: globalThis.NumberConstructor
+        TYPE_DOUBLE: GType<number>
+
+        String: globalThis.StringConstructor
+        TYPE_STRING: GType<string>
+
+        JSObject: globalThis.ObjectConstructor
+        TYPE_JSOBJECT: GType<object>
+
+        TYPE_POINTER: GType<never>
+        TYPE_BOXED: GType<unknown>
+        TYPE_PARAM: GType<ParamSpec>
+        TYPE_INTERFACE: GType<unknown> // should this be GObject.Interface?
+        TYPE_OBJECT: GType<Object>
+        TYPE_VARIANT: GType<GLib.Variant>
+
+        Type: PrimitiveConstructor<GType, string>
+        TYPE_GTYPE: GType<GType>
+    }
 }

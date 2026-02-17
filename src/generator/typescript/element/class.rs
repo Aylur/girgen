@@ -24,7 +24,7 @@ fn collect_signals(ctx: &render::Context, signals: &[element::Signal]) -> Vec<St
                 returns: s.return_value.as_ref(),
             };
 
-            match callable::render(&args) {
+            match callable::render(ctx, &args) {
                 Ok(res) => Some(res),
                 Err(err) => {
                     (ctx.event)(Event::Failed {
@@ -90,7 +90,25 @@ fn collect_properties(
         .collect()
 }
 
-impl render::Renderable for element::Class {
+#[derive(serde::Serialize)]
+pub struct ClassContext {
+    jsdoc: String,
+    is_abstract: bool,
+    name: String,
+    name_class: String,
+    parent: Option<String>,
+    parent_class: Option<String>,
+    extends: Vec<String>,
+    signals: Vec<String>,
+    properties: Vec<minijinja::Value>,
+    methods: Vec<String>,
+    constructors: Vec<String>,
+    functions: Vec<String>,
+    virtual_methods: Vec<String>,
+    class_functions: Vec<String>,
+}
+
+impl render::Renderable<ClassContext> for element::Class {
     const KIND: &'static str = "class";
     const TEMPLATE: &'static str = include_str!("../templates/class.jinja");
 
@@ -102,7 +120,7 @@ impl render::Renderable for element::Class {
         self.info.introspectable.is_none_or(|i| i)
     }
 
-    fn env(&self, _: &render::Context) -> minijinja::Environment<'_> {
+    fn env(&self, _: &render::Context, _: &ClassContext) -> minijinja::Environment<'_> {
         let mut env = minijinja::Environment::new();
         env.add_template(
             "introspection",
@@ -113,11 +131,12 @@ impl render::Renderable for element::Class {
         env
     }
 
-    fn ctx(&self, ctx: &render::Context) -> Result<minijinja::Value, String> {
-        let extends: Vec<&String> = self
+    fn ctx(&self, ctx: &render::Context) -> Result<ClassContext, String> {
+        let extends: Vec<String> = self
             .parent
             .iter()
             .chain(self.implements.iter().map(|i| &i.name))
+            .cloned()
             .collect();
 
         let signals = collect_signals(ctx, &self.signals);
@@ -193,17 +212,19 @@ impl render::Renderable for element::Class {
                 .is_some_and(|name| name == &self.name)
         });
 
-        let class_functions = constructor_record.map(|record| {
-            callable::render_callable_elements(
-                ctx,
-                "",
-                &record
-                    .methods
-                    .iter()
-                    .map(callable::CallableElement::Method)
-                    .collect::<Vec<_>>(),
-            )
-        });
+        let class_functions = constructor_record
+            .map(|record| {
+                callable::render_callable_elements(
+                    ctx,
+                    "",
+                    &record
+                        .methods
+                        .iter()
+                        .map(callable::CallableElement::Method)
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .unwrap_or_default();
 
         let name_class = constructor_record
             .map(|rec| rec.name.clone())
@@ -224,12 +245,12 @@ impl render::Renderable for element::Class {
                 .unwrap_or_else(|| format!("{}Class", parent))
         });
 
-        Ok(minijinja::context! {
-            jsdoc => doc::jsdoc(&self.info_elements, &self.info).unwrap(),
-            is_abstarct => self.r#abstract.is_some_and(|i| i),
-            name => &self.name,
+        Ok(ClassContext {
+            jsdoc: doc::jsdoc(&self.info_elements, &self.info).unwrap(),
+            is_abstract: self.r#abstract.is_some_and(|i| i),
+            name: self.name.clone(),
             name_class,
-            parent => self.parent,
+            parent: self.parent.clone(),
             parent_class,
             extends,
             signals,
@@ -243,7 +264,7 @@ impl render::Renderable for element::Class {
     }
 }
 
-impl render::Renderable for element::Interface {
+impl render::Renderable<ClassContext> for element::Interface {
     const KIND: &'static str = "interface";
     const TEMPLATE: &'static str = include_str!("../templates/interface.jinja");
 
@@ -251,7 +272,7 @@ impl render::Renderable for element::Interface {
         &self.name
     }
 
-    fn env(&self, _: &render::Context) -> minijinja::Environment<'_> {
+    fn env(&self, _: &render::Context, _: &ClassContext) -> minijinja::Environment<'_> {
         let mut env = minijinja::Environment::new();
         env.add_template(
             "introspection",
@@ -266,7 +287,7 @@ impl render::Renderable for element::Interface {
         self.info.introspectable.is_none_or(|i| i)
     }
 
-    fn ctx(&self, ctx: &render::Context) -> Result<minijinja::Value, String> {
+    fn ctx(&self, ctx: &render::Context) -> Result<ClassContext, String> {
         let prereqs: Vec<&str> = match self.prerequisites.len() {
             0 => vec!["GObject.Object"],
             _ => self.prerequisites.iter().map(|p| p.name.as_ref()).collect(),
@@ -274,7 +295,11 @@ impl render::Renderable for element::Interface {
 
         let impls: Vec<&str> = self.implements.iter().map(|i| i.name.as_ref()).collect();
 
-        let extends: Vec<&str> = [prereqs, impls].concat();
+        let extends: Vec<String> = [prereqs, impls]
+            .concat()
+            .into_iter()
+            .map(String::from)
+            .collect();
 
         let signals = collect_signals(ctx, &self.signals);
         let properties = collect_properties(ctx, &self.properties, &self.methods);
@@ -331,27 +356,32 @@ impl render::Renderable for element::Interface {
                 .is_some_and(|name| name == &self.name)
         });
 
-        let class_functions = constructor_record.map(|iface| {
-            callable::render_callable_elements(
-                ctx,
-                "",
-                &iface
-                    .methods
-                    .iter()
-                    .map(callable::CallableElement::Method)
-                    .collect::<Vec<_>>(),
-            )
-        });
+        let class_functions = constructor_record
+            .map(|iface| {
+                callable::render_callable_elements(
+                    ctx,
+                    "",
+                    &iface
+                        .methods
+                        .iter()
+                        .map(callable::CallableElement::Method)
+                        .collect::<Vec<_>>(),
+                )
+            })
+            .unwrap_or_default();
 
-        let name_iface = constructor_record
+        let name_class = constructor_record
             .map(|rec| rec.name.clone())
             // TODO: check for possible name collision
             .unwrap_or_else(|| format!("{}Iface", &self.name));
 
-        Ok(minijinja::context! {
-            jsdoc => doc::jsdoc(&self.info_elements, &self.info).unwrap(),
-            name => &self.name,
-            name_iface,
+        Ok(ClassContext {
+            is_abstract: false,
+            parent: None,
+            parent_class: None,
+            jsdoc: doc::jsdoc(&self.info_elements, &self.info).unwrap(),
+            name: self.name.clone(),
+            name_class,
             extends,
             signals,
             properties,

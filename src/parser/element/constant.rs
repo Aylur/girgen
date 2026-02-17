@@ -43,10 +43,6 @@ impl super::Element for Constant {
             }
         };
 
-        Err(ParseError::UnhandledXmlTag(format!(
-            "{}:{}",
-            Self::KIND,
-            element.kind()
-        )))
+        Err(ParseError::UnexpectedElement(Self::KIND, element.kind()))
     }
 }

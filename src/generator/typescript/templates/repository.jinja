@@ -12,54 +12,56 @@ declare module "gi://{{ namespace.name }}?version={{ namespace.version }}" {
     import type {{ import.name }} from "gi://{{ import.name }}?version={{ import.version }}"
     {%- endfor %}
 
-    {{ namespace.content|indent(4) if namespace.content }}
-
+    {{ namespace.extra_content|indent(4) }}
 
     namespace {{ namespace.name }} {
-        const __name__: "{{ namespace.name }}"
-        const __version: "{{ namespace.version }}"
-
-        {%- for interface in namespace.interfaces %}
-        {{ interface.content|indent(8) }}
+        {%- for class in namespace.classes %}
+        {{ class|indent(8) }}
         {%- endfor %}
 
-        {%- for class in namespace.classes %}
-        {{ class.content|indent(8) }}
+        {%- for interface in namespace.interfaces %}
+        {{ interface|indent(8) }}
         {%- endfor %}
 
         {%- for record in namespace.records %}
-        {{ record.content|indent(8) }}
-        {%- endfor %}
-
-        {%- for function in namespace.functions %}
-        {{ function.content|indent(8) }}
-        {%- endfor %}
-
-        {%- for constant in namespace.constants %}
-        {{ constant.content|indent(8) }}
+        {{ record|indent(8) }}
         {%- endfor %}
 
         {%- for union in namespace.unions %}
-        {{ union.content|indent(8) }}
+        {{ union|indent(8) }}
         {%- endfor %}
 
         {%- for enum in namespace.enums %}
-        {{ enum.content|indent(8) }}
+        {{ enum|indent(4) }}
         {%- endfor %}
 
         {%- for bitfield in namespace.bitfields %}
-        {{ bitfield.content|indent(8) }}
+        {{ bitfield|indent(8) }}
         {%- endfor %}
 
         {%- for callback in namespace.callbacks %}
-        {{ callback.content|indent(8) }}
+        {{ callback|indent(8) }}
         {%- endfor %}
 
         {%- for alias in namespace.aliases %}
-        {{ alias.content|indent(8) }}
+        {{ alias|indent(8) }}
         {%- endfor %}
+
+        interface $Exports {
+            __name__: "{{ namespace.name }}"
+            __version: "{{ namespace.version }}"
+
+            {%- for constant in namespace.constants %}
+            {{ constant|indent(12) }}
+            {%- endfor %}
+
+            {%- for function in namespace.functions %}
+            {{ function|indent(12) }}
+            {%- endfor %}
+        }
     }
 
+    const {{ namespace.name }}: {{ namespace.name }}.$Exports
     export default {{ namespace.name }}
 }
 {%- endfor -%}

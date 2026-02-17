@@ -38,11 +38,7 @@ impl super::Element for DocSection {
                 self.elements.push(ok);
                 Ok(())
             }
-            Err(ele) => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            Err(ele) => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }

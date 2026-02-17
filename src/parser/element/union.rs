@@ -64,11 +64,7 @@ impl super::Element for Union {
             AnyElement::FunctionInline(i) => self.inline_functions.push(i),
             AnyElement::Record(i) => self.records.push(i),
             ele => {
-                return Err(ParseError::UnhandledXmlTag(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 

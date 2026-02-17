@@ -69,11 +69,7 @@ impl super::Element for Repository {
             AnyElement::Namespace(namespace) => self.namespaces.push(namespace),
             AnyElement::DocFormat(doc_format) => self.doc_formats.push(doc_format),
             ele => {
-                return Err(ParseError::UnexpectedElement(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
         Ok(())

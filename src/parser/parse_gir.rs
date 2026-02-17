@@ -7,7 +7,7 @@ fn attributes(e: &BytesStart) -> Result<Attrs, ParseError> {
 
     for attr in e.attributes() {
         match attr {
-            Err(_) => todo!(),
+            Err(err) => return Err(ParseError::AttrError(err)),
             Ok(a) => {
                 let key = String::from_utf8(a.key.into_inner().to_vec())?;
                 let value = a.unescape_value()?.into_owned();
@@ -20,13 +20,17 @@ fn attributes(e: &BytesStart) -> Result<Attrs, ParseError> {
 }
 
 impl AnyElement {
+    // TODO: impl ParseEvent and log invalid elements
     fn push(&mut self, e: &BytesStart) -> Result<Self, ParseError> {
-        let attrs = attributes(e)?;
+        let attrs = match attributes(e) {
+            Ok(ok) => ok,
+            Err(_) => return Ok(Self::Invalid),
+        };
         match AnyElement::new(e.name().as_ref(), &attrs) {
             Ok(ok) => Ok(ok),
             Err(err) => match err {
-                // TODO: impl ParseEvent and log invalid element
                 ParseError::MissingAttribute(_) => Ok(Self::Invalid),
+                ParseError::InvalidGirElement(_) => Ok(Self::Invalid),
                 err => Err(err),
             },
         }
@@ -74,7 +78,12 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
 
                     if !matches!(second, AnyElement::Invalid) && !matches!(top, AnyElement::Invalid)
                     {
-                        second.end(top)?;
+                        match second.end(top) {
+                            // TODO: impl ParseEvent and log invalid elements
+                            Err(ParseError::UnexpectedElement(_, _)) => (),
+                            Err(err) => return Err(err),
+                            Ok(_) => (),
+                        }
                     }
                 }
             },
@@ -100,7 +109,7 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
                 let ch = match e.xml_content()?.as_ref() {
                     "lt" => "<",
                     "gt" => ">",
-                    "amp" => "'",
+                    "amp" => "&",
                     c => todo!("write ref event {}", c),
                 };
 

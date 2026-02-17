@@ -103,11 +103,7 @@ impl super::Element for Class {
             AnyElement::Record(r) => self.records.push(r),
             AnyElement::Callback(c) => self.callbacks.push(c),
             ele => {
-                return Err(ParseError::UnexpectedElement(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 

@@ -8,63 +8,72 @@ pub struct Context<'a> {
     pub event: fn(Event),
 }
 
-#[derive(serde::Serialize)]
-pub struct RenderedElement {
-    pub name: String,
-    pub content: String,
+fn escape_member(name: &str) -> String {
+    match name.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        true => format!("\"{name}\""),
+        false => name.to_owned(),
+    }
 }
 
-pub trait Renderable {
+fn escape_toplevel(name: &str) -> String {
+    if name.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        return format!("_{name}");
+    }
+
+    match name {
+        "void" | "enum" | "function" | "false" | "true" | "break" => format!("_{name}"),
+        _ => name.to_owned(),
+    }
+}
+
+pub trait Renderable<T: serde::Serialize> {
     const KIND: &'static str;
     const TEMPLATE: &'static str;
 
-    fn ctx(&self, _ctx: &Context) -> Result<minijinja::Value, String> {
-        Ok(minijinja::context! {})
-    }
+    fn name(&self, _: &Context) -> &str;
+    fn introspectable(&self, _: &Context) -> bool;
+    fn ctx(&self, _: &Context) -> Result<T, String>;
 
-    fn introspectable(&self, _ctx: &Context) -> bool {
-        true
-    }
-
-    fn env(&self, _ctx: &Context) -> minijinja::Environment<'_> {
+    fn env(&self, _: &Context, _: &T) -> minijinja::Environment<'_> {
         minijinja::Environment::new()
     }
 
-    fn name(&self, _ctx: &Context) -> &str;
+    fn render(&self, g_ctx: &Context) -> Result<String, String> {
+        let name = self.name(g_ctx);
 
-    fn render(&self, ctx: &Context) -> Result<RenderedElement, String> {
-        let jinja_ctx = match self.ctx(ctx) {
+        let ctx = match self.ctx(g_ctx) {
             Ok(ctx) => ctx,
             Err(err) => {
                 return Err(format!(
                     "rendering {} {}-{}.{}: {}",
                     Self::KIND,
-                    ctx.namespace.name,
-                    ctx.namespace.version,
-                    self.name(ctx),
+                    g_ctx.namespace.name,
+                    g_ctx.namespace.version,
+                    name,
                     err
                 ));
             }
         };
 
-        match self.env(ctx).render_str(Self::TEMPLATE, jinja_ctx) {
-            Err(err) => Err(format!(
+        let mut env = self.env(g_ctx, &ctx);
+
+        env.add_filter("escape_member", escape_member);
+        env.add_filter("escape_toplevel", escape_toplevel);
+
+        env.render_str(Self::TEMPLATE, &ctx).map_err(|err| {
+            format!(
                 "rendering {} {}-{}.{}: {:?}",
                 Self::KIND,
-                ctx.namespace.name,
-                ctx.namespace.version,
-                self.name(ctx),
+                g_ctx.namespace.name,
+                g_ctx.namespace.version,
+                self.name(g_ctx),
                 err
-            )),
-            Ok(res) => Ok(RenderedElement {
-                name: self.name(ctx).to_string(),
-                content: res,
-            }),
-        }
+            )
+        })
     }
 }
 
-fn render<T: Renderable + Sync>(items: &[T], ctx: &Context) -> Vec<RenderedElement> {
+fn render<R: serde::Serialize, T: Renderable<R> + Sync>(items: &[T], ctx: &Context) -> Vec<String> {
     let overrides = overrides::OVERRIDES
         .iter()
         .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version);
@@ -81,6 +90,7 @@ fn render<T: Renderable + Sync>(items: &[T], ctx: &Context) -> Vec<RenderedEleme
             }
 
             match elem.render(ctx) {
+                Ok(elem) => Some(elem),
                 Err(err) => {
                     (ctx.event)(Event::Failed {
                         repo: None,
@@ -88,19 +98,6 @@ fn render<T: Renderable + Sync>(items: &[T], ctx: &Context) -> Vec<RenderedEleme
                     });
                     None
                 }
-                Ok(elem) => match elem.name.as_str() {
-                    "enum" | "function" | "false" | "true" | "break" | "void" => {
-                        (ctx.event)(Event::Failed {
-                            repo: None,
-                            err: &format!(
-                                "failed to include {}-{}.{} due to invalid name",
-                                ctx.namespace.name, ctx.namespace.version, elem.name,
-                            ),
-                        });
-                        None
-                    }
-                    _ => Some(elem),
-                },
             }
         })
         .collect()
@@ -110,17 +107,17 @@ fn render<T: Renderable + Sync>(items: &[T], ctx: &Context) -> Vec<RenderedEleme
 struct RenderedNamespace<'a> {
     name: &'a str,
     version: &'a str,
-    content: Option<&'a str>,
-    aliases: Vec<RenderedElement>,
-    classes: Vec<RenderedElement>,
-    interfaces: Vec<RenderedElement>,
-    records: Vec<RenderedElement>,
-    enums: Vec<RenderedElement>,
-    functions: Vec<RenderedElement>,
-    unions: Vec<RenderedElement>,
-    bitfields: Vec<RenderedElement>,
-    callbacks: Vec<RenderedElement>,
-    constants: Vec<RenderedElement>,
+    extra_content: &'a str,
+    aliases: Vec<String>,
+    classes: Vec<String>,
+    interfaces: Vec<String>,
+    records: Vec<String>,
+    enums: Vec<String>,
+    functions: Vec<String>,
+    unions: Vec<String>,
+    bitfields: Vec<String>,
+    callbacks: Vec<String>,
+    constants: Vec<String>,
 }
 
 fn render_namespace<'a>(ctx: Context<'a>) -> RenderedNamespace<'a> {
@@ -155,7 +152,7 @@ fn render_namespace<'a>(ctx: Context<'a>) -> RenderedNamespace<'a> {
     RenderedNamespace {
         name: &ctx.namespace.name,
         version: &ctx.namespace.version,
-        content: overrides.map(|o| o.content).unwrap_or_default(),
+        extra_content: overrides.and_then(|o| o.content).unwrap_or_default(),
         aliases: aliases.unwrap(),
         classes: classes.unwrap(),
         interfaces: interfaces.unwrap(),

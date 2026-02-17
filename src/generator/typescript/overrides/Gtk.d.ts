@@ -1,6 +1,8 @@
 namespace Gtk {
-    const children: unique symbol
-    const cssName: unique symbol
-    const internalChildren: unique symbol
-    const template: unique symbol
+    interface $Exports {
+        children: symbol
+        cssName: symbol
+        internalChildren: symbol
+        template: symbol
+    }
 }

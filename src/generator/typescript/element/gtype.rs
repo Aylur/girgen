@@ -1,4 +1,4 @@
-use crate::element::{AnyType, Parameter, Parameters, ReturnValue};
+use crate::element::{AnyType, Array, Parameter, Parameters, ReturnValue};
 
 pub fn filter_parameters<'a>(
     params: Option<&'a Parameters>,
@@ -9,7 +9,7 @@ pub fn filter_parameters<'a>(
         None => return Vec::new(),
     };
 
-    let mut remove = vec![false; params.len()];
+    let mut remove = vec![false; params.len() + 1];
     let mut result = Vec::new();
 
     if let Some(ret) = returns
@@ -48,8 +48,28 @@ pub fn filter_parameters<'a>(
     result
 }
 
-fn resolve_primitive(name: &str) -> Result<String, String> {
-    match name {
+enum TypeError<'a> {
+    MissingName,
+    Failed(&'a str),
+    UnhandledGeneric(&'a str),
+    UnhandledElement(&'a Array),
+    MissingContent(&'a Array),
+}
+
+fn resolve_typename<'a>(typename: &'a str) -> Result<String, TypeError<'a>> {
+    if typename.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        return Ok(format!("_{typename}"));
+    }
+
+    let mut words = typename.split(".");
+    if let Some(namespace) = words.next()
+        && let Some(name) = words.next()
+        && name.chars().next().is_some_and(|c| c.is_ascii_digit())
+    {
+        return Ok(format!("{namespace}._{name}"));
+    }
+
+    match typename {
         "GType" => Ok("GObject.GType".to_string()),
         "gunichar" | "filename" | "utf8" => Ok("string".to_string()),
         "void" | "none" => Ok("void".to_string()),
@@ -61,30 +81,20 @@ fn resolve_primitive(name: &str) -> Result<String, String> {
         "gboolean" => Ok("boolean".to_string()),
         "object" => Ok("object".to_string()),
         "gpointer" | "gintptr" | "guintptr" => Ok("never".to_string()),
-        t if t.chars().next().is_some_and(|c| c.is_ascii_digit()) => {
-            // TODO:
-            Ok(format!("_{t}"))
-        }
-        t if t.chars().next().is_some_and(|c| c.is_uppercase()) || t.contains(".") => {
-            Ok(t.to_string())
-        }
-        t => {
-            // TODO:
-            if t.ends_with("_t") || t.starts_with("_") {
-                Ok("never".to_string())
-            } else {
-                Err(format!("failed to resolve type '{t}'"))
-            }
-        }
+        t if t.contains(".") => Ok(t.to_string()),
+        t if t.chars().next().is_some_and(|c| c.is_uppercase()) => Ok(t.to_string()),
+        // TODO:
+        t if t.ends_with("_t") || t.starts_with("_") => Ok("never".to_string()),
+        // TODO: some libraries use lowercase names
+        t => Err(TypeError::Failed(t)),
     }
 }
 
-pub fn resolve_anytype(input: &AnyType) -> Result<String, String> {
+fn resolve_anytype<'a>(input: &'a AnyType) -> Result<String, TypeError<'a>> {
     match input {
         AnyType::Type(t) => {
-            let name = t.name.as_ref().ok_or("missing type name")?;
+            let name = t.name.as_ref().ok_or(TypeError::MissingName)?;
 
-            // NOTE: I'm not entirely sure if this is correct
             match name.as_str() {
                 "GLib.List" | "GLib.SList" => {
                     if let Some(g) = t.elements.first() {
@@ -107,15 +117,15 @@ pub fn resolve_anytype(input: &AnyType) -> Result<String, String> {
                         Ok(name.clone())
                     }
                 }
-                _ if !t.elements.is_empty() => Err(format!("unhandled generic type: {}", name)),
-                _ => resolve_primitive(name),
+                _ if !t.elements.is_empty() => Err(TypeError::UnhandledGeneric(name)),
+                _ => resolve_typename(name),
             }
         }
         AnyType::Array(arr) => {
-            let ele = arr.elements.first().ok_or("missing array element")?;
+            let ele = arr.elements.first().ok_or(TypeError::MissingContent(arr))?;
 
             if arr.elements.len() > 1 {
-                return Err("unhandled second element of array type".to_string());
+                return Err(TypeError::UnhandledElement(arr));
             }
 
             if let AnyType::Type(item) = ele
@@ -134,7 +144,26 @@ pub fn resolve_anytype(input: &AnyType) -> Result<String, String> {
 }
 
 pub fn tstype(anytype: Option<&AnyType>, nullable: bool) -> Result<String, String> {
-    let tstype = resolve_anytype(anytype.ok_or("Missing type".to_owned())?)?;
+    let r#type = anytype.ok_or("missing type".to_string())?;
+
+    let tstype = match resolve_anytype(r#type) {
+        Ok(ok) => Ok(ok),
+        Err(err) => match err {
+            TypeError::MissingName => Err("missing type name".to_string()),
+            TypeError::Failed(name) => Err(format!("failed to resolve type '{name}'")),
+            TypeError::UnhandledGeneric(name) => {
+                if name.starts_with("GLib") {
+                    eprintln!("unhandled generic type: {}", name);
+                }
+                Err(format!("unhandled generic type: {}", name))
+            }
+            TypeError::UnhandledElement(array) => {
+                Err(format!("unhandled array elements {:?}", array))
+            }
+            TypeError::MissingContent(array) => Err(format!("missing array element {:?}", array)),
+        },
+    }?;
+
     if nullable {
         Ok(format!("{tstype} | null"))
     } else {

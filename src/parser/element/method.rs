@@ -59,11 +59,7 @@ impl super::Element for Method {
                 self.return_value = Some(r);
                 Ok(())
             }
-            ele => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            ele => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }
@@ -98,11 +94,7 @@ impl super::Element for MethodInline {
                 self.return_value = Some(r);
                 Ok(())
             }
-            ele => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            ele => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }
@@ -138,11 +130,7 @@ impl super::Element for VirtualMethod {
                 self.return_value = Some(r);
                 Ok(())
             }
-            ele => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            ele => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }

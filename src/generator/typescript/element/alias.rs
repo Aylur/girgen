@@ -2,26 +2,33 @@ use super::super::render;
 use super::{doc, gtype};
 use crate::element;
 
-impl render::Renderable for element::Alias {
+#[derive(serde::Serialize)]
+pub struct AliasContext {
+    jsdoc: String,
+    name: String,
+    value: String,
+}
+
+impl render::Renderable<AliasContext> for element::Alias {
     const KIND: &'static str = "alias";
-    const TEMPLATE: &'static str = "{{ jsdoc if jsdoc}}\ntype {{ name }} = {{ type }}";
+    const TEMPLATE: &'static str = "{{ jsdoc if jsdoc }}\ntype {{ name }} = {{ value }}";
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name
     }
 
-    fn ctx(&self, _: &render::Context) -> Result<minijinja::Value, String> {
-        let gtype = match &self.r#type {
-            Some(t) => gtype::resolve_anytype(t),
-            None => Err("Missing type".to_owned()),
-        }?;
+    fn introspectable(&self, _ctx: &render::Context) -> bool {
+        self.info.introspectable.is_none_or(|i| i)
+    }
 
+    fn ctx(&self, _: &render::Context) -> Result<AliasContext, String> {
+        let value = gtype::tstype(self.r#type.as_ref(), false)?;
         let jsdoc = doc::jsdoc(&self.info_elements, &self.info).unwrap();
 
-        Ok(minijinja::context! {
+        Ok(AliasContext {
             jsdoc,
-            name => self.name,
-            type => gtype
+            name: self.name.clone(),
+            value,
         })
     }
 }

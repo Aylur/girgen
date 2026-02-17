@@ -5,12 +5,11 @@ namespace {{ name }} {
 
     interface Interface {{ extend_list(extends) }} {
         {%- for method in virtual_methods %}
-        {{ method|indent(8) }}
+        {{ method|indent(12) }}
         {%- endfor %}
     }
 }
 
-{{ jsdoc if jsdoc }}
 interface {{ name }} {{ extend_list(extends+[name+".Interface"]) }} {
     readonly $signals: {{ name }}.SignalSignatures
     readonly $readableProperties: {{ name }}.ReadableProperties
@@ -18,7 +17,7 @@ interface {{ name }} {{ extend_list(extends+[name+".Interface"]) }} {
     readonly $constructOnlyProperties: {{ name }}.ConstructOnlyProperties
 
     {%- for property in properties %}
-    {{ property.jsdoc|indent(4) }}
+    {{ property.jsdoc|indent(8) }}
     {%- if property.readable %}
     get {{ property.name|camel_case }}(): {{ property.type }}
     {%- endif %}
@@ -28,24 +27,26 @@ interface {{ name }} {{ extend_list(extends+[name+".Interface"]) }} {
     {%- endfor %}
 
     {%- for method in methods %}
-    {{ method|indent(4) }}
+    {{ method|indent(8) }}
     {%- endfor %}
 }
 
-
-interface {{ name_iface }} {
+interface {{ name_class }} {
     readonly $gtype: GObject.GType<{{ name }}>
     readonly prototype: {{ name }}
 
     {%- for fn in functions %}
-    {{ fn|indent(4) }}
+    {{ fn|indent(8) }}
     {%- endfor %}
 
     {%- for fn in class_functions %}
-    {{ fn|indent(4) }}
+    {{ fn|indent(8) }}
     {%- endfor %}
 
     [Symbol.hasInstance](instance: unknown): instance is {{ name }}
 }
 
-const {{ name }}: {{ name_iface }}
+interface $Exports {
+    {{ jsdoc|indent(4) if jsdoc }}
+    {{ name }}: {{ name_class }}
+}

@@ -4,7 +4,6 @@ namespace {{ name }} {
     {% include "introspection" %}
 }
 
-{{ jsdoc if jsdoc }}
 interface {{ name }} {{ extend_list(extends) }} {
     readonly $signals: {{ name }}.SignalSignatures
     readonly $readableProperties: {{ name }}.ReadableProperties
@@ -53,4 +52,7 @@ interface {{ name_class }}{% if parent_class %} extends Omit<{{ parent_class }},
     {%- endfor %}
 }
 
-const {{ name }}: {{ name_class }}
+interface $Exports {
+    {{ jsdoc|indent(4) if jsdoc }}
+    {{ name }}: {{ name_class }}
+}

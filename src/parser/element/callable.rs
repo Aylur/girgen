@@ -112,11 +112,7 @@ impl super::Element for Parameters {
                 self.parameters.push(p);
             }
             ele => {
-                return Err(ParseError::UnexpectedElement(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
         Ok(())
@@ -152,11 +148,7 @@ impl super::Element for InstanceParameter {
                 self.doc_elements.push(ok);
                 Ok(())
             }
-            Err(ele) => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            Err(ele) => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }
@@ -209,11 +201,7 @@ impl super::Element for Parameter {
                 self.annotations.push(attr);
             }
             ele => {
-                return Err(ParseError::UnexpectedElement(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 
@@ -261,11 +249,7 @@ impl super::Element for ReturnValue {
                 self.annotations.push(attr);
                 Ok(())
             }
-            ele => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            ele => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }

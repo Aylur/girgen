@@ -53,11 +53,7 @@ impl super::Element for Signal {
                 self.return_value = Some(r);
                 Ok(())
             }
-            ele => Err(ParseError::UnexpectedElement(format!(
-                "{}:{}",
-                Self::KIND,
-                ele.kind()
-            ))),
+            ele => Err(ParseError::UnexpectedElement(Self::KIND, ele.kind())),
         }
     }
 }

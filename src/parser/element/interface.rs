@@ -84,11 +84,7 @@ impl super::Element for Interface {
             AnyElement::Constant(c) => self.constants.push(c),
             AnyElement::Callback(c) => self.callbacks.push(c),
             ele => {
-                return Err(ParseError::UnexpectedElement(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 

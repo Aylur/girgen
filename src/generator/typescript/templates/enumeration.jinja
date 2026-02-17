@@ -1,27 +1,35 @@
+{%- set enum = name|escape_toplevel %}
+{%- set iface = enum + suffix %}
+
 {%- if error_domain %}
-abstract class {{ name }} extends GLib.Error {
-    static readonly $gtype: GObject.GType<{{ name }}>
+interface {{ enum }} extends GLib.Error {}
+
+interface {{ iface }} {
+    readonly $gtype: GObject.GType<{{ enum }}>
+
+    [Symbol.hasInstance](instance: unknown): instance is {{ enum }}
 
     {%- for member in members %}
     {{ member.jsdoc|indent(4) if member.jsdoc }}
-    static readonly "{{ member.name }}": {{ member.value }}
+    readonly "{{ member.name }}": {{ member.value }}
     {%- endfor %}
 }
-
 {%- else %}
-namespace {{ name }} {
-    const $gtype: GObject.GType<{{ name }}>
-}
+interface {{ iface }} {
+    readonly $gtype: GObject.GType<{{ enum }}>
 
-{{ jsdoc if jsdoc }}
-enum {{ name }} {
     {%- for member in members %}
     {{ member.jsdoc|indent(4) }}
-    "{{ member.name }}" = {{ member.value }},
+    readonly "{{ member.name }}": {{ member.value }}
     {%- endfor %}
 }
+type {{ enum }} = {{ iface }}[Exclude<keyof {{ iface }}, "$gtype">]
 {%- endif %}
 
-{%- for fn in functions %}
-{{ fn }}
-{%- endfor %}
+interface $Exports {
+    {{ jsdoc|indent(4) if jsdoc }}
+    {{ name|escape_member }}: {{ iface }}
+    {%- for fn in functions %}
+    {{ fn }}
+    {%- endfor %}
+}

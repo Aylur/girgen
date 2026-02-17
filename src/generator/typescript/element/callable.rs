@@ -46,7 +46,7 @@ pub struct CallableArgs<'a> {
     pub returns: Option<&'a element::ReturnValue>,
 }
 
-pub fn render(args: &CallableArgs) -> Result<String, String> {
+pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String> {
     let env = minijinja::Environment::new();
 
     let (p_returns, p_parameters): (Vec<_>, Vec<_>) =
@@ -212,7 +212,7 @@ pub fn render_callable_elements(
                 CallableElement::VirtualMethod(i) => callable_args!(i, prefix, name),
             };
 
-            match render(&args) {
+            match render(ctx, &args) {
                 Ok(res) => Some(res),
                 Err(err) => {
                     (ctx.event)(Event::Failed {

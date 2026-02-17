@@ -1,4 +1,5 @@
 type Variant<S extends string = any> = GLib.Variant<S>
+type VariantType<S extends string = any> = GLib.VariantType<S>
 
 // prettier-ignore
 type CreateIndexType<Key extends string, Value> =
@@ -363,38 +364,6 @@ namespace GLib {
         runAsync(): Promise<void>
     }
 
-    const MAXINT64_BIGINT: bigint
-    const MININT64_BIGINT: bigint
-    const MAXUINT64_BIGINT: bigint
-
-    /**
-     * Log a message with structured data.
-     * For more information about this function, see the upstream documentation for [g_log_structured](https://docs.gtk.org/glib/func.log_structured.html).
-     *
-     * @param logDomain A log domain, usually G_LOG_DOMAINA
-     * @param logLevel A log level, either from {@link LogLevelFlags}, or a user-defined level
-     * @param stringFields Key–value pairs of structured data to add to the log message
-     */
-    function log_structured(
-        logDomain: string,
-        logLevel: LogLevelFlags,
-        stringFields: Record<string, any>,
-    ): void
-
-    function idle_add_once(priority: number, callback: () => void): number
-
-    function timeout_add_once(
-        priority: number,
-        interval: number,
-        callback: () => void,
-    ): number
-
-    function timeout_add_seconds_once(
-        priority: number,
-        interval: number,
-        callback: () => void,
-    ): number
-
     interface Bytes {
         /**
          * Convert a {@link GLib.Bytes} object to a `Uint8Array` object.
@@ -434,8 +403,8 @@ namespace GLib {
      * @see {@link https://gjs.guide/guides/glib/gvariant.html|GJS Guide: GVariant}
      * @see {@link https://docs.gtk.org/glib/struct.Variant.html|GLib Documentation: GVariant}
      */
-    class Variant<S extends string = any> {
-        static readonly $gtype: GObject.GType<Variant>
+    interface VariantStruct<S extends string = any> {
+        readonly $gtype: GObject.GType<Variant>
 
         /**
          * Creates a new GVariant with the specified type signature and value.
@@ -448,8 +417,8 @@ namespace GLib {
          * const arrayVariant = new GLib.Variant('as', ['one', 'two', 'three']);
          * ```
          */
-        constructor(sig: S, value: $ParseDeepVariant<S>)
-        constructor(copy: Variant<S>)
+        new (sig: S, value: $ParseDeepVariant<S>): Variant<S>
+        new (copy: Variant<S>): Variant<S>
 
         /**
          * Creates a new GVariant with the specified type signature and value.
@@ -462,10 +431,7 @@ namespace GLib {
          * const arrayVariant = GLib.Variant.new('as', ['one', 'two', 'three']);
          * ```
          */
-        static new<S extends string>(
-            sig: S,
-            value: $ParseDeepVariant<S>,
-        ): Variant<S>
+        "new"<S extends string>(sig: S, value: $ParseDeepVariant<S>): Variant<S>
 
         /**
          * Creates a new #GVariant array from `children`.
@@ -488,7 +454,7 @@ namespace GLib {
          * @param children an array of            #GVariant pointers, the children
          * @returns a floating reference to a new #GVariant array
          */
-        static new_array<C extends string = "a?">(
+        new_array<C extends string = "a?">(
             child_type: VariantType<C> | null,
             children: typeof child_type extends VariantType<any>
                 ? Variant<$VariantTypeToString<typeof child_type>>[]
@@ -501,14 +467,14 @@ namespace GLib {
          * @param value a #gboolean value
          * @returns a floating reference to a new boolean #GVariant instance
          */
-        static new_boolean(value: boolean): Variant<"b">
+        new_boolean(value: boolean): Variant<"b">
         /**
          * Creates a new byte #GVariant instance.
          * @since 2.24
          * @param value a #guint8 value
          * @returns a floating reference to a new byte #GVariant instance
          */
-        static new_byte(value: number): Variant<"y">
+        new_byte(value: number): Variant<"y">
         /**
          * Creates an array-of-bytes #GVariant with the contents of `string`.
          * This function is just like g_variant_new_string() except that the
@@ -520,7 +486,7 @@ namespace GLib {
          * @param string a normal          nul-terminated string in no particular encoding
          * @returns a floating reference to a new bytestring #GVariant instance
          */
-        static new_bytestring(string: Uint8Array | string): Variant<"ay">
+        new_bytestring(string: Uint8Array | string): Variant<"ay">
         /**
          * Constructs an array of bytestring #GVariant from the given array of
          * strings.
@@ -530,7 +496,7 @@ namespace GLib {
          * @param strv an array of strings
          * @returns a new floating #GVariant instance
          */
-        static new_bytestring_array(strv: string[]): Variant<"aay">
+        new_bytestring_array(strv: string[]): Variant<"aay">
         /**
          * Creates a new dictionary entry #GVariant. `key` and `value` must be
          * non-%NULL. `key` must be a value of a basic type (ie: not a container).
@@ -542,14 +508,14 @@ namespace GLib {
          * @param value a #GVariant, the value
          * @returns a floating reference to a new dictionary entry #GVariant
          */
-        static new_dict_entry(key: Variant, value: Variant): Variant<"{vv}">
+        new_dict_entry(key: Variant, value: Variant): Variant<"{vv}">
         /**
          * Creates a new double #GVariant instance.
          * @since 2.24
          * @param value a #gdouble floating point value
          * @returns a floating reference to a new double #GVariant instance
          */
-        static new_double(value: number): Variant<"d">
+        new_double(value: number): Variant<"d">
         /**
          * Constructs a new array #GVariant instance, where the elements are
          * of `element_type` type.
@@ -571,7 +537,7 @@ namespace GLib {
          * @param element_size the size of each element
          * @returns a floating reference to a new array #GVariant instance
          */
-        static new_fixed_array<C extends string = "a?">(
+        new_fixed_array<C extends string = "a?">(
             element_type: VariantType<C>,
             elements:
                 | Variant<$VariantTypeToString<typeof element_type>>[]
@@ -595,7 +561,7 @@ namespace GLib {
          * @param trusted if the contents of `bytes` are trusted
          * @returns a new #GVariant with a floating reference
          */
-        static new_from_bytes<C extends string>(
+        new_from_bytes<C extends string>(
             type: VariantType<C>,
             bytes: Bytes | Uint8Array,
             trusted: boolean,
@@ -638,7 +604,7 @@ namespace GLib {
          * @param user_data data for `notify`
          * @returns a new floating #GVariant of type `type`
          */
-        static new_from_data<C extends string>(
+        new_from_data<C extends string>(
             type: VariantType<C>,
             data: Uint8Array | string,
             trusted: boolean,
@@ -654,28 +620,28 @@ namespace GLib {
          * @param value a #gint32 value
          * @returns a floating reference to a new handle #GVariant instance
          */
-        static new_handle(value: number): Variant<"h">
+        new_handle(value: number): Variant<"h">
         /**
          * Creates a new int16 #GVariant instance.
          * @since 2.24
          * @param value a #gint16 value
          * @returns a floating reference to a new int16 #GVariant instance
          */
-        static new_int16(value: number): Variant<"n">
+        new_int16(value: number): Variant<"n">
         /**
          * Creates a new int32 #GVariant instance.
          * @since 2.24
          * @param value a #gint32 value
          * @returns a floating reference to a new int32 #GVariant instance
          */
-        static new_int32(value: number): Variant<"i">
+        new_int32(value: number): Variant<"i">
         /**
          * Creates a new int64 #GVariant instance.
          * @since 2.24
          * @param value a #gint64 value
          * @returns a floating reference to a new int64 #GVariant instance
          */
-        static new_int64(value: number): Variant<"x">
+        new_int64(value: number): Variant<"x">
         /**
          * Depending on if `child` is %NULL, either wraps `child` inside of a
          * maybe container or creates a Nothing instance for the given `type`.
@@ -692,7 +658,7 @@ namespace GLib {
          * @param child the child value, or %NULL
          * @returns a floating reference to a new #GVariant maybe instance
          */
-        static new_maybe(
+        new_maybe(
             child_type: VariantType | null,
             child: Variant | null,
         ): Variant<"mv">
@@ -704,7 +670,7 @@ namespace GLib {
          * @param object_path a normal C nul-terminated string
          * @returns a floating reference to a new object path #GVariant instance
          */
-        static new_object_path(object_path: string): Variant<"o">
+        new_object_path(object_path: string): Variant<"o">
         /**
          * Constructs an array of object paths #GVariant from the given array of
          * strings.
@@ -717,7 +683,7 @@ namespace GLib {
          * @param strv an array of strings
          * @returns a new floating #GVariant instance
          */
-        static new_objv(strv: string[]): Variant<"ao">
+        new_objv(strv: string[]): Variant<"ao">
         /**
          * Creates a D-Bus type signature #GVariant with the contents of
          *  `string`.  `string` must be a valid D-Bus type signature.  Use
@@ -726,7 +692,7 @@ namespace GLib {
          * @param signature a normal C nul-terminated string
          * @returns a floating reference to a new signature #GVariant instance
          */
-        static new_signature(signature: string): Variant<"g">
+        new_signature(signature: string): Variant<"g">
         /**
          * Creates a string #GVariant with the contents of `string`.
          *
@@ -737,7 +703,7 @@ namespace GLib {
          * @param string a normal UTF-8 nul-terminated string
          * @returns a floating reference to a new string #GVariant instance
          */
-        static new_string(string: string): Variant<"s">
+        new_string(string: string): Variant<"s">
         /**
          * Constructs an array of strings #GVariant from the given array of
          * strings.
@@ -747,7 +713,7 @@ namespace GLib {
          * @param strv an array of strings
          * @returns a new floating #GVariant instance
          */
-        static new_strv(strv: string[]): Variant<"as">
+        new_strv(strv: string[]): Variant<"as">
         /**
          * Creates a new tuple #GVariant out of the items in `children`.  The
          * type is determined from the types of `children`.  No entry in the
@@ -761,30 +727,32 @@ namespace GLib {
          * @param children the items to make the tuple out of
          * @returns a floating reference to a new #GVariant tuple
          */
-        static new_tuple<
+        new_tuple<
             Items extends ReadonlyArray<VariantType> | readonly [VariantType],
-        >(children: Items): Variant<`(${$ToTuple<Items>})`>
+        >(
+            children: Items,
+        ): Variant<`(${$ToTuple<Items>})`>
         /**
          * Creates a new uint16 #GVariant instance.
          * @since 2.24
          * @param value a #guint16 value
          * @returns a floating reference to a new uint16 #GVariant instance
          */
-        static new_uint16(value: number): Variant<"q">
+        new_uint16(value: number): Variant<"q">
         /**
          * Creates a new uint32 #GVariant instance.
          * @since 2.24
          * @param value a #guint32 value
          * @returns a floating reference to a new uint32 #GVariant instance
          */
-        static new_uint32(value: number): Variant<"u">
+        new_uint32(value: number): Variant<"u">
         /**
          * Creates a new uint64 #GVariant instance.
          * @since 2.24
          * @param value a #guint64 value
          * @returns a floating reference to a new uint64 #GVariant instance
          */
-        static new_uint64(value: number): Variant<"t">
+        new_uint64(value: number): Variant<"t">
         /**
          * Boxes `value`.  The result is a #GVariant instance representing a
          * variant containing the original value.
@@ -795,7 +763,7 @@ namespace GLib {
          * @param value a #GVariant instance
          * @returns a floating reference to a new variant #GVariant instance
          */
-        static new_variant(value: Variant): Variant<"v">
+        new_variant(value: Variant): Variant<"v">
         /**
          * Determines if a given string is a valid D-Bus object path.  You
          * should ensure that a string is a valid D-Bus object path before
@@ -809,7 +777,7 @@ namespace GLib {
          * @param string a normal C nul-terminated string
          * @returns %TRUE if `string` is a D-Bus object path
          */
-        static is_object_path(string: string): boolean
+        is_object_path(string: string): boolean
         /**
          * Determines if a given string is a valid D-Bus type signature.  You
          * should ensure that a string is a valid D-Bus type signature before
@@ -821,7 +789,7 @@ namespace GLib {
          * @param string a normal C nul-terminated string
          * @returns %TRUE if `string` is a D-Bus type signature
          */
-        static is_signature(string: string): boolean
+        is_signature(string: string): boolean
         /**
          * Parses a #GVariant from a text representation.
          *
@@ -866,7 +834,7 @@ namespace GLib {
          * @param endptr a location to store the end pointer, or %NULL
          * @returns a non-floating reference to a #GVariant, or %NULL
          */
-        static parse(
+        parse(
             type: VariantType | null,
             text: string,
             limit: string | null,
@@ -907,17 +875,17 @@ namespace GLib {
          * @param source_str the string that was given to the parser
          * @returns the printed message
          */
-        static parse_error_print_context(
-            error: Error,
-            source_str: string,
-        ): string
+        parse_error_print_context(error: Error, source_str: string): string
 
-        static parse_error_quark(): Quark
+        parse_error_quark(): Quark
         /**
          * Same as g_variant_error_quark().
          * @deprecated Use g_variant_parse_error_quark() instead.
          */
-        static parser_get_error_quark(): Quark
+        parser_get_error_quark(): Quark
+    }
+
+    interface Variant<S extends string = any> {
         /**
          * Performs a byteswapping operation on the contents of `value`.  The
          * result is that all multi-byte numeric data contained in `value` is
@@ -1631,11 +1599,11 @@ namespace GLib {
      * const dict = dictBuilder.end();
      * ```
      */
-    class VariantBuilder<S extends string = "a*"> {
-        static readonly $gtype: GObject.GType<VariantBuilder>
+    interface VariantBuilderStruct<S extends string = "a*"> {
+        readonly $gtype: GObject.GType<VariantBuilder>
 
-        constructor(type: VariantType<S>)
-        constructor(copy: VariantBuilder<S>)
+        new (type: VariantType<S>): VariantBuilder<S>
+        new (copy: VariantBuilder<S>): VariantBuilder<S>
 
         /**
          * Allocates and initialises a new #GVariantBuilder.
@@ -1651,9 +1619,10 @@ namespace GLib {
          * @param type a container type
          * @returns a #GVariantBuilder
          */
-        static new<S extends string = "a*">(
-            type: VariantType<S>,
-        ): VariantBuilder<S>
+        "new"<S extends string = "a*">(type: VariantType<S>): VariantBuilder<S>
+    }
+
+    interface VariantBuilder<S extends string = "a*"> {
         /**
          * Adds `value` to `builder`.
          *
@@ -1706,274 +1675,12 @@ namespace GLib {
          */
         open(type: VariantType): void
     }
-    /**
-     * #GVariantDict is a mutable interface to #GVariant dictionaries.
-     *
-     * It can be used for doing a sequence of dictionary lookups in an
-     * efficient way on an existing #GVariant dictionary or it can be used
-     * to construct new dictionaries with a hashtable-like interface.  It
-     * can also be used for taking existing dictionaries and modifying them
-     * in order to create new ones.
-     *
-     * #GVariantDict can only be used with %G_VARIANT_TYPE_VARDICT
-     * dictionaries.
-     *
-     * @since 2.40
-     */
-    class VariantDict {
-        static readonly $gtype: GObject.GType<VariantDict>
 
-        constructor(from_asv?: Variant | null)
-        constructor(copy: VariantDict)
+    interface VariantTypeStruct<S extends string = any> {
+        readonly $gtype: GObject.GType<VariantType>
 
-        /**
-         * Allocates and initialises a new #GVariantDict.
-         *
-         * @since 2.40
-         * @param from_asv the #GVariant with which to initialise the   dictionary
-         * @returns a #GVariantDict
-         */
-        static new(from_asv: Variant | null): VariantDict
-        /**
-         * Releases all memory associated with a #GVariantDict without freeing
-         * the #GVariantDict structure itself.
-         *
-         * It is valid to call this function on either an initialised
-         * #GVariantDict or one that was previously cleared by an earlier call
-         * to g_variant_dict_clear() but it is not valid to call this function
-         * on uninitialised memory.
-         * @since 2.40
-         */
-        clear(): void
-        /**
-         * Checks if `key` exists in `dict`.
-         * @since 2.40
-         * @param key the key to look up in the dictionary
-         * @returns %TRUE if `key` is in `dict`
-         */
-        contains(key: string): boolean
-        /**
-         * Returns the current value of `dict` as a #GVariant of type
-         * %G_VARIANT_TYPE_VARDICT, clearing it in the process.
-         *
-         * @since 2.40
-         * @returns a new, floating, #GVariant
-         */
-        end(): Variant
-        /**
-         * Inserts (or replaces) a key in a #GVariantDict.
-         *
-         *  `value` is consumed if it is floating.
-         * @since 2.40
-         * @param key the key to insert a value for
-         * @param value the value to insert
-         */
-        insert_value(key: string, value: Variant): void
-        /**
-         * Looks up a value in a #GVariantDict.
-         *
-         * If `key` is not found in `dictionary`, %NULL is returned.
-         *
-         * The `expected_type` string specifies what type of value is expected.
-         * If the value associated with `key` has a different type then %NULL is
-         * returned.
-         *
-         * If the key is found and the value has the correct type, it is
-         * returned.  If `expected_type` was specified then any non-%NULL return
-         * value will have this type.
-         * @since 2.40
-         * @param key the key to look up in the dictionary
-         * @param expected_type a #GVariantType, or %NULL
-         * @returns the value of the dictionary key, or %NULL
-         */
-        lookup_value(
-            key: string,
-            expected_type: VariantType | null,
-        ): Variant | null
-        /**
-         * Removes a key and its associated value from a #GVariantDict.
-         * @since 2.40
-         * @param key the key to remove
-         * @returns %TRUE if the key was found and removed
-         */
-        remove(key: string): boolean
-
-        /**
-         * GJS shortcut for {@link lookup_value} that also unpacks the value.
-         */
-        lookup(
-            key: string,
-            variantType?: string | VariantType,
-            deep?: boolean,
-        ): unknown
-    }
-    /**
-     * A type in the [type@GLib.Variant] type system.
-     *
-     * [type@GLib.Variant] types are represented as strings, but have a strict
-     * syntax described below. All [type@GLib.VariantType]s passed to GLib must be
-     * valid, and they are typically expected to be static (i.e. not provided by
-     * user input) as they determine how binary [type@GLib.Variant] data is
-     * interpreted.
-     *
-     * ## GVariant Type System
-     *
-     * This section introduces the [type@GLib.Variant] type system. It is based, in
-     * large part, on the D-Bus type system, with two major changes and
-     * some minor lifting of restrictions. The
-     * [D-Bus specification](http://dbus.freedesktop.org/doc/dbus-specification.html),
-     * therefore, provides a significant amount of
-     * information that is useful when working with [type@GLib.Variant].
-     *
-     * The first major change with respect to the D-Bus type system is the
-     * introduction of maybe (or ‘nullable’) types.  Any type in [type@GLib.Variant]
-     * can be converted to a maybe type, in which case, `nothing` (or `null`)
-     * becomes a valid value.  Maybe types have been added by introducing the
-     * character `m` to type strings.
-     *
-     * The second major change is that the [type@GLib.Variant] type system supports
-     * the concept of ‘indefinite types’ — types that are less specific than
-     * the normal types found in D-Bus.  For example, it is possible to speak
-     * of ‘an array of any type’ in [type@GLib.Variant], where the D-Bus type system
-     * would require you to speak of ‘an array of integers’ or ‘an array of
-     * strings’.  Indefinite types have been added by introducing the
-     * characters `*`, `?` and `r` to type strings.
-     *
-     * Finally, all arbitrary restrictions relating to the complexity of
-     * types are lifted along with the restriction that dictionary entries
-     * may only appear nested inside of arrays.
-     *
-     * Just as in D-Bus, [type@GLib.Variant] types are described with strings (‘type
-     * strings’).  Subject to the differences mentioned above, these strings
-     * are of the same form as those found in D-Bus.  Note, however: D-Bus
-     * always works in terms of messages and therefore individual type
-     * strings appear nowhere in its interface.  Instead, ‘signatures’
-     * are a concatenation of the strings of the type of each argument in a
-     * message.  [type@GLib.Variant] deals with single values directly so
-     * [type@GLib.Variant] type strings always describe the type of exactly one
-     * value.  This means that a D-Bus signature string is generally not a valid
-     * [type@GLib.Variant] type string — except in the case that it is the signature
-     * of a message containing exactly one argument.
-     *
-     * An indefinite type is similar in spirit to what may be called an
-     * abstract type in other type systems.  No value can exist that has an
-     * indefinite type as its type, but values can exist that have types
-     * that are subtypes of indefinite types.  That is to say,
-     * [method@GLib.Variant.get_type] will never return an indefinite type, but
-     * calling [method@GLib.Variant.is_of_type] with an indefinite type may return
-     * true.  For example, you cannot have a value that represents ‘an
-     * array of no particular type’, but you can have an ‘array of integers’
-     * which certainly matches the type of ‘an array of no particular type’,
-     * since ‘array of integers’ is a subtype of ‘array of no particular
-     * type’.
-     *
-     * This is similar to how instances of abstract classes may not
-     * directly exist in other type systems, but instances of their
-     * non-abstract subtypes may.  For example, in GTK, no object that has
-     * the type of [`GtkWidget`](https://docs.gtk.org/gtk4/class.Widget.html) can
-     * exist (since `GtkWidget` is an abstract class), but a [`GtkWindow`](https://docs.gtk.org/gtk4/class.Window.html)
-     * can certainly be instantiated, and you would say that a `GtkWindow` is a
-     * `GtkWidget` (since `GtkWindow` is a subclass of `GtkWidget`).
-     *
-     * Two types may not be compared by value; use [method@GLib.VariantType.equal]
-     * or [method@GLib.VariantType.is_subtype_of]  May be copied using
-     * [method@GLib.VariantType.copy] and freed using [method@GLib.VariantType.free].
-     *
-     * ## GVariant Type Strings
-     *
-     * A [type@GLib.Variant] type string can be any of the following:
-     *
-     * - any basic type string (listed below)
-     * - `v`, `r` or `*`
-     * - one of the characters `a` or `m`, followed by another type string
-     * - the character `(`, followed by a concatenation of zero or more other
-     *   type strings, followed by the character `)`
-     * - the character `{`, followed by a basic type string (see below),
-     *   followed by another type string, followed by the character `}`
-     *
-     * A basic type string describes a basic type (as per
-     * [method@GLib.VariantType.is_basic]) and is always a single character in
-     * length. The valid basic type strings are `b`, `y`, `n`, `q`, `i`, `u`, `x`,
-     * `t`, `h`, `d`, `s`, `o`, `g` and `?`.
-     *
-     * The above definition is recursive to arbitrary depth. `aaaaai` and
-     * `(ui(nq((y)))s)` are both valid type strings, as is
-     * `a(aa(ui)(qna{ya(yd)}))`. In order to not hit memory limits,
-     * [type@GLib.Variant] imposes a limit on recursion depth of 65 nested
-     * containers. This is the limit in the D-Bus specification (64) plus one to
-     * allow a [`GDBusMessage`](../gio/class.DBusMessage.html) to be nested in
-     * a top-level tuple.
-     *
-     * The meaning of each of the characters is as follows:
-     *
-     * - `b`: the type string of `G_VARIANT_TYPE_BOOLEAN`; a boolean value.
-     * - `y`: the type string of `G_VARIANT_TYPE_BYTE`; a byte.
-     * - `n`: the type string of `G_VARIANT_TYPE_INT16`; a signed 16 bit integer.
-     * - `q`: the type string of `G_VARIANT_TYPE_UINT16`; an unsigned 16 bit integer.
-     * - `i`: the type string of `G_VARIANT_TYPE_INT32`; a signed 32 bit integer.
-     * - `u`: the type string of `G_VARIANT_TYPE_UINT32`; an unsigned 32 bit integer.
-     * - `x`: the type string of `G_VARIANT_TYPE_INT64`; a signed 64 bit integer.
-     * - `t`: the type string of `G_VARIANT_TYPE_UINT64`; an unsigned 64 bit integer.
-     * - `h`: the type string of `G_VARIANT_TYPE_HANDLE`; a signed 32 bit value
-     *   that, by convention, is used as an index into an array of file
-     *   descriptors that are sent alongside a D-Bus message.
-     * - `d`: the type string of `G_VARIANT_TYPE_DOUBLE`; a double precision
-     *   floating point value.
-     * - `s`: the type string of `G_VARIANT_TYPE_STRING`; a string.
-     * - `o`: the type string of `G_VARIANT_TYPE_OBJECT_PATH`; a string in the form
-     *   of a D-Bus object path.
-     * - `g`: the type string of `G_VARIANT_TYPE_SIGNATURE`; a string in the form of
-     *   a D-Bus type signature.
-     * - `?`: the type string of `G_VARIANT_TYPE_BASIC`; an indefinite type that
-     *   is a supertype of any of the basic types.
-     * - `v`: the type string of `G_VARIANT_TYPE_VARIANT`; a container type that
-     *   contain any other type of value.
-     * - `a`: used as a prefix on another type string to mean an array of that
-     *   type; the type string `ai`, for example, is the type of an array of
-     *   signed 32-bit integers.
-     * - `m`: used as a prefix on another type string to mean a ‘maybe’, or
-     *   ‘nullable’, version of that type; the type string `ms`, for example,
-     *   is the type of a value that maybe contains a string, or maybe contains
-     *   nothing.
-     * - `()`: used to enclose zero or more other concatenated type strings to
-     *   create a tuple type; the type string `(is)`, for example, is the type of
-     *   a pair of an integer and a string.
-     * - `r`: the type string of `G_VARIANT_TYPE_TUPLE`; an indefinite type that is
-     *   a supertype of any tuple type, regardless of the number of items.
-     * - `{}`: used to enclose a basic type string concatenated with another type
-     *   string to create a dictionary entry type, which usually appears inside of
-     *   an array to form a dictionary; the type string `a{sd}`, for example, is
-     *   the type of a dictionary that maps strings to double precision floating
-     *   point values.
-     *
-     *   The first type (the basic type) is the key type and the second type is
-     *   the value type. The reason that the first type is restricted to being a
-     *   basic type is so that it can easily be hashed.
-     * - `*`: the type string of `G_VARIANT_TYPE_ANY`; the indefinite type that is
-     *   a supertype of all types.  Note that, as with all type strings, this
-     *   character represents exactly one type. It cannot be used inside of tuples
-     *   to mean ‘any number of items’.
-     *
-     * Any type string of a container that contains an indefinite type is,
-     * itself, an indefinite type. For example, the type string `a*`
-     * (corresponding to `G_VARIANT_TYPE_ARRAY`) is an indefinite type
-     * that is a supertype of every array type. `(*s)` is a supertype
-     * of all tuples that contain exactly two items where the second
-     * item is a string.
-     *
-     * `a{?*}` is an indefinite type that is a supertype of all arrays
-     * containing dictionary entries where the key is any basic type and
-     * the value is any type at all.  This is, by definition, a dictionary,
-     * so this type string corresponds to `G_VARIANT_TYPE_DICTIONARY`. Note
-     * that, due to the restriction that the key of a dictionary entry must
-     * be a basic type, `{**}` is not a valid type string.
-     * @since 2.24
-     */
-    class VariantType<S extends string = any> {
-        static readonly $gtype: GObject.GType<VariantType>
-
-        constructor(type_string: S)
-        constructor(copy: VariantType<S>)
+        new (type_string: S): VariantType<S>
+        new (copy: VariantType<S>): VariantType<S>
 
         /**
          * Creates a new [type@GLib.VariantType] corresponding to the type string given
@@ -1985,7 +1692,7 @@ namespace GLib {
          * @param type_string a valid [GVariant type string](./struct.VariantType.html#gvariant-type-strings)
          * @returns a new [type@GLib.VariantType]
          */
-        static new<S extends string>(type_string: S): VariantType<S>
+        "new"<S extends string>(type_string: S): VariantType<S>
         /**
          * Constructs the type corresponding to an array of elements of the
          * type `type`.
@@ -1994,7 +1701,7 @@ namespace GLib {
          * @param element an element type
          * @returns a new array type Since 2.24
          */
-        static new_array<S extends string>(
+        new_array<S extends string>(
             element: VariantType<S>,
         ): VariantType<`a${S}`>
         /**
@@ -2006,7 +1713,7 @@ namespace GLib {
          * @param value a type to use for the value
          * @returns a new dictionary entry type Since 2.24
          */
-        static new_dict_entry<K extends string, V extends string>(
+        new_dict_entry<K extends string, V extends string>(
             key: VariantType<K>,
             value: VariantType<V>,
         ): VariantType<`{${K}${V}}`>
@@ -2018,7 +1725,7 @@ namespace GLib {
          * @param element an element type
          * @returns a new ‘maybe’ type Since 2.24
          */
-        static new_maybe<S extends string>(
+        new_maybe<S extends string>(
             element: VariantType<S>,
         ): VariantType<`m${S}`>
         /**
@@ -2031,9 +1738,11 @@ namespace GLib {
          * @param items an array of types, one for each item
          * @returns a new tuple type Since 2.24
          */
-        static new_tuple<
+        new_tuple<
             Items extends ReadonlyArray<VariantType> | readonly [VariantType],
-        >(items: Items): VariantType<`(${$ToTuple<Items>})`>
+        >(
+            items: Items,
+        ): VariantType<`(${$ToTuple<Items>})`>
         /**
          * Checks if `type_string` is a valid
          * [GVariant type string](./struct.VariantType.html#gvariant-type-strings).
@@ -2043,7 +1752,7 @@ namespace GLib {
          * @param type_string a pointer to any string
          * @returns true if `type_string` is exactly one valid type string Since 2.24
          */
-        static string_is_valid(type_string: string): boolean
+        string_is_valid(type_string: string): boolean
         /**
          * Scan for a single complete and valid GVariant type string in `string`.
          *
@@ -2064,10 +1773,10 @@ namespace GLib {
          * @param limit the end of `string`
          * @returns true if a valid type string was found, location to store the end pointer
          */
-        static string_scan(
-            string: string,
-            limit: string | null,
-        ): [boolean, string]
+        string_scan(string: string, limit: string | null): [boolean, string]
+    }
+
+    interface VariantType<S extends string = any> {
         /**
          * Makes a copy of a [type@GLib.VariantType].
          *
@@ -2294,5 +2003,41 @@ namespace GLib {
          * @returns the value type of the dictionary entry Since 2.24
          */
         value(): VariantType
+    }
+
+    interface $Exports {
+        VariantType: VariantTypeStruct
+        VariantBuilder: VariantBuilderStruct
+
+        MAXINT64_BIGINT: bigint
+        MININT64_BIGINT: bigint
+        MAXUINT64_BIGINT: bigint
+        /**
+         * Log a message with structured data.
+         * For more information about this function, see the upstream documentation for [g_log_structured](https://docs.gtk.org/glib/func.log_structured.html).
+         *
+         * @param logDomain A log domain, usually G_LOG_DOMAINA
+         * @param logLevel A log level, either from {@link LogLevelFlags}, or a user-defined level
+         * @param stringFields Key–value pairs of structured data to add to the log message
+         */
+        log_structured(
+            logDomain: string,
+            logLevel: LogLevelFlags,
+            stringFields: Record<string, any>,
+        ): void
+
+        idle_add_once(priority: number, callback: () => void): number
+
+        timeout_add_once(
+            priority: number,
+            interval: number,
+            callback: () => void,
+        ): number
+
+        timeout_add_seconds_once(
+            priority: number,
+            interval: number,
+            callback: () => void,
+        ): number
     }
 }

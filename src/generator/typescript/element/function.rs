@@ -2,7 +2,12 @@ use super::super::render;
 use super::callable;
 use crate::element;
 
-impl render::Renderable for element::Function {
+#[derive(serde::Serialize)]
+pub struct FunctionContext {
+    function: String,
+}
+
+impl render::Renderable<FunctionContext> for element::Function {
     const KIND: &'static str = "function";
     const TEMPLATE: &'static str = "{{ function }}";
 
@@ -22,22 +27,24 @@ impl render::Renderable for element::Function {
             && self.attrs.info.introspectable.is_none_or(|i| i)
     }
 
-    fn ctx(&self, _: &render::Context) -> Result<minijinja::Value, String> {
+    fn ctx(&self, ctx: &render::Context) -> Result<FunctionContext, String> {
+        let name = match &self.attrs.shadows {
+            Some(name) => name,
+            None => &self.attrs.name,
+        };
+
         let args = callable::CallableArgs {
             info_elements: &self.info_elements,
             info: &self.attrs.info,
             throws: self.attrs.throws,
-            prefix: Some("function "),
-            name: Some(match &self.attrs.shadows {
-                Some(name) => name,
-                None => &self.attrs.name,
-            }),
+            prefix: Some(&format!("{name}: ")),
+            name: None,
             parameters: self.parameters.as_ref(),
             returns: self.return_value.as_ref(),
         };
 
-        Ok(minijinja::context! {
-            function => callable::render(&args)?,
+        Ok(FunctionContext {
+            function: callable::render(ctx, &args)?,
         })
     }
 }

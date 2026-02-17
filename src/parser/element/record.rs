@@ -73,11 +73,7 @@ impl super::Element for Record {
             AnyElement::MethodInline(i) => self.inline_methods.push(i),
             AnyElement::Constructor(i) => self.constructors.push(i),
             ele => {
-                return Err(ParseError::UnhandledXmlTag(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 

@@ -48,11 +48,7 @@ impl super::Element for Enumeration {
             AnyElement::Function(f) => self.functions.push(f),
             AnyElement::FunctionInline(f) => self.inline_functions.push(f),
             ele => {
-                return Err(ParseError::UnhandledXmlTag(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 

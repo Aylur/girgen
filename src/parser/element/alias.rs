@@ -40,10 +40,6 @@ impl super::Element for Alias {
             }
         };
 
-        Err(ParseError::UnexpectedElement(format!(
-            "{}: {}",
-            Self::KIND,
-            element.kind(),
-        )))
+        Err(ParseError::UnexpectedElement(Self::KIND, element.kind()))
     }
 }

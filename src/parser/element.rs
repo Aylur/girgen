@@ -90,11 +90,7 @@ pub trait Element {
         Self: Sized;
 
     fn end(&mut self, element: AnyElement) -> Result<(), ParseError> {
-        Err(ParseError::UnexpectedElement(format!(
-            "{} is expected to be empty, but got {}",
-            Self::KIND,
-            element.kind(),
-        )))
+        Err(ParseError::UnexpectedElement(Self::KIND, element.kind()))
     }
 
     fn text(&mut self, _str: &str) -> Result<(), ParseError> {
@@ -244,7 +240,7 @@ impl AnyElement {
             b"member" => Self::Member(Member::new(attrs)?),
             b"docsection" => Self::DocSection(DocSection::new(attrs)?),
             tag => {
-                return Err(ParseError::UnhandledXmlTag(
+                return Err(ParseError::InvalidGirElement(
                     str::from_utf8(tag).unwrap().to_owned(),
                 ));
             }
@@ -253,6 +249,10 @@ impl AnyElement {
     }
 
     pub fn end(&mut self, e: AnyElement) -> Result<(), ParseError> {
+        if matches!(e, Self::Invalid) {
+            return Ok(());
+        }
+
         match self {
             Self::Invalid => Ok(()),
             Self::Repository(i) => i.end(e),

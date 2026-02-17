@@ -5,31 +5,37 @@ use stringcase::snake_case;
 
 const TEMPLATE: &str = include_str!("../templates/record.jinja");
 
+#[derive(serde::Serialize)]
+pub struct FieldContext {
+    jsdoc: String,
+    name: String,
+    r#type: String,
+    readable: bool,
+    writable: bool,
+}
+
 macro_rules! ctx {
-    ($self:expr, $ctx:expr, $ctor:expr) => {{
+    ($ns:expr, $self:expr, $name:expr, $ctx:expr, $ctor:expr) => {{
         let jsdoc = doc::jsdoc(&$self.info_elements, &$self.info)?;
 
-        let fields: Vec<minijinja::Value> = $self
+        let fields: Vec<FieldContext> = $self
             .fields
             .iter()
             .filter(|f| f.info.introspectable.is_none_or(|i| i) && f.private.is_none_or(|p| !p))
             .filter_map(|f| {
-                let gtype = match &f.r#type {
-                    None => return None,
-                    Some(t) => match gtype::resolve_anytype(t) {
-                        Err(_) => return None,
-                        Ok(t) => t,
-                    },
+                let gtype = match gtype::tstype(f.r#type.as_ref(), false) {
+                    Ok(ok) => ok,
+                    Err(_) => return None,
                 };
 
                 let jsdoc = doc::jsdoc(&f.info_elements, &f.info).unwrap();
 
-                Some(minijinja::context! {
+                Some(FieldContext {
                     jsdoc,
-                    name => snake_case(&f.name),
-                    type => gtype,
-                    readable => f.readable,
-                    writable => f.writable,
+                    name: snake_case(&f.name),
+                    r#type: gtype,
+                    readable: f.readable.unwrap_or(false),
+                    writable: f.writable.unwrap_or(false),
                 })
             })
             .collect();
@@ -46,7 +52,7 @@ macro_rules! ctx {
 
         let constructors = callable::render_callable_elements(
             $ctx,
-            "static ",
+            "",
             &$self
                 .constructors
                 .iter()
@@ -56,7 +62,7 @@ macro_rules! ctx {
 
         let functions = callable::render_callable_elements(
             $ctx,
-            "static ",
+            "",
             &$self
                 .functions
                 .iter()
@@ -64,10 +70,11 @@ macro_rules! ctx {
                 .collect::<Vec<_>>(),
         );
 
-        Ok(minijinja::context! {
+        Ok(RecordContext {
+            namespace: $ns.clone(),
             jsdoc,
-            name => $self.name,
-            constructor => $ctor,
+            name: $name,
+            constructor: $ctor,
             fields,
             methods,
             constructors,
@@ -76,7 +83,19 @@ macro_rules! ctx {
     }};
 }
 
-impl render::Renderable for element::Record {
+#[derive(serde::Serialize)]
+pub struct RecordContext {
+    namespace: String,
+    jsdoc: String,
+    name: String,
+    constructor: Option<String>,
+    fields: Vec<FieldContext>,
+    methods: Vec<String>,
+    constructors: Vec<String>,
+    functions: Vec<String>,
+}
+
+impl render::Renderable<RecordContext> for element::Record {
     const KIND: &'static str = "record";
     const TEMPLATE: &'static str = TEMPLATE;
 
@@ -87,21 +106,15 @@ impl render::Renderable for element::Record {
     fn introspectable(&self, _: &render::Context) -> bool {
         // gtype structs are rendered in classes/interfaces
         self.glib_is_gtype_struct_for.is_none() && self.info.introspectable.is_none_or(|i| i)
-        // && self.name.is_some()
     }
 
-    fn ctx(&self, ctx: &render::Context) -> Result<minijinja::Value, String> {
+    fn ctx(&self, ctx: &render::Context) -> Result<RecordContext, String> {
         // TODO: generate a constructor for non opaque records
-        let constructor = Option::<&str>::None;
-
-        match &self.glib_is_gtype_struct_for {
-            Some(type_for) => Ok(minijinja::context! { name => self.name, type_for }),
-            None => ctx!(self, ctx, constructor),
-        }
+        ctx!(ctx.namespace.name, self, self.name.clone(), ctx, None)
     }
 }
 
-impl render::Renderable for element::Union {
+impl render::Renderable<RecordContext> for element::Union {
     const KIND: &'static str = "union";
     const TEMPLATE: &'static str = TEMPLATE;
 
@@ -116,7 +129,8 @@ impl render::Renderable for element::Union {
         self.info.introspectable.is_none_or(|i| i) && self.name.is_some()
     }
 
-    fn ctx(&self, ctx: &render::Context) -> Result<minijinja::Value, String> {
-        ctx!(self, ctx, Option::<&str>::None)
+    fn ctx(&self, ctx: &render::Context) -> Result<RecordContext, String> {
+        let name = self.name.clone().unwrap_or_default();
+        ctx!(ctx.namespace.name, self, name, ctx, None)
     }
 }

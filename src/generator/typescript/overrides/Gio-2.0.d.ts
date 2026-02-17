@@ -39,56 +39,18 @@ namespace Gio {
         runAsync(argv: string[] | null): Promise<number>
     }
 
-    /**
-     * A convenient helper to create Promise wrappers for asynchronous functions in GJS.
-     *
-     * This utility replaces the original function on the class prototype with a Promise-based version,
-     * allowing the function to be called on any instance of the class, including subclasses.
-     * Simply pass the class prototype, the "async" function name, and the "finish" function name as arguments.
-     *
-     * The function can be used like any other Promise, without the need for a custom wrapper, by leaving out the callback argument.
-     * The original function will still be available, and can be used by passing the callback.
-     *
-     * @param proto - The class prototype that contains the asynchronous function.
-     * @param asyncFunc - The name of the asynchronous function.
-     * @param finishFunc - The name of the "finish" function that is used to retrieve the result of the asynchronous function.
-     *
-     * @version Gjs 1.54
-     * @see https://gjs.guide/guides/gjs/asynchronous-programming.html#promisify-helper
-     *
-     * @example
-     * ```js
-     * import Gio from "gi://Gio?version=2.0";
-     *
-     * Gio._promisify(Gio.InputStream.prototype, 'read_bytes_async', 'read_bytes_finish');
-     *
-     * try {
-     *    const inputStream = new Gio.UnixInputStream({fd: 0});
-     *    const bytes = await inputStream.read_bytes_async(4096, GLib.PRIORITY_DEFAULT, null);
-     * } catch (e) {
-     *    logError(e, 'Failed to read bytes');
-     * }
-     * ```
-     *
-     */
-    export function _promisify(
-        proto: any,
-        asyncFunc: string,
-        finishFunc?: string,
-    ): void
+    interface DBus {
+        get: Gio["bus_get"]
+        get_finish: Gio["bus_get_finish"]
+        get_sync: Gio["bus_get_sync"]
 
-    namespace DBus {
-        export import get = Gio.bus_get
-        export import get_finish = Gio.bus_get_finish
-        export import get_sync = Gio.bus_get_sync
+        own_name: Gio["bus_own_name"]
+        own_name_on_connection: Gio["bus_own_name_on_connection"]
+        unown_name: Gio["bus_unown_name"]
 
-        export import own_name = Gio.bus_own_name
-        export import own_name_on_connection = Gio.bus_own_name_on_connection
-        export import unown_name = Gio.bus_unown_name
-
-        export import watch_name = Gio.bus_watch_name
-        export import watch_name_on_connection = Gio.bus_watch_name_on_connection
-        export import unwatch_name = Gio.bus_unwatch_name
+        watch_name: Gio["bus_watch_name"]
+        watch_name_on_connection: Gio["bus_watch_name_on_connection"]
+        unwatch_name: Gio["bus_unwatch_name"]
 
         /**
          * Convenience for getting the session {@link Gio.DBusConnection}.
@@ -98,7 +60,7 @@ namespace Gio {
          * Gio.bus_get_sync(Gio.BusType.SESSION, null)
          * ```
          */
-        const session: Gio.DBusConnection
+        session: Gio.DBusConnection
         /**
          * Convenience for getting the system {@link Gio.DBusConnection}.
          * This always returns the same object and is equivalent to calling:
@@ -107,7 +69,7 @@ namespace Gio {
          * Gio.bus_get_sync(Gio.BusType.SYSTEM, null)
          * ```
          */
-        const system: Gio.DBusConnection
+        system: Gio.DBusConnection
     }
 
     interface DBusConnection {
@@ -200,9 +162,7 @@ namespace Gio {
         emit_signal(signalName: string, signalParameters: GLib.Variant): void
     }
 
-    const DBusExportedObject: DBusExportedObjectClass
-
-    namespace DBusInterfaceInfo {
+    interface DBusInterfaceInfoStruct {
         /**
          * Parses `xmlData` and returns a {@link Gio.DBusInterfaceInfo} representing the first `<interface>` element of the data.
          * This is a convenience wrapper around {@link Gio.DBusNodeInfo.new_for_xml} for the common case of a {@link Gio.DBusNodeInfo} with a single interface.
@@ -210,7 +170,7 @@ namespace Gio {
          * @param xmlData Valid D-Bus introspection XML
          * @returns A {@link Gio.DBusInterfaceInfo} structure
          */
-        function new_for_xml(xmlData: string): Gio.DBusInterfaceInfo
+        new_for_xml(xmlData: string): DBusInterfaceInfo
     }
 
     interface ListStore {
@@ -264,5 +224,43 @@ namespace Gio {
          * @param entries Array of action entries to add
          */
         add_action_entries(entries: ActionEntryObject[]): void
+    }
+
+    interface $Exports {
+        DBus: DBus
+        DBusExportedObject: DBusExportedObjectClass
+
+        /**
+         * A convenient helper to create Promise wrappers for asynchronous functions in GJS.
+         *
+         * This utility replaces the original function on the class prototype with a Promise-based version,
+         * allowing the function to be called on any instance of the class, including subclasses.
+         * Simply pass the class prototype, the "async" function name, and the "finish" function name as arguments.
+         *
+         * The function can be used like any other Promise, without the need for a custom wrapper, by leaving out the callback argument.
+         * The original function will still be available, and can be used by passing the callback.
+         *
+         * @param proto - The class prototype that contains the asynchronous function.
+         * @param asyncFunc - The name of the asynchronous function.
+         * @param finishFunc - The name of the "finish" function that is used to retrieve the result of the asynchronous function.
+         *
+         * @version Gjs 1.54
+         * @see https://gjs.guide/guides/gjs/asynchronous-programming.html#promisify-helper
+         *
+         * @example
+         * ```js
+         * import Gio from "gi://Gio?version=2.0";
+         *
+         * Gio._promisify(Gio.InputStream.prototype, 'read_bytes_async', 'read_bytes_finish');
+         *
+         * try {
+         *    const inputStream = new Gio.UnixInputStream({fd: 0});
+         *    const bytes = await inputStream.read_bytes_async(4096, GLib.PRIORITY_DEFAULT, null);
+         * } catch (e) {
+         *    logError(e, 'Failed to read bytes');
+         * }
+         * ```
+         */
+        _promisify(proto: any, asyncFunc: string, finishFunc?: string): void
     }
 }

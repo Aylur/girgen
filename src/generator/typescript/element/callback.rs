@@ -2,7 +2,12 @@ use super::super::render;
 use super::callable;
 use crate::element;
 
-impl render::Renderable for element::Callback {
+#[derive(serde::Serialize)]
+pub struct CallbackContext {
+    callback: String,
+}
+
+impl render::Renderable<CallbackContext> for element::Callback {
     const KIND: &'static str = "callback";
     const TEMPLATE: &'static str = "{{ callback }}";
 
@@ -22,7 +27,7 @@ impl render::Renderable for element::Callback {
             && self.info.introspectable.is_none_or(|i| i)
     }
 
-    fn ctx(&self, _: &render::Context) -> Result<minijinja::Value, String> {
+    fn ctx(&self, ctx: &render::Context) -> Result<CallbackContext, String> {
         let args = callable::CallableArgs {
             info_elements: &self.info_elements,
             info: &self.info,
@@ -33,8 +38,8 @@ impl render::Renderable for element::Callback {
             returns: self.return_value.as_ref(),
         };
 
-        Ok(minijinja::context! {
-            callback => callable::render(&args)?,
+        Ok(CallbackContext {
+            callback: callable::render(ctx, &args)?,
         })
     }
 }

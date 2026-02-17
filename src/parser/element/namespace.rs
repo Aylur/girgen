@@ -66,11 +66,7 @@ impl super::Element for Namespace {
             AnyElement::Boxed(i) => self.boxeds.push(i),
             AnyElement::DocSection(i) => self.doc_sections.push(i),
             ele => {
-                return Err(ParseError::UnhandledXmlTag(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
         Ok(())

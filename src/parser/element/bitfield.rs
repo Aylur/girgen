@@ -52,11 +52,7 @@ impl super::Element for Bitfield {
                 self.inline_functions.push(function_inline);
             }
             ele => {
-                return Err(ParseError::UnexpectedElement(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 

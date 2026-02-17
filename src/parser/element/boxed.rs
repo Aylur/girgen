@@ -46,11 +46,7 @@ impl super::Element for Boxed {
                 self.inline_functions.push(function_inline);
             }
             ele => {
-                return Err(ParseError::UnexpectedElement(format!(
-                    "{}:{}",
-                    Self::KIND,
-                    ele.kind()
-                )));
+                return Err(ParseError::UnexpectedElement(Self::KIND, ele.kind()));
             }
         }
 

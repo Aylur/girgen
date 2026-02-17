@@ -37,10 +37,6 @@ impl super::Element for Member {
             }
         };
 
-        Err(ParseError::UnexpectedElement(format!(
-            "{}:{}",
-            Self::KIND,
-            element.kind()
-        )))
+        Err(ParseError::UnexpectedElement(Self::KIND, element.kind()))
     }
 }
