@@ -30,7 +30,7 @@ type NotifySignals<Emitter> = Emitter extends {
 }
     ? {
           [P in Keyof<Emitter["$readableProperties"]> as `notify::${P}`]: (
-              pspec: Emitter["$readableProperties"][P],
+              pspec: GObject.ParamSpec<Emitter["$readableProperties"][P]>,
           ) => void
       }
     : never
