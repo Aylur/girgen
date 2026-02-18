@@ -1,8 +1,7 @@
 mod cache;
-mod typescript;
+pub mod typescript;
 
 pub use cache::{cache, hash, lookup_cache};
-pub use typescript::generate as typescript;
 
 use crate::element;
 use std::{io, path};
@@ -47,7 +46,8 @@ impl From<io::Error> for Error {
     }
 }
 
-pub type Generator = fn(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error>;
+pub type Generator<T> =
+    fn(opts: T, girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error>;
 
 pub struct Gir<'a> {
     pub name: &'a str,

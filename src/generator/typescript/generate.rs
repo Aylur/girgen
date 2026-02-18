@@ -1,9 +1,34 @@
 use super::{super::cache, gjs_lib};
 use crate::generator::{Error, Event, Gir};
 use rayon::prelude::*;
-use std::fs;
+use std::{collections, fs};
 
-pub fn generate(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error> {
+pub struct Opts {
+    pub short_paths: bool,
+}
+
+fn unique_girs<'a>(items: &'a [Gir]) -> Vec<(&'a str, &'a str)> {
+    let names = items
+        .iter()
+        .filter_map(|gir| gir.name.rsplit_once('-'))
+        .collect::<Vec<_>>();
+
+    let mut counts: collections::HashMap<&str, usize> = collections::HashMap::new();
+    for (name, _) in names.iter() {
+        *counts.entry(name).or_insert(0) += 1;
+    }
+
+    let mut out = Vec::new();
+    for (name, version) in names {
+        if matches!(counts.get(name), Some(1)) {
+            out.push((name, version));
+        }
+    }
+
+    out
+}
+
+pub fn generate(opts: &Opts, girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error> {
     if girs.is_empty() {
         return Err(Error::Empty);
     }
@@ -12,13 +37,12 @@ pub fn generate(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Erro
 
     let repos = girs.iter().map(|gir| &gir.repo).collect::<Vec<_>>();
 
-    let index = girs
+    let imports = girs
         .par_iter()
         .filter_map(|gir| {
             let hash = cache::hash("ts_", gir.name, &gir.contents);
             let cache_path = cache::lookup_cache(&hash);
             let out_path = format!("{}/{}.d.ts", outdir, gir.name);
-            let import = format!("import \"./{}.d.ts\"", gir.name);
 
             if let Some(path) = cache_path {
                 match fs::read_to_string(path) {
@@ -34,7 +58,7 @@ pub fn generate(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Erro
                                 repo: gir.name,
                                 out_path: &out_path,
                             });
-                            return Some(import);
+                            return Some(gir.name);
                         }
                     },
                 }
@@ -70,7 +94,7 @@ pub fn generate(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Erro
                         repo: gir.name,
                         out_path: &out_path,
                     });
-                    Some(import)
+                    Some(gir.name)
                 }
             }
         })
@@ -87,11 +111,31 @@ pub fn generate(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Erro
                     repo: lib.name,
                     out_path: &path,
                 });
-                Some(format!("import \"./{}.d.ts\"", lib.name))
+                Some(lib.name)
             }
         }))
-        .collect::<Vec<_>>()
-        .join("\n");
+        .collect::<Vec<_>>();
+
+    let aliases = if opts.short_paths {
+        unique_girs(girs)
+            .iter()
+            .map(|(name, version)| {
+                minijinja::context! {
+                    name,
+                    version,
+                }
+            })
+            .collect::<Vec<_>>()
+    } else {
+        Vec::new()
+    };
+
+    let index = minijinja::Environment::new()
+        .render_str(
+            include_str!("./templates/index.jinja"),
+            minijinja::context! { imports, aliases },
+        )
+        .unwrap();
 
     let index_path = format!("{}/index.d.ts", outdir);
     fs::write(&index_path, index)?;
@@ -102,7 +146,7 @@ pub fn generate(girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Erro
 
     let package_path = format!("{}/package.json", outdir);
     fs::write(&package_path, include_str!("./gjs_lib/package.json"))?;
-    event(Event::Generated {
+    event(Event::CacheHit {
         repo: "package",
         out_path: package_path.as_str(),
     });

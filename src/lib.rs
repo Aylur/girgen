@@ -34,15 +34,15 @@ pub fn default_dirs() -> String {
     dirs.join(":")
 }
 
-pub struct Args<'a> {
+pub struct Args<'a, T> {
     pub dirs: &'a [&'a path::Path],
     pub outdir: &'a str,
     pub ignore: &'a [&'a str],
     pub event: fn(Event),
-    pub generator: Generator,
+    pub generator: Generator<T>,
 }
 
-pub fn girgen(args: &Args) -> Result<(), Error> {
+pub fn girgen<T: Sync>(opts: T, args: &Args<T>) -> Result<(), Error> {
     let mut gir_paths = args
         .dirs
         .iter()
@@ -116,5 +116,5 @@ pub fn girgen(args: &Args) -> Result<(), Error> {
         })
         .collect::<Vec<_>>();
 
-    (args.generator)(&girs, args.outdir, args.event)
+    (args.generator)(opts, &girs, args.outdir, args.event)
 }

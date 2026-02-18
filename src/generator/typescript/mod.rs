@@ -4,4 +4,4 @@ mod gjs_lib;
 mod overrides;
 mod render;
 
-pub use generate::generate;
+pub use generate::{Opts, generate};

@@ -90,6 +90,10 @@ enum Language {
         /// Target directory to generate to
         #[arg(short, long, value_name = "PATH", default_value = "./.types/gi")]
         outdir: String,
+
+        /// Generate non versioned import aliases
+        #[arg(short, long)]
+        alias: bool,
     },
 }
 
@@ -100,25 +104,27 @@ fn main() -> process::ExitCode {
         VERBOSE.set(false).unwrap();
     }
 
-    let dirs: Vec<path::PathBuf> = cli.dirs.split(":").map(path::PathBuf::from).collect();
+    let dir_paths: Vec<path::PathBuf> = cli.dirs.split(":").map(path::PathBuf::from).collect();
+    let dirs = &dir_paths.iter().map(|p| p.as_path()).collect::<Vec<_>>();
+    let ignore = &cli.ignore.iter().map(|i| i.as_ref()).collect::<Vec<_>>();
 
-    let outdir = match cli.command {
-        Language::Typescript { outdir } => outdir,
+    let res = match cli.command {
+        Language::Typescript { outdir, alias } => {
+            let opts = typescript::Opts { short_paths: alias };
+
+            let args = girgen::Args {
+                dirs,
+                ignore,
+                outdir: &outdir,
+                event: on_event,
+                generator: typescript::generate,
+            };
+
+            girgen(&opts, &args)
+        }
     };
 
-    let generator = match cli.command {
-        Language::Typescript { outdir: _ } => typescript,
-    };
-
-    let args = girgen::Args {
-        dirs: &dirs.iter().map(|p| p.as_path()).collect::<Vec<_>>(),
-        outdir: &outdir,
-        ignore: &cli.ignore.iter().map(|i| i.as_ref()).collect::<Vec<_>>(),
-        event: on_event,
-        generator,
-    };
-
-    match girgen(&args) {
+    match res {
         Ok(_) => process::ExitCode::SUCCESS,
         Err(Error::Empty) => {
             eprintln!("nothing to generate");

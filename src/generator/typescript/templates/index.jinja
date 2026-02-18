@@ -1,0 +1,10 @@
+{%- for import in imports %}
+import "./{{ import }}.d.ts"
+{%- endfor %}
+
+{% for alias in aliases %}
+declare module "gi://{{ alias.name }}" {
+    import {{ alias.name }} from "gi://{{ alias.name }}?version={{ alias.version }}"
+    export default {{ alias.name }}
+}
+{%- endfor %}
