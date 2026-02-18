@@ -1,6 +1,7 @@
 /// <reference lib="es2018" />
 
 import type GObject from "gi://GObject?version=2.0"
+import type GLib from "gi://GLib?version=2.0"
 import type System from "system"
 import type Gettext from "gettext"
 import type format from "./format"
@@ -43,7 +44,10 @@ declare global {
     const ARGV: string[]
 
     interface Error {
-        matches(): boolean
+        matches(
+            domain: GLib.Quark | { $gtype: GObject.GType<Error> },
+            code: number,
+        ): boolean
     }
 
     interface BooleanConstructor {

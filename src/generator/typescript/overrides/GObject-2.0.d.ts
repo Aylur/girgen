@@ -1083,6 +1083,8 @@ namespace GObject {
             is_a_type: T | GType<T>,
         ): obj is T
 
+        type_is_a<T>(obj: GType, is_a_type: T | GType<T>): obj is GType<T>
+
         /** @see Object.connect */
         signal_connect<T extends Object>(
             object: T,

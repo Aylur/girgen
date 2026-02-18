@@ -7,12 +7,21 @@ interface {{ typename }} extends GLib.Error {}
 interface {{ value }} {
     readonly $gtype: GObject.GType<{{ typename }}>
 
-    [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
+    new(props: { message: string, code: number }): {{ typename }}
 
     {%- for member in members %}
     {{ member.jsdoc|indent(4) if member.jsdoc }}
     readonly "{{ member.name }}": {{ member.value }}
     {%- endfor %}
+
+    {%- for fn in functions %}
+    {{ fn }}
+    {%- endfor %}
+}
+
+interface $Exports {
+    {{ jsdoc|indent(4) if jsdoc }}
+    {{ name|escape_member }}: {{ value }}
 }
 {%- else %}
 interface {{ value }} {
@@ -23,9 +32,11 @@ interface {{ value }} {
     readonly "{{ member.name }}": {{ member.value }}
     {%- endfor %}
 }
-type {{ typename }} = {{ value }}[Exclude<keyof {{ value }}, "$gtype">]
-{%- endif %}
-
+type {{ typename }} = {% if suffix == "Enum" -%}
+        {{ value }}[Exclude<keyof {{ value }}, "$gtype">]
+    {%- else -%}
+        number
+    {%- endif %}
 interface $Exports {
     {{ jsdoc|indent(4) if jsdoc }}
     {{ name|escape_member }}: {{ value }}
@@ -33,3 +44,4 @@ interface $Exports {
     {{ fn }}
     {%- endfor %}
 }
+{%- endif %}

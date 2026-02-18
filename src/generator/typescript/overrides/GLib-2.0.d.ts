@@ -2005,6 +2005,14 @@ namespace GLib {
         value(): VariantType
     }
 
+    interface ErrorStruct {
+        new (domain: Quark, code: number, message: string): Error
+    }
+
+    interface Error {
+        matches(domain: { $gtype: GObject.GType<Error> }, code: number): boolean
+    }
+
     interface $Exports {
         VariantType: VariantTypeStruct
         VariantBuilder: VariantBuilderStruct
