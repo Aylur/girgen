@@ -36,6 +36,7 @@ interface {{ typename }} {{ extend_list(extends+[typename+".Interface"]) }} {
 interface {{ typename_class }} {
     readonly $gtype: GObject.GType<{{ typename }}>
     readonly prototype: {{ typename }}
+    [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
 
     {%- for fn in functions %}
     {{ fn|indent(8) }}
@@ -44,8 +45,6 @@ interface {{ typename_class }} {
     {%- for fn in class_functions %}
     {{ fn|indent(8) }}
     {%- endfor %}
-
-    [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
 }
 
 interface $Exports {

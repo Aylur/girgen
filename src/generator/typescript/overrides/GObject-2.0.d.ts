@@ -366,7 +366,8 @@ namespace GObject {
     interface ParamSpecClass {
         readonly $gtype: GType<ParamSpec>
         readonly prototype: ParamSpec
-        [Symbol.hasInstance](instance: unknown): instance is ParamSpec
+
+        new (...args: unknown[]): ParamSpec
 
         /**
          * Validate a property name for a `ParamSpec`. This can be useful for
