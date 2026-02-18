@@ -2014,6 +2014,7 @@ namespace GLib {
     }
 
     interface $Exports {
+        Variant: VariantStruct
         VariantType: VariantTypeStruct
         VariantBuilder: VariantBuilderStruct
 
