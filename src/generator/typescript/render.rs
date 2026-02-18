@@ -21,7 +21,7 @@ fn escape_toplevel(name: &str) -> String {
     }
 
     match name {
-        "void" | "enum" | "function" | "false" | "true" | "break" => format!("_{name}"),
+        "void" | "enum" | "function" | "false" | "true" | "break" | "boolean" => format!("_{name}"),
         _ => name.to_owned(),
     }
 }

@@ -1,6 +1,8 @@
 {%- from "introspection" import extend_list %}
+{%- set typename = name|escape_toplevel %}
+{%- set typename_class = name_class|escape_toplevel %}
 
-namespace {{ name }} {
+namespace {{ typename }} {
     {% include "introspection" %}
 
     interface Interface {{ extend_list(extends) }} {
@@ -10,11 +12,11 @@ namespace {{ name }} {
     }
 }
 
-interface {{ name }} {{ extend_list(extends+[name+".Interface"]) }} {
-    readonly $signals: {{ name }}.SignalSignatures
-    readonly $readableProperties: {{ name }}.ReadableProperties
-    readonly $writableProperties: {{ name }}.WritableProperties
-    readonly $constructOnlyProperties: {{ name }}.ConstructOnlyProperties
+interface {{ typename }} {{ extend_list(extends+[typename+".Interface"]) }} {
+    readonly $signals: {{ typename }}.SignalSignatures
+    readonly $readableProperties: {{ typename }}.ReadableProperties
+    readonly $writableProperties: {{ typename }}.WritableProperties
+    readonly $constructOnlyProperties: {{ typename }}.ConstructOnlyProperties
 
     {%- for property in properties %}
     {{ property.jsdoc|indent(8) }}
@@ -31,9 +33,9 @@ interface {{ name }} {{ extend_list(extends+[name+".Interface"]) }} {
     {%- endfor %}
 }
 
-interface {{ name_class }} {
-    readonly $gtype: GObject.GType<{{ name }}>
-    readonly prototype: {{ name }}
+interface {{ typename_class }} {
+    readonly $gtype: GObject.GType<{{ typename }}>
+    readonly prototype: {{ typename }}
 
     {%- for fn in functions %}
     {{ fn|indent(8) }}
@@ -43,10 +45,10 @@ interface {{ name_class }} {
     {{ fn|indent(8) }}
     {%- endfor %}
 
-    [Symbol.hasInstance](instance: unknown): instance is {{ name }}
+    [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
 }
 
 interface $Exports {
     {{ jsdoc|indent(4) if jsdoc }}
-    {{ name }}: {{ name_class }}
+    {{ name|escape_member }}: {{ typename_class }}
 }

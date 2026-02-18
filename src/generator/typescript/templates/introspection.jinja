@@ -1,6 +1,6 @@
 {%- macro extend_list(extends, suffix) -%}
 {%- if extends|length > 0 -%}
-extends {% for e in extends %}{{ e }}{{ suffix }}{% if not loop.last %}, {% endif %}{%- endfor %}
+extends {% for e in extends %}{{ e|escape_toplevel }}{{ suffix }}{% if not loop.last %}, {% endif %}{%- endfor %}
 {%- endif %}
 {%- endmacro -%}
 {%- set readable = properties|selectattr("readable") %}

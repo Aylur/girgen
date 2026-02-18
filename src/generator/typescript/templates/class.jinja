@@ -1,14 +1,16 @@
 {%- from "introspection" import extend_list %}
+{%- set typename = name|escape_toplevel %}
+{%- set typename_class = name_class|escape_toplevel %}
 
-namespace {{ name }} {
+namespace {{ typename }} {
     {% include "introspection" %}
 }
 
-interface {{ name }} {{ extend_list(extends) }} {
-    readonly $signals: {{ name }}.SignalSignatures
-    readonly $readableProperties: {{ name }}.ReadableProperties
-    readonly $writableProperties: {{ name }}.WritableProperties
-    readonly $constructOnlyProperties: {{ name }}.ConstructOnlyProperties
+interface {{ typename }} {{ extend_list(extends) }} {
+    readonly $signals: {{ typename }}.SignalSignatures
+    readonly $readableProperties: {{ typename }}.ReadableProperties
+    readonly $writableProperties: {{ typename }}.WritableProperties
+    readonly $constructOnlyProperties: {{ typename }}.ConstructOnlyProperties
 
     {%- for property in properties %}
     {{ property.jsdoc|indent(4) }}
@@ -29,14 +31,14 @@ interface {{ name }} {{ extend_list(extends) }} {
     {%- endfor %}
 }
 
-interface {{ name_class }}{% if parent_class %} extends Omit<{{ parent_class }}, "new">{% endif %} {
-    readonly $gtype: GObject.GType<{{ name }}>
-    readonly prototype: {{ name }}
+interface {{ typename_class }}{% if parent_class %} extends Omit<{{ parent_class|escape_toplevel }}, "new">{% endif %} {
+    readonly $gtype: GObject.GType<{{ typename }}>
+    readonly prototype: {{ typename }}
 
     {%- if is_abstract %}
-    [Symbol.hasInstance](instance: unknown): instance is {{ name }}
+    [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
     {%- else %}
-    new (props?: Partial<GObject.ConstructorProps<{{ name }}>>): {{ name }}
+    new (props?: Partial<GObject.ConstructorProps<{{ typename }}>>): {{ typename }}
     {%- endif %}
 
     {%- for ctor in constructors %}
@@ -54,5 +56,5 @@ interface {{ name_class }}{% if parent_class %} extends Omit<{{ parent_class }},
 
 interface $Exports {
     {{ jsdoc|indent(4) if jsdoc }}
-    {{ name }}: {{ name_class }}
+    {{ name|escape_member }}: {{ typename_class }}
 }

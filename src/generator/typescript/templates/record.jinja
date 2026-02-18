@@ -1,10 +1,12 @@
+{%- set typename = name|escape_toplevel %}
+
 interface {{ name }}Struct {
-    readonly $gtype: GObject.GType<{{ name }}>
+    readonly $gtype: GObject.GType<{{ typename }}>
 
     {%- if constructor %}
     {{ constructor|indent(4) }}
     {%- else %}
-    [Symbol.hasInstance](instance: unknown): instance is {{ name }}
+    [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
     {%- endif %}
 
     {%- for ctor in constructors %}
@@ -16,7 +18,7 @@ interface {{ name }}Struct {
     {%- endfor %}
 }
 
-interface {{ name }} {
+interface {{ typename }} {
     {%- for field in fields %}
     {{ field.jsdoc|indent(4) }}
     {{ field.name }}: {{ field.type }}
@@ -28,5 +30,5 @@ interface {{ name }} {
 }
 
 interface $Exports {
-    {{ name }}: {{ name }}Struct
+    {{ name|escape_member }}: {{ name }}Struct
 }
