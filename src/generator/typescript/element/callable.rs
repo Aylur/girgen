@@ -14,6 +14,8 @@ struct Parameter<'a> {
 fn override_parameter_type(name: &str) -> &str {
     match name {
         "GObject.Value" => "(GObject.Value | unknown)",
+        "GObject.Closure" => "((...args: unknown[]) => unknown)",
+        "GObject.Closure | null" => "((...args: unknown[]) => unknown) | null",
         "GObject.GType" => "(GObject.GType | { $gtype: GObject.GType })",
         _ => name,
     }
@@ -162,10 +164,7 @@ macro_rules! callable_filter {
     ($callable:expr) => {{
         match &$callable.attrs.shadows {
             Some(_) => true,
-            None => match &$callable.attrs.shadowed_by {
-                Some(_) => false,
-                None => $callable.attrs.info.introspectable.is_none_or(|i| i),
-            },
+            None => $callable.attrs.info.introspectable.is_none_or(|i| i),
         }
     }};
 }
