@@ -1,10 +1,10 @@
 use crate::element::{AnyType, Array, Parameter, Parameters, ReturnValue};
 
 pub fn filter_parameters<'a>(
-    params: Option<&'a Parameters>,
+    parameters: Option<&'a Parameters>,
     returns: Option<&'a ReturnValue>,
 ) -> Vec<&'a Parameter> {
-    let params = match params {
+    let params = match parameters {
         Some(p) => &p.parameters,
         None => return Vec::new(),
     };

@@ -28,17 +28,14 @@ impl render::Renderable<FunctionContext> for element::Function {
     }
 
     fn ctx(&self, ctx: &render::Context) -> Result<FunctionContext, String> {
-        let name = match &self.attrs.shadows {
-            Some(name) => name,
-            None => &self.attrs.name,
-        };
+        let name = self.attrs.shadows.as_deref().or(Some(&self.attrs.name));
 
         let args = callable::CallableArgs {
             info_elements: &self.info_elements,
             info: &self.attrs.info,
             throws: self.attrs.throws,
-            prefix: Some(&format!("{name}: ")),
-            name: None,
+            prefix: None,
+            name,
             parameters: self.parameters.as_ref(),
             returns: self.return_value.as_ref(),
         };

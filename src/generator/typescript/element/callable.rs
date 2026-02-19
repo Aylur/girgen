@@ -11,12 +11,15 @@ struct Parameter<'a> {
     tstype: String,
 }
 
+// FIXME: override before tstype to avoid duplicated nullable case
 fn override_parameter_type(name: &str) -> &str {
     match name {
         "GObject.Value" => "(GObject.Value | unknown)",
         "GObject.Closure" => "((...args: unknown[]) => unknown)",
         "GObject.Closure | null" => "((...args: unknown[]) => unknown) | null",
         "GObject.GType" => "(GObject.GType | { $gtype: GObject.GType })",
+        "GLib.Bytes" => "(GLib.Bytes | Uint8Array)",
+        "GLib.Bytes | null" => "(GLib.Bytes | Uint8Array | null)",
         _ => name,
     }
 }
@@ -38,6 +41,7 @@ fn filter_keyword(name: Option<&str>) -> &str {
     }
 }
 
+#[derive(Debug)]
 pub struct CallableArgs<'a> {
     pub info_elements: &'a [element::InfoElement],
     pub info: &'a element::InfoAttrs,
@@ -70,6 +74,7 @@ pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String
     let return_results: Vec<Result<String, String>> = args
         .returns
         .filter(|r| {
+            // returns non-void or an array
             r.r#type.as_ref().is_some_and(|t| {
                 matches!(t, element::AnyType::Type(t) if t.name.as_deref() != Some("none"))
                     || matches!(t, element::AnyType::Array(_))
@@ -77,15 +82,10 @@ pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String
         })
         .into_iter()
         .map(|r| gtype::tstype(r.r#type.as_ref(), r.nullable.is_some_and(|n| n)))
-        .chain(
-            p_returns
-                .into_iter()
-                .filter(|p| p.optional.is_none_or(|o| !o))
-                .map(|p| {
-                    gtype::tstype(p.r#type.as_ref(), p.nullable.is_some_and(|n| n))
-                        .map(|t| override_return_type(&t).to_owned())
-                }),
-        )
+        .chain(p_returns.into_iter().map(|p| {
+            gtype::tstype(p.r#type.as_ref(), p.nullable.is_some_and(|n| n))
+                .map(|t| override_return_type(&t).to_owned())
+        }))
         .collect();
 
     let return_errs = return_results.iter().filter_map(|r| {
