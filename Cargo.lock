@@ -167,7 +167,7 @@ dependencies = [
 
 [[package]]
 name = "girgen"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "clap",
  "colored",
