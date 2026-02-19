@@ -40,17 +40,17 @@ namespace Gio {
     }
 
     interface DBus {
-        get: Gio["bus_get"]
-        get_finish: Gio["bus_get_finish"]
-        get_sync: Gio["bus_get_sync"]
+        get: $Exports["bus_get"]
+        get_finish: $Exports["bus_get_finish"]
+        get_sync: $Exports["bus_get_sync"]
 
-        own_name: Gio["bus_own_name"]
-        own_name_on_connection: Gio["bus_own_name_on_connection"]
-        unown_name: Gio["bus_unown_name"]
+        own_name: $Exports["bus_own_name"]
+        own_name_on_connection: $Exports["bus_own_name_on_connection"]
+        unown_name: $Exports["bus_unown_name"]
 
-        watch_name: Gio["bus_watch_name"]
-        watch_name_on_connection: Gio["bus_watch_name_on_connection"]
-        unwatch_name: Gio["bus_unwatch_name"]
+        watch_name: $Exports["bus_watch_name"]
+        watch_name_on_connection: $Exports["bus_watch_name_on_connection"]
+        unwatch_name: $Exports["bus_unwatch_name"]
 
         /**
          * Convenience for getting the session {@link Gio.DBusConnection}.
