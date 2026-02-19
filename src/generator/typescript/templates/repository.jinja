@@ -32,7 +32,7 @@ declare module "gi://{{ namespace.name }}?version={{ namespace.version }}" {
         {%- endfor %}
 
         {%- for enum in namespace.enums %}
-        {{ enum|indent(4) }}
+        {{ enum|indent(8) }}
         {%- endfor %}
 
         {%- for bitfield in namespace.bitfields %}

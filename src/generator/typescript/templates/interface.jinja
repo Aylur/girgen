@@ -7,7 +7,7 @@ namespace {{ typename }} {
 
     interface Interface {{ extend_list(extends) }} {
         {%- for method in virtual_methods %}
-        {{ method|indent(12) }}
+        {{ method|indent(8) }}
         {%- endfor %}
     }
 }
@@ -19,7 +19,7 @@ interface {{ typename }} {{ extend_list(extends+[typename+".Interface"]) }} {
     readonly $constructOnlyProperties: {{ typename }}.ConstructOnlyProperties
 
     {%- for property in properties %}
-    {{ property.jsdoc|indent(8) }}
+    {{ property.jsdoc|indent(4) }}
     {%- if property.readable %}
     get {{ property.name|camel_case }}(): {{ property.type }}
     {%- endif %}
@@ -29,7 +29,7 @@ interface {{ typename }} {{ extend_list(extends+[typename+".Interface"]) }} {
     {%- endfor %}
 
     {%- for method in methods %}
-    {{ method|indent(8) }}
+    {{ method|indent(4) }}
     {%- endfor %}
 }
 
@@ -39,11 +39,11 @@ interface {{ typename_class }} {
     [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
 
     {%- for fn in functions %}
-    {{ fn|indent(8) }}
+    {{ fn|indent(4) }}
     {%- endfor %}
 
     {%- for fn in class_functions %}
-    {{ fn|indent(8) }}
+    {{ fn|indent(4) }}
     {%- endfor %}
 }
 
