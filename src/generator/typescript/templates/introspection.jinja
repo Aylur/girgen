@@ -5,7 +5,7 @@ extends {% for e in extends %}{{ e|escape_toplevel }}{{ suffix }}{% if not loop.
 {%- endmacro -%}
 {%- set readable = properties|selectattr("readable") %}
 {%- set writable = properties|rejectattr("construct_only")|selectattr("writable") %}
-{%- set construct_only = properties|rejectattr("readonly")|selectattr("construct_only") -%}
+{%- set construct_only = properties|selectattr("construct_only") -%}
 
 
     interface SignalSignatures {{ extend_list(extends, ".SignalSignatures")}} {

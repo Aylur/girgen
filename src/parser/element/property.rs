@@ -26,7 +26,7 @@ impl super::Element for Property {
             writable: attrs.get_boolean("writable").ok(),
             readable: attrs.get_boolean("readable").ok(),
             construct: attrs.get_boolean("construct").ok(),
-            construct_only: attrs.get_boolean("construct_only").ok(),
+            construct_only: attrs.get_boolean("construct-only").ok(),
             setter: attrs.get_string("setter").ok(),
             getter: attrs.get_string("getter").ok(),
             default_value: attrs.get_string("default-value").ok(),
