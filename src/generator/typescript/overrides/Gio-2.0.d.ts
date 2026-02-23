@@ -126,7 +126,8 @@ namespace Gio {
         }
     }
 
-    interface DBusExportedObjectClass extends DBusInterfaceSkeletonClass {
+    interface DBusExportedObjectClass
+        extends Omit<DBusInterfaceSkeletonClass, "new"> {
         new (
             props?: Partial<GObject.ConstructorProps<DBusExportedObject>>,
         ): DBusExportedObject
