@@ -98,6 +98,7 @@ pub trait Element {
     }
 }
 
+#[derive(Debug)]
 pub enum AnyElement {
     Invalid,
     Repository(Repository),

@@ -151,12 +151,7 @@ pub fn tstype(anytype: Option<&AnyType>, nullable: bool) -> Result<String, Strin
         Err(err) => match err {
             TypeError::MissingName => Err("missing type name".to_string()),
             TypeError::Failed(name) => Err(format!("failed to resolve type '{name}'")),
-            TypeError::UnhandledGeneric(name) => {
-                if name.starts_with("GLib") {
-                    eprintln!("unhandled generic type: {}", name);
-                }
-                Err(format!("unhandled generic type: {}", name))
-            }
+            TypeError::UnhandledGeneric(name) => Err(format!("unhandled generic type: {}", name)),
             TypeError::UnhandledElement(array) => {
                 Err(format!("unhandled array elements {:?}", array))
             }
