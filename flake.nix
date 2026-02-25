@@ -42,7 +42,7 @@
         pname = cargoToml.package.name;
         version = cargoToml.package.version;
         src = ./.;
-        cargoHash = "sha256-nf9i4WDPpRYm0ohBc8hewqXoOiJY3g2kDZkvxo3ENfE=";
+        cargoHash = "sha256-F4KRCm3k/K4CNpEHHQRWNHjtpwfXRx5gnwJuqGAi+4U=";
       };
     });
   };
