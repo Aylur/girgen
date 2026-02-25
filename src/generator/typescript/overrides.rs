@@ -41,6 +41,7 @@ pub const OVERRIDES: &[Override] = &[
                     "steal_data",
                     "steal_qdata",
                     "force_floating",
+                    "notify",
                     "ref",
                     "ref_sink",
                     "unref",

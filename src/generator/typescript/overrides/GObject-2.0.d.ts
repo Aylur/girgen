@@ -6,6 +6,10 @@ type SignalArgs<Signal> = Signal extends (...args: infer Args) => infer _
     ? Args
     : never
 
+type SignalReturnType<Signal> = Signal extends (...args: infer _) => infer R
+    ? R
+    : never
+
 type Signals<Emitter> = Emitter extends { $signals: unknown }
     ? {
           [S in Keyof<Emitter["$signals"]> as S extends `${infer Name}::{}`
@@ -38,22 +42,22 @@ type NotifySignals<Emitter> = Emitter extends {
 type SignalHandlerOptions = {
     /**
      * Emissiont behavior
-     * @default {GObject.SignalFlags.RUN_FIRST}
+     * @default GObject.SignalFlags.RUN_FIRST
      */
     flags?: GObject.SignalFlags
     /**
      * List of GType arguments
-     * @default {[]}
+     * @default []
      */
     param_types?: readonly GObject.GType[]
     /**
      * List of GType arguments
-     * @default {GObject.TYPE_NONE}
+     * @default GObject.TYPE_NONE
      */
     return_type?: GObject.GType
     /**
      * Return value behavior
-     * @default {GObject.AccumulatorType.NONE}
+     * @default GObject.AccumulatorType.NONE
      */
     accumulator?: GObject.AccumulatorType
 }
@@ -176,22 +180,22 @@ namespace GObject {
         emit<Signal extends Keyof<DetaliedSignals<this>>>(
             signal: `${Signal}::${string}`,
             ...args: SignalArgs<DetaliedSignals<this>[Signal]>
-        ): void
+        ): SignalReturnType<Signal>
 
         emit<Signal extends Keyof<Signals<this>>>(
             signal: Signal,
             ...args: SignalArgs<Signals<this>[Signal]>
-        ): void
+        ): SignalReturnType<Signal>
 
         emit<Signal extends Keyof<NotifySignals<this>>>(
             signal: Signal,
             ...args: SignalArgs<NotifySignals<this>[Signal]>
-        ): void
+        ): SignalReturnType<Signal>
 
         disconnect(id: number): void
 
         notify<Property extends Keyof<this["$readableProperties"]>>(
-            property: Property,
+            property: Property | (string & {}),
         ): void
 
         /**
