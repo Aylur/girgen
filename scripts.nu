@@ -1,5 +1,9 @@
 #!/usr/bin/env nu
 
+def "main girs" [] {
+    flatpak run --command=cp --filesystem=home org.gnome.Sdk -r /usr/share/gir-1.0 gir-1.0
+}
+
 def "main build" [--os: string, --cpu: string, --target: string] {
     cargo build --release --target $target
 

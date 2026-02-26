@@ -11,7 +11,7 @@ pub struct AliasContext {
 
 impl render::Renderable<AliasContext> for element::Alias {
     const KIND: &'static str = "alias";
-    const TEMPLATE: &'static str = "{{ jsdoc if jsdoc }}\ntype {{ name }} = {{ value }}";
+    const TEMPLATE: &'static str = "{{ jsdoc if jsdoc }}\ntype {{ name|escape_toplevel }} = {{ value }}";
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name

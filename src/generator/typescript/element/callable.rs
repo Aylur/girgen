@@ -119,8 +119,10 @@ pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String
     })?;
 
     let name = args.name.map(|name| match name {
-        "new" => "\"new\"",
-        n => n,
+        "" => "\"\"".to_owned(),
+        "new" => "\"new\"".to_owned(),
+        n if n.chars().next().is_some_and(|c| c.is_ascii_digit()) => format!("\"{n}\""),
+        n => n.to_owned(),
     });
 
     let ctx = minijinja::context! {

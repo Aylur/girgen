@@ -9,10 +9,11 @@ pub struct Context<'a> {
 }
 
 fn escape_member(name: &str) -> String {
-    match name.chars().next().is_some_and(|c| c.is_ascii_digit()) {
-        true => format!("\"{name}\""),
-        false => name.to_owned(),
+    if name.is_empty() || name.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        return format!("\"{name}\"");
     }
+
+    name.to_owned()
 }
 
 fn escape_toplevel(name: &str) -> String {

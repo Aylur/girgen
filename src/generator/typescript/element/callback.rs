@@ -9,7 +9,7 @@ pub struct CallbackContext {
 
 impl render::Renderable<CallbackContext> for element::Callback {
     const KIND: &'static str = "callback";
-    const TEMPLATE: &'static str = "{{ callback }}";
+    const TEMPLATE: &'static str = "{{ callback|escape_toplevel }}";
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name
