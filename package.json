@@ -23,7 +23,8 @@
         "@types/node": "latest"
     },
     "optionalDependencies": {
-        "@girgen/linux-x64": "0.3.0"
+        "@girgen/linux-x64": "0.3.0",
+        "@girgen/linux-arm64": "0.3.0"
     },
     "files": [
         "bin"
