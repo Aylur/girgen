@@ -8,3 +8,11 @@ declare module "gi://{{ alias.name }}" {
     export default {{ alias.name }}
 }
 {%- endfor %}
+
+declare global {
+    interface LegacyGiImports {
+        {%- for alias in legacy_imports %}
+        {{ alias.name }}: import("gi://{{ alias.name }}?version={{ alias.version }}").{{ alias.name }}.$Exports
+        {%- endfor %}
+    }
+}

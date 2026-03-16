@@ -5,6 +5,7 @@ use std::{collections, fs};
 
 pub struct Opts {
     pub short_paths: bool,
+    pub legacy_imports: bool,
 }
 
 fn unique_girs<'a>(items: &'a [Gir]) -> Vec<(&'a str, &'a str)> {
@@ -116,16 +117,24 @@ pub fn generate(opts: &Opts, girs: &[Gir], outdir: &str, event: fn(Event)) -> Re
         }))
         .collect::<Vec<_>>();
 
+    let unique_repos = unique_girs(girs)
+        .iter()
+        .map(|(name, version)| {
+            minijinja::context! {
+                name,
+                version,
+            }
+        })
+        .collect::<Vec<_>>();
+
     let aliases = if opts.short_paths {
-        unique_girs(girs)
-            .iter()
-            .map(|(name, version)| {
-                minijinja::context! {
-                    name,
-                    version,
-                }
-            })
-            .collect::<Vec<_>>()
+        unique_repos.clone()
+    } else {
+        Vec::new()
+    };
+
+    let legacy_imports = if opts.legacy_imports {
+        unique_repos.clone()
     } else {
         Vec::new()
     };
@@ -133,7 +142,7 @@ pub fn generate(opts: &Opts, girs: &[Gir], outdir: &str, event: fn(Event)) -> Re
     let index = minijinja::Environment::new()
         .render_str(
             include_str!("./templates/index.jinja"),
-            minijinja::context! { imports, aliases },
+            minijinja::context! { imports, aliases, legacy_imports },
         )
         .unwrap();
 
