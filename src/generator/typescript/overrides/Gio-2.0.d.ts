@@ -30,7 +30,7 @@ type ActionEntryObject = {
     >
 }
 
-namespace Gio {
+export namespace Gio {
     interface Application {
         /**
          * Similar to {@link Gio.Application.run} but return a `Promise` which resolves when the main loop ends, instead of blocking while the main loop runs.

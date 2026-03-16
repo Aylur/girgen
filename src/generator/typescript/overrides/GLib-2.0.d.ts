@@ -355,7 +355,7 @@ type $ElementSig<E> =
     E extends [infer Element, ...infer Elements] ? Element | $ElementSig<Elements> :
     E extends globalThis.Array<infer Element> ? Element : never
 
-namespace GLib {
+export namespace GLib {
     interface MainLoop {
         /**
          * Similar to {@link GLib.MainLoop.run} but return a `Promise` which resolves when the main loop ends, instead of blocking while the main loop runs.

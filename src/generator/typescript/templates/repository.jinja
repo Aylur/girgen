@@ -14,7 +14,7 @@ declare module "gi://{{ namespace.name }}?version={{ namespace.version }}" {
 
     {{ namespace.extra_content|indent(4) }}
 
-    namespace {{ namespace.name }} {
+    export namespace {{ namespace.name }} {
         {%- for class in namespace.classes %}
         {{ class|indent(8) }}
         {%- endfor %}
