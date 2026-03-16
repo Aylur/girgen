@@ -45,7 +45,7 @@ declare global {
 
     interface Error {
         matches(
-            domain: GLib.Quark | { $gtype: GObject.GType<Error> },
+            domain: GLib.Quark | { $gtype: GObject.GType<GLib.Error> },
             code: number,
         ): boolean
     }
