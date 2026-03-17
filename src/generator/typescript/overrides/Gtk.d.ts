@@ -1,4 +1,4 @@
-export namespace Gtk {
+namespace Gtk {
     interface $Exports {
         children: symbol
         cssName: symbol

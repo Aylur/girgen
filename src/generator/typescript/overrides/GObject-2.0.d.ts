@@ -99,7 +99,7 @@ type PrimitiveConstructor<T, Input = unknown> = {
     (v: Input): T
 }
 
-export namespace GObject {
+namespace GObject {
     type GType<T = unknown> = {
         [$type]: T
         name: string
