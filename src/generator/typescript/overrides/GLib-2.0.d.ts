@@ -2013,6 +2013,11 @@ namespace GLib {
         matches(domain: { $gtype: GObject.GType<Error> }, code: number): boolean
     }
 
+    type LogWriterFunc = (
+        logLevel: LogLevelFlags,
+        stringFields: Record<string, unknown>,
+    ) => LogWriterOutput
+
     interface $Exports {
         Variant: VariantStruct
         VariantType: VariantTypeStruct
@@ -2021,6 +2026,7 @@ namespace GLib {
         MAXINT64_BIGINT: bigint
         MININT64_BIGINT: bigint
         MAXUINT64_BIGINT: bigint
+
         /**
          * Log a message with structured data.
          * For more information about this function, see the upstream documentation for [g_log_structured](https://docs.gtk.org/glib/func.log_structured.html).
@@ -2032,8 +2038,10 @@ namespace GLib {
         log_structured(
             logDomain: string,
             logLevel: LogLevelFlags,
-            stringFields: Record<string, any>,
+            stringFields: Record<string, unknown>,
         ): void
+
+        log_set_writer_func(writer_func: LogWriterFunc): void
 
         idle_add_once(priority: number, callback: () => void): number
 
