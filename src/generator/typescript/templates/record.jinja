@@ -5,6 +5,12 @@ interface {{ name }}Struct {
 
     {%- if constructor %}
     {{ constructor|indent(4) }}
+    {%- elif bag_constructor %}
+    new (fields?: {
+        {%- for field in fields %}
+        {{ field.name }}?: {{ field.type }}
+        {%- endfor %}
+    }): {{ typename }}
     {%- else %}
     [Symbol.hasInstance](instance: unknown): instance is {{ typename }}
     {%- endif %}
