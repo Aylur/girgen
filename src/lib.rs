@@ -10,7 +10,7 @@ use std::{env, fs, path};
 pub fn default_dirs() -> String {
     let data_dirs = match env::var("XDG_DATA_DIRS") {
         Ok(dirs) => dirs,
-        Err(_) => return "".to_string(),
+        Err(_) => ["/usr/share", "/usr/locale/share"].join(":"),
     };
 
     let mut dirs = data_dirs
