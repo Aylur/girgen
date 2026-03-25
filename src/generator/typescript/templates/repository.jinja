@@ -49,7 +49,7 @@ declare module "gi://{{ namespace.name }}?version={{ namespace.version }}" {
 
         interface $Exports {
             __name__: "{{ namespace.name }}"
-            __version: "{{ namespace.version }}"
+            __version__: "{{ namespace.version }}"
 
             {%- for constant in namespace.constants %}
             {{ constant|indent(12) }}
