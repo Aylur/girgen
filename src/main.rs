@@ -94,10 +94,6 @@ enum Language {
         /// Generate non versioned import aliases
         #[arg(short, long)]
         alias: bool,
-
-        /// Generate legacy non versioned import aliases
-        #[arg(short, long)]
-        legacy: bool,
     },
 }
 
@@ -113,15 +109,8 @@ fn main() -> process::ExitCode {
     let ignore = &cli.ignore.iter().map(|i| i.as_ref()).collect::<Vec<_>>();
 
     let res = match cli.command {
-        Language::Typescript {
-            outdir,
-            alias,
-            legacy,
-        } => {
-            let opts = typescript::Opts {
-                short_paths: alias,
-                legacy_imports: legacy,
-            };
+        Language::Typescript { outdir, alias } => {
+            let opts = typescript::Opts { short_paths: alias };
 
             let args = girgen::Args {
                 dirs,

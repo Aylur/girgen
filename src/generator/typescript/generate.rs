@@ -1,32 +1,11 @@
 use super::{super::cache, gjs_lib};
+use crate::element::Repository;
 use crate::generator::{Error, Event, Gir};
 use rayon::prelude::*;
-use std::{collections, fs};
+use std::{collections::HashMap, fs};
 
 pub struct Opts {
     pub short_paths: bool,
-    pub legacy_imports: bool,
-}
-
-fn unique_girs<'a>(items: &'a [Gir]) -> Vec<(&'a str, &'a str)> {
-    let names = items
-        .iter()
-        .filter_map(|gir| gir.name.rsplit_once('-'))
-        .collect::<Vec<_>>();
-
-    let mut counts: collections::HashMap<&str, usize> = collections::HashMap::new();
-    for (name, _) in names.iter() {
-        *counts.entry(name).or_insert(0) += 1;
-    }
-
-    let mut out = Vec::new();
-    for (name, version) in names {
-        if matches!(counts.get(name), Some(1)) {
-            out.push((name, version));
-        }
-    }
-
-    out
 }
 
 pub fn generate(opts: &Opts, girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error> {
@@ -36,9 +15,9 @@ pub fn generate(opts: &Opts, girs: &[Gir], outdir: &str, event: fn(Event)) -> Re
 
     fs::create_dir_all(outdir)?;
 
-    let repos = girs.iter().map(|gir| &gir.repo).collect::<Vec<_>>();
+    let repos: Vec<&Repository> = girs.iter().map(|gir| &gir.repo).collect();
 
-    let imports = girs
+    let valid_girs: Vec<&Gir> = girs
         .par_iter()
         .filter_map(|gir| {
             let hash = cache::hash("ts_", gir.name, &gir.contents);
@@ -59,7 +38,7 @@ pub fn generate(opts: &Opts, girs: &[Gir], outdir: &str, event: fn(Event)) -> Re
                                 repo: gir.name,
                                 out_path: &out_path,
                             });
-                            return Some(gir.name);
+                            return Some(gir);
                         }
                     },
                 }
@@ -95,54 +74,54 @@ pub fn generate(opts: &Opts, girs: &[Gir], outdir: &str, event: fn(Event)) -> Re
                         repo: gir.name,
                         out_path: &out_path,
                     });
-                    Some(gir.name)
+                    Some(gir)
                 }
             }
         })
-        .chain(gjs_lib::GJS_LIBS.par_iter().filter_map(|lib| {
+        .collect();
+
+    let imports: Vec<&str> = gjs_lib::GJS_LIBS
+        .par_iter()
+        .map(|lib| {
             let path = format!("{}/{}.d.ts", outdir, lib.name);
-            if let Err(err) = fs::write(&path, lib.content) {
-                event(Event::Failed {
-                    repo: Some(lib.name),
-                    err: err.to_string().as_str(),
-                });
-                None
-            } else {
-                event(Event::CacheHit {
-                    repo: lib.name,
-                    out_path: &path,
-                });
-                Some(lib.name)
-            }
-        }))
-        .collect::<Vec<_>>();
-
-    let unique_repos = unique_girs(girs)
-        .iter()
-        .map(|(name, version)| {
-            minijinja::context! {
-                name,
-                version,
-            }
+            fs::write(&path, lib.content).expect("Failed to write file");
+            event(Event::CacheHit {
+                repo: lib.name,
+                out_path: &path,
+            });
+            lib.name
         })
-        .collect::<Vec<_>>();
+        .collect();
 
-    let aliases = if opts.short_paths {
-        unique_repos.clone()
-    } else {
-        Vec::new()
-    };
+    let namespaces: HashMap<&str, Vec<&str>> = valid_girs
+        .iter()
+        .filter_map(|gir| gir.name.rsplit_once('-'))
+        .fold(HashMap::new(), |mut acc, (namespace, version)| {
+            acc.entry(namespace).or_default().push(version);
+            acc
+        });
 
-    let legacy_imports = if opts.legacy_imports {
-        unique_repos.clone()
-    } else {
-        Vec::new()
-    };
+    if opts.short_paths {
+        let aliases = minijinja::Environment::new()
+            .render_str(
+                include_str!("./templates/aliases.jinja"),
+                minijinja::context! {
+                    namespaces,
+                },
+            )
+            .unwrap();
+
+        fs::write(format!("{}/aliases.d.ts", outdir), aliases)?;
+    }
 
     let index = minijinja::Environment::new()
         .render_str(
             include_str!("./templates/index.jinja"),
-            minijinja::context! { imports, aliases, legacy_imports },
+            minijinja::context! {
+                imports,
+                namespaces,
+                short_paths => opts.short_paths,
+            },
         )
         .unwrap();
 

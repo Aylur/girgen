@@ -2,17 +2,39 @@
 import "./{{ import }}.d.ts"
 {%- endfor %}
 
-{% for alias in aliases %}
-declare module "gi://{{ alias.name }}" {
-    import {{ alias.name }} from "gi://{{ alias.name }}?version={{ alias.version }}"
-    export default {{ alias.name }}
-}
+
+{%- for name, versions in namespaces|items %}
+{%- for version in versions %}
+import "./{{ name }}-{{ version }}.d.ts"
 {%- endfor %}
+{%- endfor %}
+
+
+{%- if short_paths %}
+import "./aliases.d.ts"
+{%- endif %}
+
 
 declare global {
     interface LegacyGiImports {
-        {%- for alias in legacy_imports %}
-        {{ alias.name }}: import("gi://{{ alias.name }}?version={{ alias.version }}").{{ alias.name }}.$Exports
+        {%- for name, versions in namespaces|items %}
+        {{ name }}: {%- for version in versions -%}
+            | typeof import("gi://{{ name }}?version={{ version }}").default
+        {%- endfor %}
         {%- endfor %}
     }
 }
+
+interface Gi {
+    {%- for name, versions in namespaces|items %}
+    {%- for version in versions %}
+    require(namespace: "{{ name }}", version: "{{ version }}"): typeof import("gi://{{ name }}?version={{ version }}").default
+    {%- endfor %}
+    require(namespace: "{{ name }}"): {%- for version in versions -%}
+        | typeof import("gi://{{ name }}?version={{ version }}").default
+    {%- endfor %}
+    {%- endfor %}
+}
+
+const gi: Gi
+export default gi
