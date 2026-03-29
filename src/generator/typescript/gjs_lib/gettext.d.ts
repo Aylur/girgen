@@ -191,6 +191,7 @@ declare module "gettext" {
         function domain(domainName: string): GettextDomain
     }
 
+    export import GettextDomain = Gettext.GettextDomain
     export import LocaleCategory = Gettext.LocaleCategory
     export import setlocale = Gettext.setlocale
     export import textdomain = Gettext.textdomain
