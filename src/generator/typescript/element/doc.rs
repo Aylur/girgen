@@ -1,18 +1,48 @@
 use super::gtype;
 use crate::element;
-use regex::Regex;
+use regex::{Captures, Regex};
 use std::sync::LazyLock;
+use stringcase::camel_case;
 
 static TEMPLATE: &str = include_str!("../templates/doc.jinja");
 static DOC_AT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?:^|\s)@(\w+)").unwrap());
+static GI_DOCDGEN_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\[(\w+)@([^\]]+)\]").unwrap());
 
-// TODO: format gi-docgen links
-// e.g `[method@NS.Class.method]` -> `{@link NS.Class.prototype.method}`
-fn fmt(text: &str) -> String {
-    DOC_AT_RE
-        .replace_all(text, r" `$1`")
-        .into_owned()
-        .replace('\n', " ")
+fn format_gi_docgen(caps: &Captures<'_>) -> String {
+    let kind = &caps[1];
+    let target = &caps[2];
+
+    match kind {
+        "property" => {
+            if let Some((prefix, prop)) = target.rsplit_once(':') {
+                format!("{{@link {}.{}}}", prefix, camel_case(prop))
+            } else {
+                format!("{{@link {}}}", target)
+            }
+        }
+        "signal" => {
+            if let Some((prefix, signal)) = target.split_once("::") {
+                format!(r#"{{@link {}.SignalSignatures["{}"]}}"#, prefix, signal)
+            } else {
+                format!("{{@link {}}}", target)
+            }
+        }
+        "vfunc" => {
+            if let Some((prefix, func)) = target.rsplit_once('.') {
+                format!("{{@link {}.vfunc_{}}}", prefix, func)
+            } else {
+                format!("{{@link {}}}", target)
+            }
+        }
+        _ => format!("{{@link {}}}", target),
+    }
+}
+
+fn escape_doc(text: &str) -> String {
+    let text = GI_DOCDGEN_RE.replace_all(text, format_gi_docgen);
+    let text = DOC_AT_RE.replace_all(&text, r" `$1`");
+    text.replace('\n', " ")
 }
 
 fn get_doc_text(info: &[element::DocElement]) -> String {
@@ -72,8 +102,8 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
         }
     }
 
-    let text_lines: Vec<&str> = doc.lines().collect();
-    let deprecated_text: Option<String> = doc_deprecated.map(fmt);
+    let text_lines: Vec<String> = doc.lines().map(escape_doc).collect();
+    let deprecated_text: Option<String> = doc_deprecated.map(escape_doc);
     let parameters = gtype::filter_parameters(args.parameters, args.returns);
 
     let in_parameters: Vec<DocParameter> = parameters
@@ -81,7 +111,7 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
         .filter(|p| matches!(p.direction.as_deref(), None | Some("in")))
         .map(|p| DocParameter {
             name: p.name.as_deref().unwrap_or("arg"),
-            text: get_doc_text(&p.doc_elements),
+            text: escape_doc(&get_doc_text(&p.doc_elements)),
         })
         .collect();
 
@@ -96,7 +126,7 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
                 .filter(|p| matches!(p.direction.as_deref(), Some("out" | "inout")))
                 .map(|p| get_doc_text(&p.doc_elements)),
         )
-        .map(|s| fmt(&s))
+        .map(|s| escape_doc(&s))
         .collect();
 
     let experimental = doc_stability.is_some_and(|s| s == "Unstable");
