@@ -4,10 +4,12 @@ import type GObject from "gi://GObject?version=2.0"
 import type GLib from "gi://GLib?version=2.0"
 import type System from "system"
 import type Gettext from "gettext"
+import type Console from "console"
 import type format from "./format"
 import type cairo from "./cairo"
 
 declare global {
+    const console: Console.Console
     interface LegacyGiImports {}
 
     interface LegacyImports {
