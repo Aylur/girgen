@@ -72,11 +72,11 @@ struct Cli {
     silent: bool,
 
     /// Lookup these directories for .gir files
-    #[arg(short, long, value_name = "PATHS", default_value_t = default_dirs())]
-    dirs: String,
+    #[arg(short, long, value_name = "PATHS", default_values_os_t = default_dirs())]
+    dirs: Vec<path::PathBuf>,
 
     /// Skip rendering by name and version, e.g "Gtk-4.0"
-    #[arg(short, long, value_name = "GIRS")]
+    #[arg(short, long, value_name = "NAMESPACE")]
     ignore: Vec<String>,
 
     #[command(subcommand)]
@@ -104,8 +104,7 @@ fn main() -> process::ExitCode {
         VERBOSE.set(false).unwrap();
     }
 
-    let dir_paths: Vec<path::PathBuf> = cli.dirs.split(":").map(path::PathBuf::from).collect();
-    let dirs = &dir_paths.iter().map(|p| p.as_path()).collect::<Vec<_>>();
+    let dirs = &cli.dirs.iter().map(|p| p.as_path()).collect::<Vec<_>>();
     let ignore = &cli.ignore.iter().map(|i| i.as_ref()).collect::<Vec<_>>();
 
     let res = match cli.command {

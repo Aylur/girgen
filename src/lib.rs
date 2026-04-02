@@ -5,15 +5,16 @@ pub use parser::{element, error, parse_gir};
 
 use generator::{Error, Event, Generator, Gir};
 use rayon::prelude::*;
-use std::{env, fs, path};
+use std::path::{Path, PathBuf};
+use std::{env, fs};
 
-pub fn default_dirs() -> String {
+pub fn default_dirs() -> Vec<PathBuf> {
     let data_dirs = match env::var("XDG_DATA_DIRS") {
         Ok(dirs) => dirs,
         Err(_) => ["/usr/share", "/usr/locale/share"].join(":"),
     };
 
-    let mut dirs = data_dirs
+    let mut dirs: Vec<PathBuf> = data_dirs
         .split(":")
         .filter_map(|path| {
             // ignore nix path as this is a side effect
@@ -21,21 +22,21 @@ pub fn default_dirs() -> String {
                 return None;
             }
             let name = format!("{}/gir-1.0", &path);
-            let gir_path = path::Path::new(&name);
+            let gir_path = Path::new(&name);
             match gir_path.exists() && gir_path.is_dir() {
-                true => Some(name),
+                true => Some(PathBuf::from(name)),
                 false => None,
             }
         })
-        .collect::<Vec<_>>();
+        .collect();
 
     dirs.sort();
     dirs.dedup();
-    dirs.join(":")
+    dirs
 }
 
 pub struct Args<'a, T> {
-    pub dirs: &'a [&'a path::Path],
+    pub dirs: &'a [&'a Path],
     pub outdir: &'a str,
     pub ignore: &'a [&'a str],
     pub event: fn(Event),
