@@ -208,3 +208,37 @@ class MyClass {
     }
 }
 ```
+
+### Module Augmentation
+
+If you are using
+[`Gio._promisify`](https://gjs.guide/guides/gjs/asynchronous-programming.html#promisify-helper)
+you can augment namespaces.
+
+```ts
+import Gio from "gi://Gio?version=2.0"
+import GLib from "gi://GLib?version=2.0"
+
+Gio._promisify(
+    Gio.InputStream.prototype,
+    "read_bytes_async",
+    "read_bytes_finish",
+)
+
+declare module "gi://Gio?version=2.0" {
+    namespace GI {
+        namespace Gio {
+            interface InputStream {
+                read_bytes_async(
+                    count: number,
+                    io_priority: number,
+                    cancellable: Gio.Cancellable | null,
+                ): GLib.Bytes
+            }
+        }
+    }
+}
+
+declare const stream: Gio.InputStream
+const bytes = await stream.read_bytes_async(4096, GLib.PRIORITY_DEFAULT, null)
+```

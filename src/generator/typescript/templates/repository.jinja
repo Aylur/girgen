@@ -12,56 +12,63 @@ declare module "gi://{{ namespace.name }}?version={{ namespace.version }}" {
     import type {{ import.name }} from "gi://{{ import.name }}?version={{ import.version }}"
     {%- endfor %}
 
-    {{ namespace.extra_content|indent(4) }}
+    /**
+     * Do **not** import this at runtime.
+     * This namespace is only exported for module augmentation.
+     */
+    export namespace GI {
+        {{ namespace.extra_content|indent(8) }}
 
-    namespace {{ namespace.name }} {
-        {%- for class in namespace.classes %}
-        {{ class|indent(8) }}
-        {%- endfor %}
-
-        {%- for interface in namespace.interfaces %}
-        {{ interface|indent(8) }}
-        {%- endfor %}
-
-        {%- for record in namespace.records %}
-        {{ record|indent(8) }}
-        {%- endfor %}
-
-        {%- for union in namespace.unions %}
-        {{ union|indent(8) }}
-        {%- endfor %}
-
-        {%- for enum in namespace.enums %}
-        {{ enum|indent(8) }}
-        {%- endfor %}
-
-        {%- for bitfield in namespace.bitfields %}
-        {{ bitfield|indent(8) }}
-        {%- endfor %}
-
-        {%- for callback in namespace.callbacks %}
-        {{ callback|indent(8) }}
-        {%- endfor %}
-
-        {%- for alias in namespace.aliases %}
-        {{ alias|indent(8) }}
-        {%- endfor %}
-
-        interface $Exports {
-            __name__: "{{ namespace.name }}"
-            __version__: "{{ namespace.version }}"
-
-            {%- for constant in namespace.constants %}
-            {{ constant|indent(12) }}
+        namespace {{ namespace.name }} {
+            {%- for class in namespace.classes %}
+            {{ class|indent(12) }}
             {%- endfor %}
 
-            {%- for function in namespace.functions %}
-            {{ function|indent(12) }}
+            {%- for interface in namespace.interfaces %}
+            {{ interface|indent(12) }}
             {%- endfor %}
+
+            {%- for record in namespace.records %}
+            {{ record|indent(12) }}
+            {%- endfor %}
+
+            {%- for union in namespace.unions %}
+            {{ union|indent(12) }}
+            {%- endfor %}
+
+            {%- for enum in namespace.enums %}
+            {{ enum|indent(12) }}
+            {%- endfor %}
+
+            {%- for bitfield in namespace.bitfields %}
+            {{ bitfield|indent(12) }}
+            {%- endfor %}
+
+            {%- for callback in namespace.callbacks %}
+            {{ callback|indent(12) }}
+            {%- endfor %}
+
+            {%- for alias in namespace.aliases %}
+            {{ alias|indent(12) }}
+            {%- endfor %}
+
+            interface $Exports {
+                __name__: "{{ namespace.name }}"
+                __version__: "{{ namespace.version }}"
+
+                {%- for constant in namespace.constants %}
+                {{ constant|indent(16) }}
+                {%- endfor %}
+
+                {%- for function in namespace.functions %}
+                {{ function|indent(16) }}
+                {%- endfor %}
+            }
         }
+
+        const {{ namespace.name }}: {{ namespace.name }}.$Exports
     }
 
-    const {{ namespace.name }}: {{ namespace.name }}.$Exports
-    export default {{ namespace.name }}
+    export default GI.{{ namespace.name }}
 }
 {%- endfor -%}
