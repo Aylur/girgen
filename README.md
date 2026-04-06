@@ -42,11 +42,11 @@ in `tsconfig.json`.
 
 ```json
 {
-    "compilerOptions": {
-        "lib": ["es2024"], // don't forget to specify a `lib` to avoid sourcing TypeScript's `dom` lib
-        "skipLibCheck": true, // it's recommended to turn this on
-        "typeRoots": [".types"]
-    }
+  "compilerOptions": {
+    "lib": ["es2024"], // don't forget to specify a `lib` to avoid sourcing TypeScript's `dom` lib
+    "skipLibCheck": true, // it's recommended to turn this on
+    "typeRoots": [".types"]
+  }
 }
 ```
 
@@ -87,31 +87,31 @@ containing type declarations where each member is written in `kebab-case`:
 
 ```ts
 namespace MyClass {
-    export interface SignalSignatures extends GObject.Object.SignalSignatures {
-        // simple signal
-        "my-signal"(arg: number): void
-        // detailed signals are annotated with the `::{}` suffix
-        "my-detailed-signal::{}"(arg: number): void
-    }
+  export interface SignalSignatures extends GObject.Object.SignalSignatures {
+    // simple signal
+    "my-signal"(arg: number): void
+    // detailed signals are annotated with the `::{}` suffix
+    "my-detailed-signal::{}"(arg: number): void
+  }
 
-    // ReadableProperties is also used for notify signal annotations
-    export interface ReadableProperties
-        extends GObject.Object.ReadableProperties {
-        // property which has a public getter
-        "my-prop": number
-    }
+  // ReadableProperties is also used for notify signal annotations
+  export interface ReadableProperties
+    extends GObject.Object.ReadableProperties {
+    // property which has a public getter
+    "my-prop": number
+  }
 
-    export interface WritableProperties
-        extends GObject.Object.WritableProperties {
-        // property which has a public setter
-        "my-prop": number
-    }
+  export interface WritableProperties
+    extends GObject.Object.WritableProperties {
+    // property which has a public setter
+    "my-prop": number
+  }
 
-    export interface ConstructOnlyProperties
-        extends GObject.Object.ConstructOnlyProperties {
-        // property which can only be set at construction
-        "my-ctor-prop": number
-    }
+  export interface ConstructOnlyProperties
+    extends GObject.Object.ConstructOnlyProperties {
+    // property which can only be set at construction
+    "my-ctor-prop": number
+  }
 }
 ```
 
@@ -124,53 +124,53 @@ And the Class will refer to these using special `$` prefixed fields:
 
 ```ts
 class MyClass extends GObject.Object {
-    declare readonly $signals: MyClass.SignalSignatures
-    declare readonly $readableProperties: MyClass.ReadableProperties
-    declare readonly $writableProperties: MyClass.WritableProperties
-    declare readonly $constructOnlyProperties: MyClass.ConstructOnlyProperties
+  declare readonly $signals: MyClass.SignalSignatures
+  declare readonly $readableProperties: MyClass.ReadableProperties
+  declare readonly $writableProperties: MyClass.WritableProperties
+  declare readonly $constructOnlyProperties: MyClass.ConstructOnlyProperties
 
-    static {
-        GObject.registerClass(
-            {
-                Signals: {
-                    "my-signal": {
-                        param_types: [GObject.TYPE_DOUBLE],
-                    },
-                    "my-detailed-signal": {
-                        param_types: [GObject.TYPE_DOUBLE],
-                        flags: GObject.SignalFlags.DETAILED,
-                    },
-                },
-                Properties: {
-                    "my-prop": GObject.ParamSpec.double(
-                        "my-prop",
-                        null,
-                        null,
-                        GObject.ParamFlags.READWRITE,
-                        -GObject.Double.MAX_VALUE,
-                        GObject.Double.MAX_VALUE,
-                    ),
-                    "my-ctor-prop": GObject.ParamSpec.double(
-                        "my-ctor-prop",
-                        null,
-                        null,
-                        GObject.ParamFlags.CONSTRUCT_ONLY,
-                        -GObject.Double.MAX_VALUE,
-                        GObject.Double.MAX_VALUE,
-                    ),
-                },
-            },
-            MyClass,
-        )
-    }
+  static {
+    GObject.registerClass(
+      {
+        Signals: {
+          "my-signal": {
+            param_types: [GObject.TYPE_DOUBLE],
+          },
+          "my-detailed-signal": {
+            param_types: [GObject.TYPE_DOUBLE],
+            flags: GObject.SignalFlags.DETAILED,
+          },
+        },
+        Properties: {
+          "my-prop": GObject.ParamSpec.double(
+            "my-prop",
+            null,
+            null,
+            GObject.ParamFlags.READWRITE,
+            -GObject.Double.MAX_VALUE,
+            GObject.Double.MAX_VALUE,
+          ),
+          "my-ctor-prop": GObject.ParamSpec.double(
+            "my-ctor-prop",
+            null,
+            null,
+            GObject.ParamFlags.CONSTRUCT_ONLY,
+            -GObject.Double.MAX_VALUE,
+            GObject.Double.MAX_VALUE,
+          ),
+        },
+      },
+      MyClass,
+    )
+  }
 
-    // GObject.ConstructorProps can be used to infer props from the annotations
-    constructor(props: Partial<GObject.ConstructorProps<MyClass>>) {
-        super(props)
+  // GObject.ConstructorProps can be used to infer props from the annotations
+  constructor(props: Partial<GObject.ConstructorProps<MyClass>>) {
+    super(props)
 
-        // note that properties will be annotated as camelCase
-        console.log(props.myProp, props.myCtorProp)
-    }
+    // note that properties will be annotated as camelCase
+    console.log(props.myProp, props.myCtorProp)
+  }
 }
 ```
 
@@ -181,15 +181,15 @@ annotations.
 const instance = new MyClass()
 
 instance.connect("my-signal", (source, arg) => {
-    console.log(arg)
+  console.log(arg)
 })
 
 instance.connect("my-detailed-signal::detail", (source, arg) => {
-    console.log(arg)
+  console.log(arg)
 })
 
 instance.connect("notify::my-prop", (_, pspec) => {
-    console.log(pspec.name)
+  console.log(pspec.name)
 })
 ```
 
@@ -198,14 +198,14 @@ typecast to correctly infer types within the class.
 
 ```ts
 class MyClass {
-    myFn(this: MyClass) {
-        this.emit("my-signal", 0)
-    }
+  myFn(this: MyClass) {
+    this.emit("my-signal", 0)
+  }
 
-    myFn() {
-        const self = this as MyClass
-        self.emit("my-signal", 0)
-    }
+  myFn() {
+    const self = this as MyClass
+    self.emit("my-signal", 0)
+  }
 }
 ```
 
@@ -220,23 +220,23 @@ import Gio from "gi://Gio?version=2.0"
 import GLib from "gi://GLib?version=2.0"
 
 Gio._promisify(
-    Gio.InputStream.prototype,
-    "read_bytes_async",
-    "read_bytes_finish",
+  Gio.InputStream.prototype,
+  "read_bytes_async",
+  "read_bytes_finish",
 )
 
 declare module "gi://Gio?version=2.0" {
-    namespace GI {
-        namespace Gio {
-            interface InputStream {
-                read_bytes_async(
-                    count: number,
-                    io_priority: number,
-                    cancellable: Gio.Cancellable | null,
-                ): GLib.Bytes
-            }
-        }
+  namespace GI {
+    namespace Gio {
+      interface InputStream {
+        read_bytes_async(
+          count: number,
+          io_priority: number,
+          cancellable: Gio.Cancellable | null,
+        ): GLib.Bytes
+      }
     }
+  }
 }
 
 declare const stream: Gio.InputStream

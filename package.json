@@ -17,7 +17,17 @@
     "prettier": {
         "semi": false,
         "tabWidth": 4,
-        "printWidth": 80
+        "printWidth": 80,
+        "overrides": [
+            {
+                "files": "**/*.md",
+                "options": {
+                    "tabWidth": 2,
+                    "printWidth": 80,
+                    "proseWrap": "always"
+                }
+            }
+        ]
     },
     "devDependencies": {
         "@types/node": "latest"
