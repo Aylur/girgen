@@ -262,6 +262,10 @@ namespace Gio {
          * }
          * ```
          */
-        _promisify(proto: any, asyncFunc: string, finishFunc?: string): void
+        _promisify<Proto>(
+            proto: Proto,
+            asyncFunc: keyof Proto,
+            finishFunc?: keyof Proto,
+        ): void
     }
 }
