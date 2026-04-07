@@ -1,7 +1,150 @@
 mod element;
-mod generate;
 mod gjs_lib;
 mod overrides;
 mod render;
 
-pub use generate::{Opts, generate};
+use super::cache;
+use crate::element::Repository;
+use crate::generator::{Error, Event, Generator, Gir};
+use rayon::prelude::*;
+use std::{collections::HashMap, fs};
+
+pub struct TypeScript {
+    pub alias: bool,
+}
+
+impl Generator for TypeScript {
+    fn generate(&self, girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error> {
+        if girs.is_empty() {
+            return Err(Error::Empty);
+        }
+
+        fs::create_dir_all(outdir)?;
+
+        let repos: Vec<&Repository> = girs.iter().map(|gir| &gir.repo).collect();
+
+        let valid_girs: Vec<&Gir> = girs
+            .par_iter()
+            .filter_map(|gir| {
+                let hash = cache::hash("ts_", gir.name, &gir.contents);
+                let cache_path = cache::lookup_cache(&hash);
+                let out_path = format!("{}/{}.d.ts", outdir, gir.name);
+
+                if let Some(path) = cache_path {
+                    match fs::read_to_string(path) {
+                        Err(err) => event(Event::Warning {
+                            warning: err.to_string().as_str(),
+                        }),
+                        Ok(result) => match fs::write(&out_path, result) {
+                            Err(err) => event(Event::Warning {
+                                warning: err.to_string().as_str(),
+                            }),
+                            Ok(_) => {
+                                event(Event::CacheHit {
+                                    repo: gir.name,
+                                    out_path: &out_path,
+                                });
+                                return Some(gir);
+                            }
+                        },
+                    }
+                }
+
+                let result = match gir.repo.generate_dts(&repos, event) {
+                    Ok(result) => result,
+                    Err(err) => {
+                        event(Event::Failed {
+                            repo: Some(gir.name),
+                            err: err.as_str(),
+                        });
+                        return None;
+                    }
+                };
+
+                if let Err(err) = cache::cache(&hash, &result) {
+                    event(Event::Warning {
+                        warning: err.to_string().as_str(),
+                    })
+                }
+
+                match fs::write(&out_path, &result) {
+                    Err(err) => {
+                        event(Event::Failed {
+                            repo: Some(gir.name),
+                            err: err.to_string().as_str(),
+                        });
+                        None
+                    }
+                    Ok(_) => {
+                        event(Event::Generated {
+                            repo: gir.name,
+                            out_path: &out_path,
+                        });
+                        Some(gir)
+                    }
+                }
+            })
+            .collect();
+
+        let imports: Vec<&str> = gjs_lib::GJS_LIBS
+            .par_iter()
+            .map(|lib| {
+                let path = format!("{}/{}.d.ts", outdir, lib.name);
+                fs::write(&path, lib.content).expect("Failed to write file");
+                event(Event::CacheHit {
+                    repo: lib.name,
+                    out_path: &path,
+                });
+                lib.name
+            })
+            .collect();
+
+        let namespaces: HashMap<&str, Vec<&str>> = valid_girs
+            .iter()
+            .filter_map(|gir| gir.name.rsplit_once('-'))
+            .fold(HashMap::new(), |mut acc, (namespace, version)| {
+                acc.entry(namespace).or_default().push(version);
+                acc
+            });
+
+        if self.alias {
+            let aliases = minijinja::Environment::new()
+                .render_str(
+                    include_str!("./templates/aliases.jinja"),
+                    minijinja::context! {
+                        namespaces,
+                    },
+                )
+                .unwrap();
+
+            fs::write(format!("{}/aliases.d.ts", outdir), aliases)?;
+        }
+
+        let index = minijinja::Environment::new()
+            .render_str(
+                include_str!("./templates/index.jinja"),
+                minijinja::context! {
+                    imports,
+                    namespaces,
+                    short_paths => self.alias,
+                },
+            )
+            .unwrap();
+
+        let index_path = format!("{}/index.d.ts", outdir);
+        fs::write(&index_path, index)?;
+        event(Event::Generated {
+            repo: "index",
+            out_path: index_path.as_str(),
+        });
+
+        let package_path = format!("{}/package.json", outdir);
+        fs::write(&package_path, include_str!("./gjs_lib/package.json"))?;
+        event(Event::CacheHit {
+            repo: "package",
+            out_path: package_path.as_str(),
+        });
+
+        Ok(())
+    }
+}

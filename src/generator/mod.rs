@@ -46,11 +46,12 @@ impl From<io::Error> for Error {
     }
 }
 
-pub type Generator<T> =
-    fn(opts: T, girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error>;
-
 pub struct Gir<'a> {
     pub name: &'a str,
     pub contents: String,
     pub repo: element::Repository,
+}
+
+pub trait Generator {
+    fn generate(&self, girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error>;
 }

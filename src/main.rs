@@ -104,23 +104,14 @@ fn main() -> process::ExitCode {
         VERBOSE.set(false).unwrap();
     }
 
-    let dirs = &cli.dirs.iter().map(|p| p.as_path()).collect::<Vec<_>>();
-    let ignore = &cli.ignore.iter().map(|i| i.as_ref()).collect::<Vec<_>>();
-
     let res = match cli.command {
-        Language::Typescript { outdir, alias } => {
-            let opts = typescript::Opts { short_paths: alias };
-
-            let args = girgen::Args {
-                dirs,
-                ignore,
-                outdir: &outdir,
-                event: on_event,
-                generator: typescript::generate,
-            };
-
-            girgen(&opts, &args)
-        }
+        Language::Typescript { outdir, alias } => girgen(girgen::Args {
+            dirs: cli.dirs,
+            ignore: cli.ignore,
+            outdir,
+            on_event,
+            generator: typescript::TypeScript { alias },
+        }),
     };
 
     match res {

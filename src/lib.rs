@@ -35,15 +35,15 @@ pub fn default_dirs() -> Vec<PathBuf> {
     dirs
 }
 
-pub struct Args<'a, T> {
-    pub dirs: &'a [&'a Path],
-    pub outdir: &'a str,
-    pub ignore: &'a [&'a str],
-    pub event: fn(Event),
-    pub generator: Generator<T>,
+pub struct Args<G: Generator + Sync> {
+    pub dirs: Vec<PathBuf>,
+    pub outdir: String,
+    pub ignore: Vec<String>,
+    pub on_event: fn(Event),
+    pub generator: G,
 }
 
-pub fn girgen<T: Sync>(opts: T, args: &Args<T>) -> Result<(), Error> {
+pub fn girgen<T: Generator + Sync>(args: Args<T>) -> Result<(), Error> {
     let mut gir_paths = args
         .dirs
         .iter()
@@ -73,7 +73,7 @@ pub fn girgen<T: Sync>(opts: T, args: &Args<T>) -> Result<(), Error> {
                 let ignore = args.ignore.iter().any(|ignore| **ignore == *name);
                 let keep = is_new && !ignore;
                 if !keep {
-                    (args.event)(Event::Ignored {
+                    (args.on_event)(Event::Ignored {
                         file_path: path,
                         cause: (if !is_new { "duplicate " } else { "" }),
                     })
@@ -89,7 +89,7 @@ pub fn girgen<T: Sync>(opts: T, args: &Args<T>) -> Result<(), Error> {
             let contents = match fs::read_to_string(path) {
                 Ok(ok) => ok,
                 Err(err) => {
-                    (args.event)(Event::ParseFailed {
+                    (args.on_event)(Event::ParseFailed {
                         file_path: path,
                         err: err.to_string().as_str(),
                     });
@@ -99,7 +99,7 @@ pub fn girgen<T: Sync>(opts: T, args: &Args<T>) -> Result<(), Error> {
 
             match parse_gir::parse(&contents) {
                 Ok(repo) => {
-                    (args.event)(Event::Parsed { file_path: path });
+                    (args.on_event)(Event::Parsed { file_path: path });
                     Some(Gir {
                         name: path.file_stem().and_then(|f| f.to_str()).unwrap(),
                         repo,
@@ -107,7 +107,7 @@ pub fn girgen<T: Sync>(opts: T, args: &Args<T>) -> Result<(), Error> {
                     })
                 }
                 Err(err) => {
-                    (args.event)(Event::ParseFailed {
+                    (args.on_event)(Event::ParseFailed {
                         file_path: path,
                         err: err.to_string().as_str(),
                     });
@@ -117,5 +117,5 @@ pub fn girgen<T: Sync>(opts: T, args: &Args<T>) -> Result<(), Error> {
         })
         .collect::<Vec<_>>();
 
-    (args.generator)(opts, &girs, args.outdir, args.event)
+    args.generator.generate(&girs, &args.outdir, args.on_event)
 }
