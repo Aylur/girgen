@@ -71,7 +71,7 @@ struct Cli {
     #[arg(short, long, default_value_t = false)]
     silent: bool,
 
-    /// Lookup these directories for .gir files
+    /// Extra directories for .gir lookup
     #[arg(short, long, value_name = "PATHS", default_values_os_t = default_dirs())]
     dirs: Vec<path::PathBuf>,
 
@@ -99,6 +99,8 @@ enum Language {
 
 fn main() -> process::ExitCode {
     let cli = Cli::parse();
+    let mut dirs = [cli.dirs, default_dirs()].concat();
+    dirs.dedup();
 
     if cli.silent {
         VERBOSE.set(false).unwrap();
@@ -106,7 +108,7 @@ fn main() -> process::ExitCode {
 
     let res = match cli.command {
         Language::Typescript { outdir, alias } => girgen(girgen::Args {
-            dirs: cli.dirs,
+            dirs,
             ignore: cli.ignore,
             outdir,
             on_event,
