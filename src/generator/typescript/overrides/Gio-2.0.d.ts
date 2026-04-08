@@ -104,8 +104,16 @@ namespace Gio {
             extends DBusInterfaceSkeleton.SignalSignatures {
             "handle-method-call"(
                 methodName: string,
-                parameters: GLib.Variant,
-                invocation: DBusMethodInvocation,
+                // see https://gitlab.gnome.org/GNOME/gjs/-/issues/730
+                ...params:
+                    | [
+                          parameters: GLib.Variant,
+                          invocation: DBusMethodInvocation,
+                      ]
+                    | [
+                          invocation: DBusMethodInvocation,
+                          parameters: GLib.Variant,
+                      ]
             ): void
             "handle-property-get"(propertyName: string): GLib.Variant | null
             "handle-property-set"(
