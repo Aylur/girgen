@@ -55,10 +55,19 @@ pub struct CallableArgs<'a> {
 pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String> {
     let env = minijinja::Environment::new();
 
-    let (p_returns, p_parameters): (Vec<_>, Vec<_>) =
-        gtype::filter_parameters(args.parameters, args.returns)
-            .into_iter()
-            .partition(|p| matches!(p.direction.as_deref(), Some("inout" | "out")));
+    let params = gtype::filter_parameters(args.parameters, args.returns);
+
+    let p_returns: Vec<_> = params
+        .iter()
+        .filter(|p| matches!(p.direction.as_deref(), Some("inout" | "out")))
+        .cloned()
+        .collect();
+
+    let p_parameters: Vec<_> = params
+        .iter()
+        .filter(|p| matches!(p.direction.as_deref(), None | Some("in" | "inout")))
+        .cloned()
+        .collect();
 
     let parameter_results: Vec<Result<Parameter, String>> = p_parameters
         .into_iter()
