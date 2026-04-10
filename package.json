@@ -1,6 +1,6 @@
 {
     "name": "girgen",
-    "version": "0.3.13",
+    "version": "0.3.14",
     "author": "Aylur",
     "license": "MIT",
     "repository": {
@@ -33,8 +33,8 @@
         "@types/node": "latest"
     },
     "optionalDependencies": {
-        "@girgen/linux-x64": "0.3.13",
-        "@girgen/linux-arm64": "0.3.13"
+        "@girgen/linux-x64": "0.3.14",
+        "@girgen/linux-arm64": "0.3.14"
     },
     "files": [
         "bin"

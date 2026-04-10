@@ -144,7 +144,7 @@ declare module "gettext" {
          * @param msgid A string to translate.
          * @returns A translated message.
          */
-        function pgettext(context: string | null, msgid: string): string
+        function pgettext(context: string, msgid: string): string
 
         /**
          * This is a variant of {@link Gettext.dgettext} which supports a disambiguating
@@ -159,7 +159,7 @@ declare module "gettext" {
          */
         function dpgettext(
             domainName: string | null,
-            context: string | null,
+            context: string,
             msgid: string,
         ): string
 
@@ -168,20 +168,20 @@ declare module "gettext" {
              * @param msgid A string to translate.
              * @returns A translated message.
              */
-            gettext: (msgid: string) => string
+            gettext(msgid: string): string
             /**
              * @param msgid1 The singular form of the string to be translated.
              * @param msgid2 The plural form of the string to be translated.
              * @param n The number determining the translation form to use.
              * @returns A translated message.
              */
-            ngettext: (msgid1: string, msgid2: string, n: number) => string
+            ngettext(msgid1: string, msgid2: string, n: number): string
             /**
              * @param context A context to disambiguate `msgid`.
              * @param msgid A string to translate.
              * @returns A translated message.
              */
-            pgettext: (context: string | null, msgid: string) => string
+            pgettext(context: string, msgid: string): string
         }
 
         /**
