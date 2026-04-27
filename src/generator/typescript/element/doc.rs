@@ -146,6 +146,9 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
         returns => out_parameters.join(", "),
     };
 
-    env.render_str(TEMPLATE, ctx)
-        .map_err(|err| format!("failed to render jsdoc: error: {:?}", err))
+    let res = env
+        .render_str(TEMPLATE, ctx)
+        .map_err(|err| format!("failed to render jsdoc: error: {:?}", err));
+
+    res.map(|doc| if doc == "/**\n */" { "".into() } else { doc })
 }
