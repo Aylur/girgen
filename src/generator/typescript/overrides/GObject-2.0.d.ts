@@ -106,14 +106,14 @@ namespace GObject {
     }
 
     type ConstructorProps<Class> = Class extends {
-        $readableProperties: unknown
+        $writableProperties: unknown
         $constructOnlyProperties: unknown
     }
         ? {
               [K in Keyof<
-                  Class["$readableProperties"] &
+                  Class["$writableProperties"] &
                       Class["$constructOnlyProperties"]
-              > as CamelCase<K>]: (Class["$readableProperties"] &
+              > as CamelCase<K>]: (Class["$writableProperties"] &
                   Class["$constructOnlyProperties"])[K]
           }
         : never
