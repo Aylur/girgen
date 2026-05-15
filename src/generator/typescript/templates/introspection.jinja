@@ -8,7 +8,13 @@
 {%- if extends|length > 0 -%}extends {{ comma_list(extends, suffix) }}{%- endif %}
 {%- endmacro -%}
 
-{%- set rw = properties|rejectattr("construct_only") %}
+{%- set rw = properties
+    |selectattr('readable')
+    |selectattr('writable')
+    |rejectattr("construct_only")
+    |unique
+%}
+
 {%- set read_only = properties|rejectattr("writable") %}
 {%- set write_only = properties|rejectattr("readable")|rejectattr("construct_only") %}
 {%- set construct_only = properties|selectattr("construct_only") -%}
@@ -28,14 +34,14 @@
 
     interface ReadableProperties extends ReadWriteProperties
     {%- if extends|length > 0 %}, {% endif %}{{ comma_list(extends, ".ReadableProperties")}} {
-        {%- for prop in readable %}
+        {%- for prop in read_only %}
         "{{ prop.name }}": {{ prop.type }}
         {%- endfor %}
     }
 
     interface WritableProperties extends ReadWriteProperties
     {%- if extends|length > 0 %}, {% endif %}{{ comma_list(extends, ".WritableProperties")}} {
-        {%- for prop in writable %}
+        {%- for prop in write_only %}
         "{{ prop.name }}": {{ prop.type }}
         {%- endfor %}
     }
