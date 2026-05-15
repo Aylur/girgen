@@ -62,7 +62,7 @@ type SignalHandlerOptions = {
     accumulator?: GObject.AccumulatorType
 }
 
-type GObjectConstructor = { new (...args: any[]): GObject.Object }
+type GObjectConstructor = abstract new (...args: any[]) => GObject.Object
 
 type PascalCase<S> = S extends `${infer Head}${"-" | "_"}${infer Tail}`
     ? `${Capitalize<Head>}${PascalCase<Tail>}`
