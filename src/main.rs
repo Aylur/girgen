@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use girgen::generator::{Error, Event, typescript};
+use girgen::generator::{Error, Event, debug, typescript};
 use girgen::{default_dirs, girgen};
 use std::{ffi, path, process, sync};
 
@@ -95,6 +95,8 @@ enum Language {
         #[arg(short, long)]
         alias: bool,
     },
+    /// Introspect parsed GIR data
+    Debug,
 }
 
 fn main() -> process::ExitCode {
@@ -110,9 +112,14 @@ fn main() -> process::ExitCode {
         Language::Typescript { outdir, alias } => girgen(girgen::Args {
             dirs,
             ignore: cli.ignore,
-            outdir,
             on_event,
-            generator: typescript::TypeScript { alias },
+            generator: typescript::TypeScript { outdir, alias },
+        }),
+        Language::Debug => girgen(girgen::Args {
+            dirs,
+            ignore: cli.ignore,
+            on_event,
+            generator: debug::Debug,
         }),
     };
 

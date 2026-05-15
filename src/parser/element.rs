@@ -149,7 +149,7 @@ pub enum AnyElement {
 impl AnyElement {
     pub fn kind(&self) -> &'static str {
         match self {
-            Self::Invalid => unreachable!(),
+            Self::Invalid => "invalid",
             Self::Repository(_) => Repository::KIND,
             Self::Namespace(_) => Namespace::KIND,
             Self::Alias(_) => Alias::KIND,

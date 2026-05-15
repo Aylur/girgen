@@ -37,7 +37,6 @@ pub fn default_dirs() -> Vec<PathBuf> {
 
 pub struct Args<G: Generator + Sync> {
     pub dirs: Vec<PathBuf>,
-    pub outdir: String,
     pub ignore: Vec<String>,
     pub on_event: fn(Event),
     pub generator: G,
@@ -117,5 +116,5 @@ pub fn girgen<T: Generator + Sync>(args: Args<T>) -> Result<(), Error> {
         })
         .collect::<Vec<_>>();
 
-    args.generator.generate(&girs, &args.outdir, args.on_event)
+    args.generator.generate(&girs, args.on_event)
 }

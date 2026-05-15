@@ -1,4 +1,5 @@
 mod cache;
+pub mod debug;
 pub mod typescript;
 
 pub use cache::{cache, hash, lookup_cache};
@@ -53,5 +54,5 @@ pub struct Gir<'a> {
 }
 
 pub trait Generator {
-    fn generate(&self, girs: &[Gir], outdir: &str, event: fn(Event)) -> Result<(), Error>;
+    fn generate(&self, girs: &[Gir], event: fn(Event)) -> Result<(), Error>;
 }
