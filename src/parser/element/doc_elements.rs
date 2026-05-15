@@ -18,8 +18,8 @@ pub struct DocStability {
 pub struct Doc {
     pub xml_space: Option<String>,
     pub xml_whitespace: Option<String>,
-    pub filename: String,
-    pub line: String,
+    pub filename: Option<String>,
+    pub line: Option<String>,
     pub column: Option<String>,
     pub text: String,
 }
@@ -102,8 +102,8 @@ impl super::Element for Doc {
         Ok(Self {
             xml_space: attrs.get_string("xml:space").ok(),
             xml_whitespace: attrs.get_string("xml:whitespace").ok(),
-            filename: attrs.get_string("filename")?,
-            line: attrs.get_string("line")?,
+            filename: attrs.get_string("filename").ok(),
+            line: attrs.get_string("line").ok(),
             column: attrs.get_string("line").ok(),
             text: String::from(""),
         })
