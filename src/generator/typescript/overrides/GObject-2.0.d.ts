@@ -95,7 +95,7 @@ interface SignalMatch {
 }
 
 type PrimitiveConstructor<T, Input = unknown> = {
-    $gtype: GObject.GType<T>
+    $gtype: GObject.GType<T>;
     (v: Input): T
 }
 
@@ -208,7 +208,7 @@ namespace GObject {
          * @param properties Object containing the properties to set
          */
         set<T extends Array<keyof this>>(params: {
-            [K in T[number]]: this[K]
+            [K in T[number]]?: this[K]
         }): void
 
         /**
