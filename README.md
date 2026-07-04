@@ -18,13 +18,13 @@ cargo install girgen --root .
 ./bin/girgen --help
 ```
 
-## TypeScript
+## GJS TypeScript
 
 Generate a standalone package that contains every namespace found in the given
 directories.
 
 ```sh
-girgen typescript --help
+girgen gjs --help
 ```
 
 > [!TIP]
@@ -34,7 +34,7 @@ girgen typescript --help
 >
 > ```sh
 > flatpak run --command=cp --filesystem=home org.gnome.Sdk -r /usr/share/gir-1.0 gir-1.0
-> girgen -d gir-1.0 typescript
+> girgen -d gir-1.0 gjs
 > ```
 
 By default it will generate the package to `.types/gi` which you can then source
@@ -63,7 +63,7 @@ Note that when using `--alias` flag to generate non version imports such as
 end up as a union of the two versions.
 
 ```sh
-girgen typescript -i Gtk-3.0 --alias
+girgen gjs -i Gtk-3.0 --alias
 ```
 
 ### TypeScript Annotations
@@ -233,7 +233,7 @@ declare module "gi://Gio?version=2.0" {
           count: number,
           io_priority: number,
           cancellable: Gio.Cancellable | null,
-        ): GLib.Bytes
+        ): Promise<GLib.Bytes>
       }
     }
   }

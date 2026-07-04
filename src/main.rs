@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use girgen::generator::{Error, Event, debug, typescript};
+use girgen::generator::{debug, typescript, Error, Event};
 use girgen::{default_dirs, girgen};
 use std::{ffi, path, process, sync};
 
@@ -85,8 +85,9 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Language {
-    /// Generate annotations for TypeScript
-    Typescript {
+    /// Generate annotations for GJS TypeScript
+    #[command(name = "gjs", alias = "typescript")]
+    Gjs {
         /// Target directory to generate to
         #[arg(short, long, value_name = "PATH", default_value = "./.types/gi")]
         outdir: String,
@@ -109,7 +110,7 @@ fn main() -> process::ExitCode {
     }
 
     let res = match cli.command {
-        Language::Typescript { outdir, alias } => girgen(girgen::Args {
+        Language::Gjs { outdir, alias } => girgen(girgen::Args {
             dirs,
             ignore: cli.ignore,
             on_event,
