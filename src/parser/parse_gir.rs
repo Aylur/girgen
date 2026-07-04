@@ -1,5 +1,7 @@
 use super::element::{AnyElement, Attrs, Element, Repository};
 use super::error::ParseError;
+use quick_xml::XmlVersion;
+use quick_xml::escape::resolve_xml_entity;
 use quick_xml::events::{BytesStart, Event};
 
 fn attributes(e: &BytesStart) -> Result<Attrs, ParseError> {
@@ -10,7 +12,7 @@ fn attributes(e: &BytesStart) -> Result<Attrs, ParseError> {
             Err(err) => return Err(ParseError::AttrError(err)),
             Ok(a) => {
                 let key = String::from_utf8(a.key.into_inner().to_vec())?;
-                let value = a.unescape_value()?.into_owned();
+                let value = a.normalized_value(XmlVersion::Implicit1_0)?.into_owned();
                 attrs.insert(key, value);
             }
         }
@@ -97,7 +99,7 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
             }
             Ok(Event::Text(e)) => {
                 if let Some(top) = stack.last_mut() {
-                    let content = e.xml_content()?;
+                    let content = e.xml_content(XmlVersion::Implicit1_0)?;
                     top.text(content.as_ref())?;
                 }
             }
@@ -106,14 +108,10 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
                     .last_mut()
                     .ok_or(ParseError::MalformedGir("general ref text"))?;
 
-                let ch = match e.xml_content()?.as_ref() {
-                    "lt" => "<",
-                    "gt" => ">",
-                    "amp" => "&",
-                    c => todo!("write ref event {}", c),
-                };
-
-                top.text(ch)?;
+                let entity = e.xml_content(XmlVersion::Implicit1_0)?;
+                let text = resolve_xml_entity(&entity)
+                    .ok_or(ParseError::MalformedGir("unknown entity reference"))?;
+                top.text(text)?;
             }
             Ok(Event::CData(_)) => {
                 todo!()
