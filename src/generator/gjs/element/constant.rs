@@ -25,7 +25,8 @@ impl render::Renderable<ConstantContext> for element::Constant {
 
         let value = match value.as_str() {
             "boolean" | "number" => self.value.clone(),
-            "string" => format!("\"{}\"", &self.value.replace('"', r#"\""#)),
+            "string" => serde_json::to_string(&self.value)
+                .expect("serializing a string constant should not fail"),
             _ => value,
         };
 
