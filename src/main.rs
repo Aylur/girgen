@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use girgen::generator::{debug, typescript, Error, Event};
+use girgen::generator::{debug, gjs, Error, Event};
 use girgen::{default_dirs, girgen};
 use std::{ffi, path, process, sync};
 
@@ -114,7 +114,7 @@ fn main() -> process::ExitCode {
             dirs,
             ignore: cli.ignore,
             on_event,
-            generator: typescript::TypeScript { outdir, alias },
+            generator: gjs::TypeScript { outdir, alias },
         }),
         Language::Debug => girgen(girgen::Args {
             dirs,

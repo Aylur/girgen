@@ -1,6 +1,6 @@
 mod cache;
 pub mod debug;
-pub mod typescript;
+pub mod gjs;
 
 pub use cache::{cache, hash, lookup_cache};
 
