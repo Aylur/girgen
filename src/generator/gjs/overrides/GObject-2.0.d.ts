@@ -180,17 +180,17 @@ namespace GObject {
         emit<Signal extends Keyof<DetaliedSignals<this>>>(
             signal: `${Signal}::${string}`,
             ...args: SignalArgs<DetaliedSignals<this>[Signal]>
-        ): SignalReturnType<Signal>
+        ): SignalReturnType<DetaliedSignals<this>[Signal]>
 
         emit<Signal extends Keyof<Signals<this>>>(
             signal: Signal,
             ...args: SignalArgs<Signals<this>[Signal]>
-        ): SignalReturnType<Signal>
+        ): SignalReturnType<Signals<this>[Signal]>
 
         emit<Signal extends Keyof<NotifySignals<this>>>(
             signal: Signal,
             ...args: SignalArgs<NotifySignals<this>[Signal]>
-        ): SignalReturnType<Signal>
+        ): SignalReturnType<NotifySignals<this>[Signal]>
 
         disconnect(id: number): void
 
