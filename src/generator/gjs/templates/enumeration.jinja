@@ -15,7 +15,7 @@ interface {{ value }} {
     {%- endfor %}
 
     {%- for fn in functions %}
-    {{ fn }}
+    {{ fn|indent(4) }}
     {%- endfor %}
 }
 
@@ -41,7 +41,7 @@ interface $Exports {
     {{ jsdoc|indent(4) if jsdoc }}
     {{ name|escape_member }}: {{ value }}
     {%- for fn in functions %}
-    {{ fn }}
+    {{ fn|indent(4) }}
     {%- endfor %}
 }
 {%- endif %}
