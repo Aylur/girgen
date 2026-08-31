@@ -4,79 +4,47 @@ use crate::{element, generator::Event};
 
 const TEMPLATE: &str = include_str!("../templates/enumeration.jinja");
 
-fn remove_prefix(fn_name: &str, prefixes: &Vec<&str>) -> String {
-    for prefix in prefixes {
-        if let Some(name) = fn_name.strip_prefix(prefix) {
-            return name.to_string();
-        }
-    }
-    fn_name.to_string()
-}
-
 macro_rules! render_functions {
     ($self:expr, $ctx:expr) => {
-        if $self.functions.is_empty() {
-            Vec::new()
-        } else {
-            match $ctx.namespace.c_symbol_prefixes.as_ref() {
-                None => {
-                    ($ctx.event)(Event::Failed {
-                        repo: None,
-                        err: &format!(
-                            "failed to render {}-{}.{} functions: Missing namespace c:symbol-prefix",
-                            $ctx.namespace.name,
-                            $ctx.namespace.version,
-                            $self.name
-                        ),
-                    });
-                    Vec::new()
+        $self
+            .functions
+            .iter()
+            .filter_map(|f| {
+                if !f.introspectable($ctx) {
+                    return None;
                 }
-                Some(prefixes) => {
-                    let ns_prefixes: Vec<_> = prefixes.split(',').collect();
 
-                    $self
-                        .functions
-                        .iter()
-                        .filter_map(|f| {
-                            if !f.introspectable($ctx) {
-                                return None;
-                            }
+                let prefix = format!("{}: ", f.attrs.name);
 
-                            let name = remove_prefix(&f.attrs.name, &ns_prefixes);
-                            let prefix = format!("{name}: ");
+                let args = callable::CallableArgs {
+                    info_elements: &f.info_elements,
+                    info: &f.attrs.info,
+                    throws: f.attrs.throws,
+                    prefix: Some(&prefix),
+                    name: None,
+                    parameters: f.parameters.as_ref(),
+                    returns: f.return_value.as_ref(),
+                };
 
-                            let args = callable::CallableArgs {
-                                info_elements: &f.info_elements,
-                                info: &f.attrs.info,
-                                throws: f.attrs.throws,
-                                prefix: Some(&prefix),
-                                name: None,
-                                parameters: f.parameters.as_ref(),
-                                returns: f.return_value.as_ref(),
-                            };
-
-                            match callable::render($ctx, &args) {
-                                Ok(res) => Some(res),
-                                Err(err) => {
-                                    ($ctx.event)(Event::Failed {
-                                        repo: None,
-                                        err: &format!(
-                                            "failed to render {}-{}.{}.{} function: {}",
-                                            $ctx.namespace.name,
-                                            $ctx.namespace.version,
-                                            $self.name,
-                                            f.attrs.name,
-                                            err
-                                        )
-                                    });
-                                    None
-                                }
-                            }
-                        })
-                        .collect()
+                match callable::render($ctx, &args) {
+                    Ok(res) => Some(res),
+                    Err(err) => {
+                        ($ctx.event)(Event::Failed {
+                            repo: None,
+                            err: &format!(
+                                "failed to render {}-{}.{}.{} function: {}",
+                                $ctx.namespace.name,
+                                $ctx.namespace.version,
+                                $self.name,
+                                f.attrs.name,
+                                err
+                            )
+                        });
+                        None
+                    }
                 }
-            }
-        }
+            })
+            .collect::<Vec<_>>()
     };
 }
 
