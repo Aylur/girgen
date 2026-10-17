@@ -1,9 +1,12 @@
 use super::super::render;
 use super::{callable, doc, gtype};
 use crate::element;
+use std::sync::LazyLock;
 use stringcase::snake_case;
 
-const TEMPLATE: &str = include_str!("../templates/record.jinja");
+static TEMPLATE: LazyLock<render::Template> = LazyLock::new(|| {
+    render::compile_template("record.jinja", include_str!("../templates/record.jinja"))
+});
 
 #[derive(serde::Serialize)]
 pub struct FieldContext {
@@ -99,7 +102,7 @@ pub struct RecordContext {
 
 impl render::Renderable<RecordContext> for element::Record {
     const KIND: &'static str = "record";
-    const TEMPLATE: &'static str = TEMPLATE;
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name
@@ -181,7 +184,7 @@ impl render::Renderable<RecordContext> for element::Record {
 
 impl render::Renderable<RecordContext> for element::Union {
     const KIND: &'static str = "union";
-    const TEMPLATE: &'static str = TEMPLATE;
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         match &self.name {

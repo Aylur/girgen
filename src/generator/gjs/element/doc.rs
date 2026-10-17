@@ -1,10 +1,13 @@
+use super::super::render;
 use super::gtype;
 use crate::element;
 use regex::{Captures, Regex};
 use std::sync::LazyLock;
 use stringcase::camel_case;
 
-static TEMPLATE: &str = include_str!("../templates/doc.jinja");
+static TEMPLATE: LazyLock<render::Template> =
+    LazyLock::new(|| render::compile_template("doc.jinja", include_str!("../templates/doc.jinja")));
+
 static DOC_AT_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?:^|\s)@(\w+)").unwrap());
 static GI_DOCDGEN_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\[(\w+)@([^\]]+)\]").unwrap());
@@ -131,8 +134,6 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
 
     let experimental = doc_stability.is_some_and(|s| s == "Unstable");
 
-    let env = minijinja::Environment::new();
-
     let ctx = minijinja::context! {
         text_lines => text_lines,
         throws => args.throws,
@@ -146,8 +147,8 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
         returns => out_parameters.join(", "),
     };
 
-    let res = env
-        .render_str(TEMPLATE, ctx)
+    let res = TEMPLATE
+        .render(ctx)
         .map_err(|err| format!("failed to render jsdoc: error: {:?}", err));
 
     res.map(|doc| if doc == "/**\n */" { "".into() } else { doc })

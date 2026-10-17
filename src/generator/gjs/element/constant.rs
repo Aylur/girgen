@@ -1,6 +1,10 @@
 use super::super::render;
 use super::gtype;
 use crate::element;
+use std::sync::LazyLock;
+
+static TEMPLATE: LazyLock<render::Template> =
+    LazyLock::new(|| render::compile_template("constant", "{{ name }}: {{ value }}"));
 
 #[derive(serde::Serialize)]
 pub struct ConstantContext {
@@ -10,7 +14,7 @@ pub struct ConstantContext {
 
 impl render::Renderable<ConstantContext> for element::Constant {
     const KIND: &'static str = "constant";
-    const TEMPLATE: &'static str = "{{ name }}: {{ value }}";
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name

@@ -1,8 +1,14 @@
 use super::super::render;
 use super::{callable, doc};
 use crate::{element, generator::Event};
+use std::sync::LazyLock;
 
-const TEMPLATE: &str = include_str!("../templates/enumeration.jinja");
+static TEMPLATE: LazyLock<render::Template> = LazyLock::new(|| {
+    render::compile_template(
+        "enumeration.jinja",
+        include_str!("../templates/enumeration.jinja"),
+    )
+});
 
 macro_rules! render_functions {
     ($self:expr, $ctx:expr) => {
@@ -38,7 +44,7 @@ macro_rules! render_functions {
                                 $self.name,
                                 f.attrs.name,
                                 err
-                            )
+                            ),
                         });
                         None
                     }
@@ -81,7 +87,7 @@ pub struct EnumContext {
 
 impl render::Renderable<EnumContext> for element::Enumeration {
     const KIND: &'static str = "enum";
-    const TEMPLATE: &'static str = TEMPLATE;
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name
@@ -105,7 +111,7 @@ impl render::Renderable<EnumContext> for element::Enumeration {
 
 impl render::Renderable<EnumContext> for element::Bitfield {
     const KIND: &'static str = "bitfield";
-    const TEMPLATE: &'static str = TEMPLATE;
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name

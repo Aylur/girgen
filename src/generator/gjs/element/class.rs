@@ -1,7 +1,18 @@
 use super::super::{overrides, render};
 use super::{callable, doc, gtype};
 use crate::{element, generator::Event};
-use stringcase::camel_case;
+use std::sync::LazyLock;
+
+static CLASS_TEMPLATE: LazyLock<render::Template> = LazyLock::new(|| {
+    render::compile_template("class.jinja", include_str!("../templates/class.jinja"))
+});
+
+static INTERFACE_TEMPLATE: LazyLock<render::Template> = LazyLock::new(|| {
+    render::compile_template(
+        "interface.jinja",
+        include_str!("../templates/interface.jinja"),
+    )
+});
 
 fn collect_signals(ctx: &render::Context, signals: &[element::Signal]) -> Vec<String> {
     signals
@@ -110,7 +121,7 @@ pub struct ClassContext {
 
 impl render::Renderable<ClassContext> for element::Class {
     const KIND: &'static str = "class";
-    const TEMPLATE: &'static str = include_str!("../templates/class.jinja");
+    const TEMPLATE: &'static LazyLock<render::Template> = &CLASS_TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name
@@ -118,17 +129,6 @@ impl render::Renderable<ClassContext> for element::Class {
 
     fn introspectable(&self, _: &render::Context) -> bool {
         self.info.introspectable.is_none_or(|i| i)
-    }
-
-    fn env(&self, _: &render::Context, _: &ClassContext) -> minijinja::Environment<'_> {
-        let mut env = minijinja::Environment::new();
-        env.add_template(
-            "introspection",
-            include_str!("../templates/introspection.jinja"),
-        )
-        .unwrap();
-        env.add_filter("camel_case", camel_case);
-        env
     }
 
     fn ctx(&self, ctx: &render::Context) -> Result<ClassContext, String> {
@@ -266,21 +266,10 @@ impl render::Renderable<ClassContext> for element::Class {
 
 impl render::Renderable<ClassContext> for element::Interface {
     const KIND: &'static str = "interface";
-    const TEMPLATE: &'static str = include_str!("../templates/interface.jinja");
+    const TEMPLATE: &'static LazyLock<render::Template> = &INTERFACE_TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name
-    }
-
-    fn env(&self, _: &render::Context, _: &ClassContext) -> minijinja::Environment<'_> {
-        let mut env = minijinja::Environment::new();
-        env.add_template(
-            "introspection",
-            include_str!("../templates/introspection.jinja"),
-        )
-        .unwrap();
-        env.add_filter("camel_case", camel_case);
-        env
     }
 
     fn introspectable(&self, _: &render::Context) -> bool {

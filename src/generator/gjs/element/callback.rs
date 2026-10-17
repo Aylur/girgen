@@ -1,6 +1,10 @@
 use super::super::render;
 use super::callable;
 use crate::element;
+use std::sync::LazyLock;
+
+static TEMPLATE: LazyLock<render::Template> =
+    LazyLock::new(|| render::compile_template("callback", "{{ callback|escape_toplevel }}"));
 
 #[derive(serde::Serialize)]
 pub struct CallbackContext {
@@ -9,7 +13,7 @@ pub struct CallbackContext {
 
 impl render::Renderable<CallbackContext> for element::Callback {
     const KIND: &'static str = "callback";
-    const TEMPLATE: &'static str = "{{ callback|escape_toplevel }}";
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name

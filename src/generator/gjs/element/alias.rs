@@ -1,6 +1,14 @@
 use super::super::render;
 use super::{doc, gtype};
 use crate::element;
+use std::sync::LazyLock;
+
+static TEMPLATE: LazyLock<render::Template> = LazyLock::new(|| {
+    render::compile_template(
+        "alias",
+        "{{ jsdoc if jsdoc }}\ntype {{ name|escape_toplevel }} = {{ value }}",
+    )
+});
 
 #[derive(serde::Serialize)]
 pub struct AliasContext {
@@ -11,7 +19,7 @@ pub struct AliasContext {
 
 impl render::Renderable<AliasContext> for element::Alias {
     const KIND: &'static str = "alias";
-    const TEMPLATE: &'static str = "{{ jsdoc if jsdoc }}\ntype {{ name|escape_toplevel }} = {{ value }}";
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.name

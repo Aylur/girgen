@@ -2,8 +2,14 @@ use super::super::render;
 use super::{doc, gtype};
 use crate::element;
 use crate::generator::Event;
+use std::sync::LazyLock;
 
-static TEMPLATE: &str = include_str!("../templates/callable.jinja");
+static TEMPLATE: LazyLock<render::Template> = LazyLock::new(|| {
+    render::compile_template(
+        "callable.jinja",
+        include_str!("../templates/callable.jinja"),
+    )
+});
 
 #[derive(serde::Serialize)]
 struct Parameter<'a> {
@@ -53,8 +59,6 @@ pub struct CallableArgs<'a> {
 }
 
 pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String> {
-    let env = minijinja::Environment::new();
-
     let params = gtype::filter_parameters(args.parameters, args.returns);
 
     let p_returns: Vec<_> = params
@@ -142,7 +146,7 @@ pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String
         returns,
     };
 
-    match env.render_str(TEMPLATE, ctx) {
+    match TEMPLATE.render(ctx) {
         Ok(res) => Ok(res),
         Err(err) => Err(format!("failed to render callable: {:?}", err)),
     }

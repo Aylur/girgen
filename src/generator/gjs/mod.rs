@@ -109,28 +109,24 @@ impl Generator for TypeScript {
             });
 
         if self.alias {
-            let aliases = minijinja::Environment::new()
-                .render_str(
-                    include_str!("./templates/aliases.jinja"),
-                    minijinja::context! {
-                        namespaces,
-                    },
-                )
-                .unwrap();
+            let aliases = render::compile_template(
+                "aliases.jinja",
+                include_str!("./templates/aliases.jinja"),
+            )
+            .render(minijinja::context! { namespaces })
+            .unwrap();
 
             fs::write(format!("{}/aliases.d.ts", &self.outdir), aliases)?;
         }
 
-        let index = minijinja::Environment::new()
-            .render_str(
-                include_str!("./templates/index.jinja"),
-                minijinja::context! {
+        let index =
+            render::compile_template("index.jinja", include_str!("./templates/index.jinja"))
+                .render(minijinja::context! {
                     imports,
                     namespaces,
                     short_paths => self.alias,
-                },
-            )
-            .unwrap();
+                })
+                .unwrap();
 
         let index_path = format!("{}/index.d.ts", &self.outdir);
         fs::write(&index_path, index)?;

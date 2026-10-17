@@ -2,6 +2,34 @@ use super::overrides;
 use crate::{element, generator::Event};
 use rayon::prelude::*;
 use rayon::scope;
+use std::sync::{LazyLock, OnceLock};
+use stringcase::camel_case;
+
+pub type Template = minijinja::Template<'static, 'static>;
+
+static ENV: OnceLock<minijinja::Environment<'static>> = OnceLock::new();
+
+pub fn compile_template(name: &'static str, source: &'static str) -> Template {
+    let env = ENV.get_or_init(|| {
+        let mut env = minijinja::Environment::new();
+        env.set_auto_escape_callback(|_| minijinja::AutoEscape::None);
+        env.add_filter("escape_member", escape_member);
+        env.add_filter("escape_toplevel", escape_toplevel);
+        env.add_filter("camel_case", camel_case);
+        env.add_template(
+            "introspection",
+            include_str!("templates/introspection.jinja"),
+        )
+        .unwrap();
+        env
+    });
+
+    env.template_from_named_str(name, source)
+        .unwrap_or_else(|err| panic!("invalid template '{name}': {err:?}"))
+}
+
+static REPOSITORY_TEMPLATE: LazyLock<Template> =
+    LazyLock::new(|| compile_template("repository", include_str!("templates/repository.jinja")));
 
 pub struct Context<'a> {
     pub namespace: &'a element::Namespace,
@@ -29,15 +57,11 @@ fn escape_toplevel(name: &str) -> String {
 
 pub trait Renderable<T: serde::Serialize> {
     const KIND: &'static str;
-    const TEMPLATE: &'static str;
+    const TEMPLATE: &'static LazyLock<Template>;
 
     fn name(&self, _: &Context) -> &str;
     fn introspectable(&self, _: &Context) -> bool;
     fn ctx(&self, _: &Context) -> Result<T, String>;
-
-    fn env(&self, _: &Context, _: &T) -> minijinja::Environment<'_> {
-        minijinja::Environment::new()
-    }
 
     fn render(&self, g_ctx: &Context) -> Result<String, String> {
         let name = self.name(g_ctx);
@@ -56,12 +80,7 @@ pub trait Renderable<T: serde::Serialize> {
             }
         };
 
-        let mut env = self.env(g_ctx, &ctx);
-
-        env.add_filter("escape_member", escape_member);
-        env.add_filter("escape_toplevel", escape_toplevel);
-
-        env.render_str(Self::TEMPLATE, &ctx).map_err(|err| {
+        Self::TEMPLATE.render(&ctx).map_err(|err| {
             format!(
                 "rendering {} {}-{}.{}: {:?}",
                 Self::KIND,
@@ -228,10 +247,7 @@ impl element::Repository {
             })
             .collect();
 
-        let res = minijinja::Environment::new().render_str(
-            include_str!("templates/repository.jinja"),
-            minijinja::context! { imports, namespaces },
-        );
+        let res = REPOSITORY_TEMPLATE.render(minijinja::context! { imports, namespaces });
 
         match res {
             Ok(res) => Ok(res),

@@ -1,6 +1,10 @@
 use super::super::render;
 use super::callable;
 use crate::element;
+use std::sync::LazyLock;
+
+static TEMPLATE: LazyLock<render::Template> =
+    LazyLock::new(|| render::compile_template("function", "{{ function }}"));
 
 #[derive(serde::Serialize)]
 pub struct FunctionContext {
@@ -9,7 +13,7 @@ pub struct FunctionContext {
 
 impl render::Renderable<FunctionContext> for element::Function {
     const KIND: &'static str = "function";
-    const TEMPLATE: &'static str = "{{ function }}";
+    const TEMPLATE: &'static LazyLock<render::Template> = &TEMPLATE;
 
     fn name(&self, _: &render::Context) -> &str {
         &self.attrs.name
