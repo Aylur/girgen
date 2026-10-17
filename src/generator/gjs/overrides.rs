@@ -69,6 +69,7 @@ pub const OVERRIDES: &[Override] = &[
             "VariantType",
             "VariantBuilder",
             "log_set_writer_func",
+            "LogWriterFunc",
         ],
     },
     Override {

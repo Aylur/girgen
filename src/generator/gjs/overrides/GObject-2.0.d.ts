@@ -285,8 +285,9 @@ namespace GObject {
 
     namespace ParamSpec {
         interface SignalSignatures {}
-        interface ReadableProperties {}
-        interface WritableProperties {}
+        interface ReadWriteProperties {}
+        interface ReadableProperties extends ReadWriteProperties {}
+        interface WritableProperties extends ReadWriteProperties {}
         interface ConstructOnlyProperties {}
     }
 

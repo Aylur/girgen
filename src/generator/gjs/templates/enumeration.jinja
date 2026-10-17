@@ -31,17 +31,22 @@ interface {{ value }} {
     {{ member.jsdoc|indent(4) }}
     readonly "{{ member.name }}": {{ member.value }}
     {%- endfor %}
+
+    {%- for fn in functions %}
+    {{ fn|indent(4) }}
+    {%- endfor %}
 }
 type {{ typename }} = {% if suffix == "Enum" -%}
-        {{ value }}[Exclude<keyof {{ value }}, "$gtype">]
+        {{ value }}[
+            {%- for member in members -%}
+                "{{ member.name }}"{% if not loop.last %} | {% endif %}
+            {%- endfor -%}
+        ]
     {%- else -%}
         number
     {%- endif %}
 interface $Exports {
     {{ jsdoc|indent(4) if jsdoc }}
     {{ name|escape_member }}: {{ value }}
-    {%- for fn in functions %}
-    {{ fn|indent(4) }}
-    {%- endfor %}
 }
 {%- endif %}

@@ -17,7 +17,7 @@ interface {{ typename }} {{ extend_list(extends) }} {
     {%- if property.readable %}
     get {{ property.name|camel_case }}(): {{ property.type }}
     {%- endif %}
-    {%- if property.writable and not property.constuct_only %}
+    {%- if property.writable and not property.construct_only %}
     set {{ property.name|camel_case }}(value: {{ property.type }})
     {%- endif %}
     {%- endfor %}
