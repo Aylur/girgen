@@ -2,6 +2,7 @@ use super::super::render;
 use super::{doc, gtype};
 use crate::element;
 use crate::generator::Event;
+use minijinja::value::Serde;
 use std::sync::LazyLock;
 
 static TEMPLATE: LazyLock<render::Template> = LazyLock::new(|| {
@@ -142,7 +143,7 @@ pub fn render(_: &render::Context, args: &CallableArgs) -> Result<String, String
         jsdoc,
         prefix => args.prefix,
         name,
-        parameters,
+        parameters => Serde(&parameters),
         returns,
     };
 

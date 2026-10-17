@@ -6,6 +6,7 @@ mod render;
 use super::cache;
 use crate::element::Repository;
 use crate::generator::{Error, Event, Generator, Gir};
+use minijinja::value::Serde;
 use rayon::prelude::*;
 use std::{collections::HashMap, fs};
 
@@ -113,7 +114,7 @@ impl Generator for TypeScript {
                 "aliases.jinja",
                 include_str!("./templates/aliases.jinja"),
             )
-            .render(minijinja::context! { namespaces })
+            .render(minijinja::context! { namespaces => Serde(&namespaces) })
             .unwrap();
 
             fs::write(format!("{}/aliases.d.ts", &self.outdir), aliases)?;
@@ -123,7 +124,7 @@ impl Generator for TypeScript {
             render::compile_template("index.jinja", include_str!("./templates/index.jinja"))
                 .render(minijinja::context! {
                     imports,
-                    namespaces,
+                    namespaces => Serde(&namespaces),
                     short_paths => self.alias,
                 })
                 .unwrap();

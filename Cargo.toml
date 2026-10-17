@@ -17,7 +17,7 @@ exclude = [
 [dependencies]
 quick-xml = "0"
 rayon = "1"
-minijinja = { version = "2", features = ["builtins"] }
+minijinja = { version = "3", features = ["builtins", "serde"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 regex = "1"

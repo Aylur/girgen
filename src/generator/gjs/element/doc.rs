@@ -1,6 +1,7 @@
 use super::super::render;
 use super::gtype;
 use crate::element;
+use minijinja::value::Serde;
 use regex::{Captures, Regex};
 use std::sync::LazyLock;
 use stringcase::camel_case;
@@ -137,13 +138,13 @@ pub fn jsdoc_with_args(args: &DocArgs) -> Result<String, String> {
     let ctx = minijinja::context! {
         text_lines => text_lines,
         throws => args.throws,
-        since => args.info.version,
+        since => args.info.version.as_deref(),
         deprecated => args.info.deprecated,
-        deprecated_since => args.info.deprecated_version,
+        deprecated_since => args.info.deprecated_version.as_deref(),
         deprecated_text => deprecated_text,
         experimental => experimental,
         default_value => args.default_value,
-        parameters => in_parameters,
+        parameters => Serde(&in_parameters),
         returns => out_parameters.join(", "),
     };
 

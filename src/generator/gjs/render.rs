@@ -1,5 +1,6 @@
 use super::overrides;
 use crate::{element, generator::Event};
+use minijinja::value::Serde;
 use rayon::prelude::*;
 use rayon::scope;
 use std::sync::{LazyLock, OnceLock};
@@ -80,7 +81,7 @@ pub trait Renderable<T: serde::Serialize> {
             }
         };
 
-        Self::TEMPLATE.render(&ctx).map_err(|err| {
+        Self::TEMPLATE.render(Serde(&ctx)).map_err(|err| {
             format!(
                 "rendering {} {}-{}.{}: {:?}",
                 Self::KIND,
@@ -247,7 +248,9 @@ impl element::Repository {
             })
             .collect();
 
-        let res = REPOSITORY_TEMPLATE.render(minijinja::context! { imports, namespaces });
+        let res = REPOSITORY_TEMPLATE.render(
+            minijinja::context! { imports => Serde(&imports), namespaces => Serde(&namespaces) },
+        );
 
         match res {
             Ok(res) => Ok(res),

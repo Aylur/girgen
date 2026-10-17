@@ -11,7 +11,7 @@ fn attributes(e: &BytesStart) -> Result<Attrs, ParseError> {
         match attr {
             Err(err) => return Err(ParseError::AttrError(err)),
             Ok(a) => {
-                let key = String::from_utf8(a.key.into_inner().to_vec())?;
+                let key = a.key.into_inner().to_owned();
                 let value = a.normalized_value(XmlVersion::Implicit1_0)?.into_owned();
                 attrs.insert(key, value);
             }
@@ -48,7 +48,7 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
     loop {
         match reader.read_event() {
             Ok(Event::Start(e)) => match e.name().as_ref() {
-                b"repository" => {
+                "repository" => {
                     let attrs = attributes(&e)?;
                     stack.push(AnyElement::Repository(Repository::new(&attrs)?));
                 }
@@ -62,7 +62,7 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
                 }
             },
             Ok(Event::End(e)) => match e.name().as_ref() {
-                b"repository" => {
+                "repository" => {
                     if let AnyElement::Repository(r) = stack.pop().ok_or(
                         ParseError::MalformedGir("root element expected to be repository"),
                     )? {
@@ -99,7 +99,7 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
             }
             Ok(Event::Text(e)) => {
                 if let Some(top) = stack.last_mut() {
-                    let content = e.xml_content(XmlVersion::Implicit1_0)?;
+                    let content = e.xml_content(XmlVersion::Implicit1_0);
                     top.text(content.as_ref())?;
                 }
             }
@@ -108,7 +108,7 @@ pub fn parse(gir_contents: &str) -> Result<Repository, ParseError> {
                     .last_mut()
                     .ok_or(ParseError::MalformedGir("general ref text"))?;
 
-                let entity = e.xml_content(XmlVersion::Implicit1_0)?;
+                let entity = e.xml_content(XmlVersion::Implicit1_0);
                 let text = resolve_xml_entity(&entity)
                     .ok_or(ParseError::MalformedGir("unknown entity reference"))?;
                 top.text(text)?;
