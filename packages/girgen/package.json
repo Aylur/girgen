@@ -1,0 +1,28 @@
+{
+    "name": "girgen",
+    "version": "0.4.0",
+    "type": "module",
+    "author": "Aylur",
+    "license": "MIT",
+    "repository": "github:Aylur/girgen",
+    "funding": {
+        "type": "kofi",
+        "url": "https://ko-fi.com/aylur"
+    },
+    "bin": {
+        "girgen": "bin/girgen.js"
+    },
+    "scripts": {
+        "prepack": "cp ../../README.md ./README.md"
+    },
+    "devDependencies": {
+        "@types/node": "latest"
+    },
+    "optionalDependencies": {
+        "@girgen/linux-x64": "workspace:*",
+        "@girgen/linux-arm64": "workspace:*"
+    },
+    "files": [
+        "bin"
+    ]
+}

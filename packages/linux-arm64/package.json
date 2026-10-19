@@ -1,0 +1,17 @@
+{
+    "name": "@girgen/linux-arm64",
+    "version": "0.4.0",
+    "author": "Aylur",
+    "license": "MIT",
+    "repository": "github:Aylur/girgen",
+    "os": [
+        "linux"
+    ],
+    "cpu": [
+        "arm64"
+    ],
+    "exports": "./girgen",
+    "files": [
+        "girgen"
+    ]
+}

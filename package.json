@@ -1,18 +1,15 @@
 {
-    "name": "girgen",
-    "version": "0.3.21",
+    "private": true,
     "author": "Aylur",
     "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Aylur/girgen.git"
-    },
+    "repository": "github:Aylur/girgen",
     "funding": {
         "type": "kofi",
         "url": "https://ko-fi.com/aylur"
     },
-    "bin": {
-        "girgen": "bin/girgen.js"
+    "scripts": {
+        "build": "cargo build --release --target x86_64-unknown-linux-musl && cp target/x86_64-unknown-linux-musl/release/girgen packages/linux-x64/girgen",
+        "girs": "flatpak run --command=cp --filesystem=home org.gnome.Sdk -r /usr/share/gir-1.0 gir-1.0"
     },
     "prettier": {
         "semi": false,
@@ -28,15 +25,5 @@
                 }
             }
         ]
-    },
-    "devDependencies": {
-        "@types/node": "latest"
-    },
-    "optionalDependencies": {
-        "@girgen/linux-x64": "0.3.20",
-        "@girgen/linux-arm64": "0.3.20"
-    },
-    "files": [
-        "bin"
-    ]
+    }
 }

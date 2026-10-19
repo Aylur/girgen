@@ -1,0 +1,42 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .: {}
+
+  packages/girgen:
+    devDependencies:
+      '@types/node':
+        specifier: latest
+        version: 26.6.5
+    optionalDependencies:
+      '@girgen/linux-arm64':
+        specifier: workspace:*
+        version: link:../linux-arm64
+      '@girgen/linux-x64':
+        specifier: workspace:*
+        version: link:../linux-x64
+
+  packages/linux-arm64: {}
+
+  packages/linux-x64: {}
+
+packages:
+
+  '@types/node@26.6.5':
+    resolution: {integrity: sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg==}
+
+  undici-types@8.9.0:
+    resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
+snapshots:
+
+  '@types/node@26.6.5':
+    dependencies:
+      undici-types: 8.9.0
+
+  undici-types@8.9.0: {}
