@@ -45,8 +45,11 @@ declare global {
 
     const ARGV: string[]
 
-    interface Error {
+    interface ErrorConstructor {
         isError(instance: unknown): instance is Error | GLib.Error
+    }
+
+    interface Error {
         matches(
             domain: GLib.Quark | { $gtype: GObject.GType<GLib.Error> },
             code: number,
