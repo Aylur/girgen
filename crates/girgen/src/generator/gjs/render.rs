@@ -35,6 +35,8 @@ static REPOSITORY_TEMPLATE: LazyLock<Template> =
 pub struct Context<'a> {
     pub namespace: &'a element::Namespace,
     pub event: fn(Event),
+    pub repos: &'a [&'a element::Repository],
+    pub includes: &'a [element::Include],
 }
 
 fn escape_member(name: &str) -> String {
@@ -233,13 +235,21 @@ impl element::Repository {
         repos: &[&element::Repository],
         event: fn(Event),
     ) -> Result<String, String> {
+        let includes = self.find_imports(repos);
+
         let namespaces = self
             .namespaces
             .par_iter()
-            .map(|namespace| render_namespace(Context { namespace, event }))
+            .map(|namespace| {
+                render_namespace(Context {
+                    namespace,
+                    event,
+                    repos,
+                    includes: &includes,
+                })
+            })
             .collect::<Vec<_>>();
 
-        let includes = self.find_imports(repos);
         let imports: Vec<Import> = includes
             .iter()
             .map(|inc| Import {

@@ -147,8 +147,9 @@ impl render::Renderable<ClassContext> for element::Class {
             .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version)
             .and_then(|o| o.classes.iter().find(|c| c.name == self.name));
 
-        let methods = callable::render_callable_elements(
+        let methods = callable::render_member_elements(
             ctx,
+            &self.name,
             "",
             &self
                 .methods
@@ -196,8 +197,9 @@ impl render::Renderable<ClassContext> for element::Class {
                 .collect::<Vec<_>>(),
         );
 
-        let virtual_methods = callable::render_callable_elements(
+        let virtual_methods = callable::render_member_elements(
             ctx,
+            &self.name,
             "vfunc_",
             &self
                 .virtual_methods
@@ -298,8 +300,9 @@ impl render::Renderable<ClassContext> for element::Interface {
             .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version)
             .and_then(|o| o.classes.iter().find(|c| c.name == self.name));
 
-        let methods = callable::render_callable_elements(
+        let methods = callable::render_member_elements(
             ctx,
+            &self.name,
             "",
             &self
                 .methods
@@ -329,8 +332,9 @@ impl render::Renderable<ClassContext> for element::Interface {
                 .collect::<Vec<_>>(),
         );
 
-        let virtual_methods = callable::render_callable_elements(
+        let virtual_methods = callable::render_member_elements(
             ctx,
+            &self.name,
             "vfunc_",
             &self
                 .virtual_methods

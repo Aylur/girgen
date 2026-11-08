@@ -1,6 +1,7 @@
 pub struct ClassOverride<'a> {
     pub name: &'a str,
     pub methods: &'a [&'a str],
+    pub declares: &'a [&'a str],
 }
 
 pub struct Override<'a> {
@@ -29,6 +30,7 @@ pub const OVERRIDES: &[Override] = &[
             ClassOverride {
                 name: "BindingGroup",
                 methods: &["bind_full"],
+                declares: &[],
             },
             ClassOverride {
                 name: "Object",
@@ -46,6 +48,18 @@ pub const OVERRIDES: &[Override] = &[
                     "ref_sink",
                     "unref",
                 ],
+                declares: &[
+                    "bind_property_full",
+                    "block_signal_handler",
+                    "connect",
+                    "connect_after",
+                    "disconnect",
+                    "emit",
+                    "notify",
+                    "set",
+                    "stop_emission_by_name",
+                    "unblock_signal_handler",
+                ],
             },
         ],
     },
@@ -57,6 +71,7 @@ pub const OVERRIDES: &[Override] = &[
         classes: &[ClassOverride {
             name: "ActionMap",
             methods: &["add_action_entries"],
+            declares: &["add_action_entries"],
         }],
     },
     Override {

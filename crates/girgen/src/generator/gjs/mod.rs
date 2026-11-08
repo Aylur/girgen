@@ -28,7 +28,15 @@ impl Generator for TypeScript {
         let valid_girs: Vec<&Gir> = girs
             .par_iter()
             .filter_map(|gir| {
-                let hash = cache::hash("ts_", gir.name, &gir.contents);
+                // output depends on included repositories because of conflict resolution
+                let contents: Vec<&str> = std::iter::once(gir.contents.as_str())
+                    .chain(gir.repo.find_includes(&repos).iter().filter_map(|inc| {
+                        girs.iter()
+                            .find(|g| g.name == format!("{}-{}", inc.name, inc.version))
+                            .map(|g| g.contents.as_str())
+                    }))
+                    .collect();
+                let hash = cache::hash("ts_", gir.name, &contents);
                 let cache_path = cache::lookup_cache(&hash);
                 let out_path = format!("{}/{}.d.ts", &self.outdir, gir.name);
 

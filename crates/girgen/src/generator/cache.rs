@@ -1,4 +1,4 @@
-use std::{collections, env, fs, io, path, sync};
+use std::{collections, env, fs, hash::Hasher, io, path, sync};
 use twox_hash::XxHash64;
 
 type Cache = collections::HashMap<String, path::PathBuf>;
@@ -42,9 +42,13 @@ fn get_cache() -> Cache {
         .unwrap_or_default()
 }
 
-pub fn hash(prefix: &str, name: &str, contents: &str) -> String {
-    let hash = XxHash64::oneshot(0, contents.as_bytes());
-    format!("{}_{}_{}_{}", prefix, name, hash, VERSION)
+pub fn hash(prefix: &str, name: &str, contents: &[&str]) -> String {
+    let mut hasher = XxHash64::with_seed(0);
+    for c in contents {
+        hasher.write(c.as_bytes());
+        hasher.write_u8(0);
+    }
+    format!("{}_{}_{}_{}", prefix, name, hasher.finish(), VERSION)
 }
 
 pub fn cache(hash: &str, result: &str) -> Result<(), io::Error> {
