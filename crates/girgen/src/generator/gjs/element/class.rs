@@ -231,7 +231,7 @@ impl render::Renderable<ClassContext> for element::Class {
         let name_class = constructor_record
             .map(|rec| rec.name.clone())
             // TODO: check for possible name collision
-            .unwrap_or_else(|| format!("{}Class", &self.name));
+            .unwrap_or_else(|| format!("{}Class", self.name));
 
         let parent_class = self.parent.as_ref().map(|parent| {
             ctx.namespace
@@ -366,7 +366,7 @@ impl render::Renderable<ClassContext> for element::Interface {
         let name_class = constructor_record
             .map(|rec| rec.name.clone())
             // TODO: check for possible name collision
-            .unwrap_or_else(|| format!("{}Iface", &self.name));
+            .unwrap_or_else(|| format!("{}Iface", self.name));
 
         Ok(ClassContext {
             is_abstract: false,

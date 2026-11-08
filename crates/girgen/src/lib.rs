@@ -21,7 +21,7 @@ pub fn default_dirs() -> Vec<PathBuf> {
             if path == "/run/current-system/sw/share" {
                 return None;
             }
-            let name = format!("{}/gir-1.0", &path);
+            let name = format!("{}/gir-1.0", path);
             let gir_path = Path::new(&name);
             match gir_path.exists() && gir_path.is_dir() {
                 true => Some(PathBuf::from(name)),

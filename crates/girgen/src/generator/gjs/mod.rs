@@ -38,7 +38,7 @@ impl Generator for TypeScript {
                     .collect();
                 let hash = cache::hash("ts_", gir.name, &contents);
                 let cache_path = cache::lookup_cache(&hash);
-                let out_path = format!("{}/{}.d.ts", &self.outdir, gir.name);
+                let out_path = format!("{}/{}.d.ts", self.outdir, gir.name);
 
                 if let Some(path) = cache_path {
                     match fs::read_to_string(path) {
@@ -99,7 +99,7 @@ impl Generator for TypeScript {
         let imports: Vec<&str> = gjs_lib::GJS_LIBS
             .par_iter()
             .map(|lib| {
-                let path = format!("{}/{}.d.ts", &self.outdir, lib.name);
+                let path = format!("{}/{}.d.ts", self.outdir, lib.name);
                 fs::write(&path, lib.content).expect("Failed to write file");
                 event(Event::CacheHit {
                     repo: lib.name,
@@ -125,7 +125,7 @@ impl Generator for TypeScript {
             .render(minijinja::context! { namespaces => Serde(&namespaces) })
             .unwrap();
 
-            fs::write(format!("{}/aliases.d.ts", &self.outdir), aliases)?;
+            fs::write(format!("{}/aliases.d.ts", self.outdir), aliases)?;
         }
 
         let index =
@@ -137,14 +137,14 @@ impl Generator for TypeScript {
                 })
                 .unwrap();
 
-        let index_path = format!("{}/index.d.ts", &self.outdir);
+        let index_path = format!("{}/index.d.ts", self.outdir);
         fs::write(&index_path, index)?;
         event(Event::Generated {
             repo: "index",
             out_path: index_path.as_str(),
         });
 
-        let package_path = format!("{}/package.json", &self.outdir);
+        let package_path = format!("{}/package.json", self.outdir);
         fs::write(&package_path, include_str!("./gjs_lib/package.json"))?;
         event(Event::CacheHit {
             repo: "package",
