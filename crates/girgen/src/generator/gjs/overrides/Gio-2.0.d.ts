@@ -1,14 +1,33 @@
 interface ProxyWrapper<T extends Gio.DBusProxy> {
-    /** @throws */
-    (bus: Gio.DBusConnection, name: string, object: string): T
+    /** Creates a proxy and initializes it synchronously. */
+    new (
+        bus: Gio.DBusConnection,
+        name: string,
+        object: string,
+        asyncCallback?: ((proxy: T | null, error: unknown) => void) | null,
+        cancellable?: Gio.Cancellable | null,
+        flags?: Gio.DBusProxyFlags,
+    ): T
+    /**
+     * Creates a proxy and initializes it synchronously.
+     * @deprecated since GJS 1.89.90: call with `new`
+     */
     (
         bus: Gio.DBusConnection,
         name: string,
         object: string,
-        asyncCallback: (proxy: Gio.DBusProxy, error: unknown) => void,
-        cancellable: Gio.Cancellable | null,
-        flags: Gio.DBusProxyFlags,
-    ): void
+        asyncCallback?: ((proxy: T | null, error: unknown) => void) | null,
+        cancellable?: Gio.Cancellable | null,
+        flags?: Gio.DBusProxyFlags,
+    ): T
+    /** Creates a proxy and initializes it asynchronously. */
+    newAsync(
+        bus: Gio.DBusConnection,
+        name: string,
+        object: string,
+        cancellable?: Gio.Cancellable | null,
+        flags?: Gio.DBusProxyFlags,
+    ): Promise<T>
 }
 
 type ActionEntryObject = {
@@ -36,7 +55,7 @@ namespace Gio {
          * Similar to {@link Gio.Application.run} but return a `Promise` which resolves when the main loop ends, instead of blocking while the main loop runs.
          * This helps avoid the situation where Promises never resolved if you didn't run the application inside a callback.
          */
-        runAsync(argv: string[] | null): Promise<number>
+        runAsync(argv?: string[] | null): Promise<number>
     }
 
     interface DBus {
@@ -93,6 +112,21 @@ namespace Gio {
         unown_name(owner_id: number): void
     }
 
+    interface DBusProxy {
+        /**
+         * Connects to a D-Bus signal of the remote object.
+         * Only available on proxies created with a {@link ProxyWrapper}.
+         * @returns A handler ID for {@link DBusProxy.disconnectSignal}
+         */
+        connectSignal(
+            name: string,
+            callback: (proxy: this, senderName: string, args: any[]) => void,
+        ): number
+
+        /** Disconnects a handler connected with {@link DBusProxy.connectSignal}. */
+        disconnectSignal(id: number): void
+    }
+
     interface DBusProxyClass {
         makeProxyWrapper<T extends DBusProxy>(
             interfaceXml: string,
@@ -134,8 +168,10 @@ namespace Gio {
         }
     }
 
-    interface DBusExportedObjectClass
-        extends Omit<DBusInterfaceSkeletonClass, "new"> {
+    interface DBusExportedObjectClass extends Omit<
+        DBusInterfaceSkeletonClass,
+        "new"
+    > {
         new (
             props?: Partial<GObject.ConstructorProps<DBusExportedObject>>,
         ): DBusExportedObject
@@ -225,6 +261,95 @@ namespace Gio {
          *
          */
         [Symbol.asyncIterator]: () => AsyncIterableIterator<FileInfo>
+    }
+
+    interface InputStream {
+        /**
+         * Reads the stream synchronously in chunks of `count` bytes until
+         * the end of the stream.
+         */
+        createSyncIterator(count: number): Generator<GLib.Bytes, void>
+
+        /**
+         * Reads the stream asynchronously in chunks of `count` bytes until
+         * the end of the stream.
+         */
+        createAsyncIterator(
+            count: number,
+            ioPriority?: number,
+        ): AsyncGenerator<GLib.Bytes, void>
+    }
+
+    interface File {
+        /**
+         * Starts an asynchronous replacement of `this` with the given
+         * `contents`. A string is encoded as UTF-8.
+         */
+        replace_contents_async(
+            contents: Uint8Array | string,
+            etag: string | null,
+            make_backup: boolean,
+            flags: FileCreateFlags,
+            cancellable: Cancellable | null,
+            callback: AsyncReadyCallback | null,
+        ): void
+
+        /**
+         * Sets an attribute from a JS value.
+         * Boolean, object and stringv attributes are not supported, use
+         * {@link FileInfo} instead.
+         * @deprecated use the type specific `set_attribute_*` methods
+         */
+        set_attribute(
+            attribute: string,
+            type: FileAttributeType,
+            value: string | number | bigint,
+            flags: FileQueryInfoFlags,
+            cancellable: Cancellable | null,
+        ): boolean
+    }
+
+    interface FileInfo {
+        /**
+         * Sets an attribute from a JS value.
+         * {@link FileAttributeType.INVALID} removes the attribute.
+         * @deprecated use the type specific `set_attribute_*` methods
+         */
+        set_attribute(
+            attribute: string,
+            type: FileAttributeType,
+            value?:
+                string | number | bigint | boolean | GObject.Object | string[],
+        ): void
+    }
+
+    interface Settings {
+        /**
+         * Like {@link Settings.bind}, but with custom mapping functions.
+         * @param key the key to bind
+         * @param object the object with the property to bind
+         * @param property the name of the property to bind
+         * @param flags flags for the binding
+         * @param get_mapping converts the setting to the property value, returning whether it succeeded
+         * @param set_mapping converts the property value to a {@link GLib.Variant} of `expected_type`, or `null` on failure
+         */
+        bind_with_mapping(
+            key: string,
+            object: GObject.Object,
+            property: string,
+            flags: SettingsBindFlags,
+            get_mapping:
+                | ((
+                      variant: GLib.Variant,
+                  ) => [success: boolean, value: unknown])
+                | null,
+            set_mapping:
+                | ((
+                      value: unknown,
+                      expected_type: GLib.VariantType,
+                  ) => GLib.Variant | null)
+                | null,
+        ): void
     }
 
     interface ActionMap {

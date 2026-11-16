@@ -8,9 +8,12 @@ declare global {
      *
      * See also: {@link console.log}.
      *
-     * @param message A string or any coercible value.
+     * Multiple arguments are joined with a space. Non-string values are
+     * pretty-printed.
+     *
+     * @param messages Strings or any other coercible value.
      */
-    function log(message: any): void
+    function log(...messages: any[]): void
 
     /**
      * Logs a stack trace for `error`, with an optional prefix, with severity equal to
@@ -18,10 +21,10 @@ declare global {
      *
      * See also: {@link console.trace}.
      *
-     * @param error An `Error` or {@link GLib.Error} object.
-     * @param prefix Optional prefix for the message.
+     * @param error An {@link Error} or {@link GLib.Error} object. Throws if it is not an object.
+     * @param prefix Optional values joined with a space to prefix the message.
      */
-    function logError(error: Error | GLib.Error, prefix?: string): void
+    function logError(error: object, ...prefix: any[]): void
 
     /**
      * Takes any number of strings (or values that can be coerced to strings), joins them

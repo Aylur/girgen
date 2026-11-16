@@ -38,7 +38,7 @@ declare module "console" {
              * @param condition A boolean condition which, if `false`, causes the log to print.
              * @param data Formatting substitutions, if applicable.
              */
-            assert(condition: boolean, ...data: any[]): void
+            assert(condition?: unknown, ...data: any[]): void
 
             /**
              * Resets grouping and clears the terminal on systems supporting ANSI terminal
@@ -62,7 +62,7 @@ declare module "console" {
              *
              * @param label The unique label to reset the count for.
              */
-            countReset(label: string): void
+            countReset(label?: string): void
 
             /**
              * Logs a message with severity equal to {@link GLib.LogLevelFlags.LEVEL_DEBUG}
@@ -77,7 +77,7 @@ declare module "console" {
              * @param item The item to display.
              * @param options Additional options for the formatter. Unused in GJS.
              */
-            dir(item: object, options?: never): void
+            dir(item?: unknown, options?: unknown): void
 
             /**
              * Note: This is an alias for {@link console.log} in GJS.
@@ -145,7 +145,7 @@ declare module "console" {
              * @param label Unique identifier for this action, pass to {@link console.timeEnd}
              * to complete.
              */
-            time(label: string): void
+            time(label?: string): void
 
             /**
              * Logs the time since the last call to {@link console.time} with the same `label`
@@ -153,7 +153,7 @@ declare module "console" {
              *
              * @param label Unique identifier for this action.
              */
-            timeEnd(label: string): void
+            timeEnd(label?: string): void
 
             /**
              * Logs the time since the last call to {@link console.time} where `label` is the same.
@@ -162,7 +162,7 @@ declare module "console" {
              * to complete.
              * @param data Formatting substitutions, if applicable.
              */
-            timeLog(label: string, ...data: any[]): void
+            timeLog(label?: string, ...data: any[]): void
 
             /**
              * Outputs a stack trace to the console.
@@ -179,15 +179,23 @@ declare module "console" {
             warn(...data: any[]): void
 
             /**
-             * @param logDomain the GLib log domain this Console should print with.
+             * @deprecated Not implemented in GJS, this is a no-op.
+             * @param label Unique identifier for this action, pass to {@link console.profileEnd}
+             * to complete.
              */
-            setLogDomain(logDomainL: string): void
+            profile(label?: string): void
 
             /**
-             * Domain set with {@link Console.setLogDomain}
-             * @default "Gjs-Console"
+             * @deprecated Not implemented in GJS, this is a no-op.
+             * @param label Unique identifier for this action.
              */
-            get logDomain(): string
+            profileEnd(label?: string): void
+
+            /**
+             * @deprecated Not implemented in GJS, this is a no-op.
+             * @param label Unique identifier for this action.
+             */
+            timeStamp(label?: string): void
         }
     }
 

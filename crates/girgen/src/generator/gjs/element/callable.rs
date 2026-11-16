@@ -234,7 +234,7 @@ impl<'a> CallableElement<'a> {
         }
     }
 
-    fn name(&self) -> &'a str {
+    pub fn name(&self) -> &'a str {
         match self {
             CallableElement::Constructor(i) => callable_name!(i),
             CallableElement::Function(i) => callable_name!(i),
@@ -397,13 +397,13 @@ impl<'a> Supertype<'a> {
             Supertype::Interface(_, i) => (&i.name, &i.methods, &i.virtual_methods),
         };
 
-        let class_override = overrides::OVERRIDES
+        let type_override = overrides::OVERRIDES
             .iter()
             .find(|o| o.namespace == ns.name && o.version == ns.version)
-            .and_then(|o| o.classes.iter().find(|c| c.name == *name));
+            .and_then(|o| o.types.iter().find(|c| c.name == *name));
 
-        let omitted = class_override.map(|o| o.methods).unwrap_or_default();
-        let declared = class_override.map(|o| o.declares).unwrap_or_default();
+        let omitted = type_override.map(|o| o.methods).unwrap_or_default();
+        let declared = type_override.map(|o| o.declares).unwrap_or_default();
 
         let signature = |prefix: &str, m: CallableElement| {
             let (parameters, returns) = resolve_types(&m.args(prefix)).ok()?;

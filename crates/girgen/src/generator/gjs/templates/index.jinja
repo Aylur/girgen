@@ -17,6 +17,11 @@ import "./aliases.d.ts"
 
 declare global {
     interface LegacyGiImports {
+        versions: {
+            {%- for name, versions in namespaces|items %}
+            {{ name }}?: "{{ versions|join('" | "') }}"
+            {%- endfor %}
+        }
         {%- for name, versions in namespaces|items %}
         {{ name }}: {%- for version in versions -%}
             | typeof import("gi://{{ name }}?version={{ version }}").default

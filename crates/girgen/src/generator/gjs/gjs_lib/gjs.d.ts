@@ -1,4 +1,4 @@
-/// <reference lib="es2018" />
+/// <reference lib="esnext" />
 
 import type GObject from "gi://GObject?version=2.0"
 import type GLib from "gi://GLib?version=2.0"
@@ -7,9 +7,14 @@ import type Gettext from "gettext"
 import type Console from "console"
 import type format from "./format"
 import type cairo from "./cairo"
+import type Legacy from "./legacy"
 
 declare global {
-    const console: Console.Console
+    var console: Console.Console
+
+    /** The global object, for compatibility with browser code. */
+    var window: typeof globalThis
+
     interface LegacyGiImports {}
 
     interface LegacyImports {
@@ -19,21 +24,18 @@ declare global {
         cairo: typeof cairo
         format: typeof format
         searchPath: string[]
-
-        // TODO:
-        // signals: typeof signals
-        // package: typeof package
-
-        // TODO: using this is not recommended
-        // mainloop: typeof mainloop
-
-        // TODO: these are deprecated
-        // lang: typeof lang
-        // byteArray: typeof byteArray
+        package: typeof Legacy.Package
+        signals: typeof Legacy.Signals
+        /** @deprecated use {@link GLib.MainLoop} */
+        mainloop: typeof Legacy.Mainloop
+        /** @deprecated */
+        lang: typeof Legacy.Lang
+        /** @deprecated */
+        byteArray: typeof Legacy.ByteArray
     }
 
     /** @deprecated use ESModules */
-    const imports: LegacyImports
+    var imports: LegacyImports
 
     interface ImportMeta {
         /**
@@ -43,10 +45,22 @@ declare global {
         url: string
     }
 
-    const ARGV: string[]
+    /**
+     * The command line arguments passed to the program, excluding the program name.
+     * Same as {@link System.programArgs}.
+     */
+    var ARGV: string[]
 
     interface ErrorConstructor {
+        /** @since 1.85.2 */
         isError(instance: unknown): instance is Error | GLib.Error
+
+        /**
+         * Creates a `stack` property on `targetObject`. Frames above and including
+         * `constructorOpt` are omitted.
+         * @since 1.85.2
+         */
+        captureStackTrace(targetObject: object, constructorOpt?: Function): void
     }
 
     interface Error {

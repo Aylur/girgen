@@ -12,19 +12,23 @@ type SignalReturnType<Signal> = Signal extends (...args: infer _) => infer R
 
 type Signals<Emitter> = Emitter extends { $signals: unknown }
     ? {
-          [S in Keyof<Emitter["$signals"]> as S extends `${infer Name}::{}`
-              ? Name
-              : S]: Emitter["$signals"][S]
+          [
+              S in Keyof<Emitter["$signals"]> as S extends `${infer Name}::{}`
+                  ? Name
+                  : S
+          ]: Emitter["$signals"][S]
       }
     : never
 
 type DetaliedSignals<Emitter> = Emitter extends { $signals: unknown }
     ? {
-          [S in Keyof<Emitter["$signals"]> as S extends `${infer Name}::{}`
-              ? Name extends "notify"
-                  ? never
-                  : Name
-              : never]: Emitter["$signals"][S]
+          [
+              S in Keyof<Emitter["$signals"]> as S extends `${infer Name}::{}`
+                  ? Name extends "notify"
+                      ? never
+                      : Name
+                  : never
+          ]: Emitter["$signals"][S]
       }
     : never
 
@@ -77,25 +81,42 @@ type CamelCase<S> = S extends `${infer Head}${"-" | "_"}${infer Tail}`
       : never
 
 /**
- * This is an object passed to a number of signal matching functions.
+ * Criteria passed to signal matching functions such as {@link GObject.signal_handler_find}.
+ * Handlers match when they match every given field. At least one field is required.
  */
-interface SignalMatch {
-    /**
-     * A signal ID. Note that this is the signal ID, not a handler ID as returned from {@link GObject.Object.prototype.connect}.
-     */
-    signalId?: number
-    /**
-     * A signal detail, such as `prop` in `notify::prop`.
-     */
-    detail?: string
-    /**
-     * A signal callback function.
-     */
-    func?: Function
+type SignalMatch<Instance> =
+    | {
+          /**
+           * Name of the signal, without a detail, such as `notify` in `notify::prop`.
+           * Despite the name, this is not a numeric signal ID or a handler ID.
+           */
+          signalId: Keyof<Signals<Instance>>
+      }
+    | {
+          /**
+           * A signal detail, such as `prop` in `notify::prop`.
+           */
+          detail: string
+      }
+    | {
+          /**
+           * The callback function passed to {@link GObject.Object.connect}.
+           */
+          func: Function
+      }
+
+type OverridableProperties<T> = T extends {
+    $readableProperties: unknown
+    $writableProperties: unknown
+    $constructOnlyProperties: unknown
 }
+    ? T["$readableProperties"] &
+          T["$writableProperties"] &
+          T["$constructOnlyProperties"]
+    : never
 
 type PrimitiveConstructor<T, Input = unknown> = {
-    $gtype: GObject.GType<T>;
+    $gtype: GObject.GType<T>
     (v: Input): T
 }
 
@@ -110,10 +131,12 @@ namespace GObject {
         $constructOnlyProperties: unknown
     }
         ? {
-              [K in Keyof<
-                  Class["$writableProperties"] &
-                      Class["$constructOnlyProperties"]
-              > as CamelCase<K>]: (Class["$writableProperties"] &
+              [
+                  K in Keyof<
+                      Class["$writableProperties"] &
+                          Class["$constructOnlyProperties"]
+                  > as CamelCase<K>
+              ]: (Class["$writableProperties"] &
                   Class["$constructOnlyProperties"])[K]
           }
         : never
@@ -137,7 +160,7 @@ namespace GObject {
          */
         readonly $gtype: GType<Object>
 
-        "new"<T>(type: GType<T>, props: Record<string, unknown>): T
+        "new"<T>(type: GType<T>, props?: Partial<ConstructorProps<T>>): T
 
         new_with_properties<T>(
             type: GType<T>,
@@ -175,6 +198,38 @@ namespace GObject {
         connect_after<Signal extends Keyof<NotifySignals<this>>>(
             signal: Signal,
             callback: SignalCallback<this, NotifySignals<this>[Signal]>,
+        ): number
+
+        /**
+         * Connects a callback to a signal, which is disconnected automatically
+         * when `gobject` is destroyed. Pass {@link ConnectFlags.AFTER} in `flags`
+         * to run it after the default handler. {@link ConnectFlags.SWAPPED} is
+         * not supported.
+         * @param signal Name of the signal, optionally with a detail.
+         * @param callback Handler for the signal.
+         * @param gobject Object whose lifetime the connection is bound to.
+         * @param flags Flags for the connection.
+         * @returns Handler ID of the connection.
+         */
+        connect_object<Signal extends Keyof<DetaliedSignals<this>>>(
+            signal: `${Signal}::${string}`,
+            callback: SignalCallback<this, DetaliedSignals<this>[Signal]>,
+            gobject: Object,
+            flags: ConnectFlags,
+        ): number
+
+        connect_object<Signal extends Keyof<Signals<this>>>(
+            signal: Signal,
+            callback: SignalCallback<this, Signals<this>[Signal]>,
+            gobject: Object,
+            flags: ConnectFlags,
+        ): number
+
+        connect_object<Signal extends Keyof<NotifySignals<this>>>(
+            signal: Signal,
+            callback: SignalCallback<this, NotifySignals<this>[Signal]>,
+            gobject: Object,
+            flags: ConnectFlags,
         ): number
 
         emit<Signal extends Keyof<DetaliedSignals<this>>>(
@@ -254,7 +309,7 @@ namespace GObject {
         ): Binding
     }
 
-    interface ObjectGroup {
+    interface BindingGroup {
         /**
          * Creates a binding between `source_property` on the source object and
          * `target_property` on @target, allowing you to set the transformation
@@ -301,13 +356,13 @@ namespace GObject {
         readonly $writableProperties: ParamSpec.WritableProperties
         readonly $constructOnlyProperties: ParamSpec.ConstructOnlyProperties
 
-        name: string
-        nick: string
-        blurb: string
-        default_value: T
-        flags: ParamFlags
-        value_type: GType
-        owner_type: GType
+        readonly name: string
+        readonly nick: string
+        readonly blurb: string
+        readonly default_value: T
+        readonly flags: ParamFlags
+        readonly value_type: GType
+        readonly owner_type: GType
 
         /**
          * Get the short description of a `GParamSpec`.
@@ -360,12 +415,6 @@ namespace GObject {
          * count of 1 still, but is not flagged "floating" anymore).
          */
         sink(): void
-        /**
-         * Registers a property override for a property introduced in a parent class or inherited interface.
-         * @param name The name of the property to override
-         * @param oclass The object class or type that contains the property to override
-         */
-        override(name: string, oclass: Object | Function | GType): void
     }
 
     interface ParamSpecClass {
@@ -382,6 +431,25 @@ namespace GObject {
          * @param name the canonical name of the property
          */
         is_valid_name(name: string): boolean
+        /**
+         * Creates a ParamSpec overriding a property introduced in a parent class or inherited interface.
+         *
+         * ```ts
+         * GObject.registerClass({
+         *     Implements: [Gio.Action],
+         *     Properties: {
+         *         "name": GObject.ParamSpec.override("name", Gio.Action),
+         *     },
+         * }, class MyAction extends GObject.Object {})
+         * ```
+         *
+         * @param name The name of the property to override
+         * @param oclass The class, interface or GType that contains the property to override
+         */
+        override<T, Name extends Keyof<OverridableProperties<T>>>(
+            name: Name,
+            oclass: GType<T> | { $gtype: GType<T> },
+        ): ParamSpec<OverridableProperties<T>[Name]>
         /**
          * Creates a new GParamSpecChar instance specifying a G_TYPE_CHAR property.
          * @param name The name of the property
@@ -586,6 +654,23 @@ namespace GObject {
             defaultValue?: any,
         ): ParamSpec<T>
         /**
+         * Creates a new GParamSpecFlags instance specifying a G_TYPE_FLAGS property.
+         * @param name The name of the property
+         * @param nick A human readable name for the property (can be null)
+         * @param blurb A longer description of the property (can be null)
+         * @param flags The flags for this property (e.g. READABLE, WRITABLE)
+         * @param flagsType The GType for this property
+         * @param defaultValue The default value for this property (optional)
+         */
+        flags<T>(
+            name: string,
+            nick: string | null,
+            blurb: string | null,
+            flags: ParamFlags,
+            flagsType: GType<T> | { $gtype: GType<T> },
+            defaultValue?: any,
+        ): ParamSpec<T>
+        /**
          * Creates a new GParamSpecDouble instance specifying a G_TYPE_DOUBLE property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
@@ -679,9 +764,30 @@ namespace GObject {
         ): ParamSpec<T>
     }
 
-    interface InterfaceConstructor<T = unknown> {
-        // TODO: come up with an API
-    }
+    /**
+     * Base class for GObject interfaces defined in JavaScript.
+     * Subclass it and register the subclass with {@link GObject.registerClass},
+     * listing prerequisites in `Requires`.
+     *
+     * ```ts
+     * interface GreeterInterface extends GObject.Object {
+     *     greet(): void
+     * }
+     *
+     * class Greeter extends Interface implements GreeterInterface {
+     *     declare static $gtype: GObject.GType<Greeter>
+     *
+     *     static {
+     *         GObject.registerClass({ Requires: [GObject.Object] }, this)
+     *     }
+     *
+     *     greet(): string {
+     *         throw new GObject.NotImplementedError()
+     *     }
+     * }
+     * ```
+     */
+    type InterfaceConstructor = abstract new () => Object
 
     /**
      * Use this to signify a function that must be overridden in an
@@ -782,7 +888,7 @@ namespace GObject {
         /**
          * @returns boxed contents of `this`
          */
-        get_boxed(): null
+        get_boxed(): T
         /**
          * @returns double contents of `this`
          */
@@ -857,7 +963,6 @@ namespace GObject {
         get_variant(): T extends GLib.Variant ? T | null : never
         /**
          * @param g_type Type the `this` should hold values of.
-         * @deprecated since GJS 1.84: use `new Value(type, value)`
          */
         init<T>(g_type: GObject.GType<T> | { $gtype: GObject.GType<T> }): void
         /**
@@ -872,7 +977,7 @@ namespace GObject {
         /**
          * @param v_boxed boxed value to be set
          */
-        set_boxed(v_boxed: never | null): void
+        set_boxed(v_boxed: T | null): void
         /**
          * @param v_double double value to be set
          */
@@ -991,6 +1096,7 @@ namespace GObject {
         Interface: InterfaceConstructor
 
         GTypeName: symbol
+        GTypeFlags: symbol
         requires: symbol
         interfaces: symbol
         properties: symbol
@@ -999,68 +1105,63 @@ namespace GObject {
         /**
          * Finds the first signal handler that matches certain selection criteria.
          * The criteria are passed as properties of a match object.
-         * The match object has to be non-empty for successful matches.
-         * If no handler was found, a falsy value is returned.
          *
          * @param instance the instance owning the signal handler to be found.
-         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
-         * @returns A valid non-0 signal handler ID for a successful match.
+         * @param match a properties object indicating whether to match by signal name, detail, or callback function.
+         * @returns The handler ID of the first match, or `0` if no handler matched.
          */
-        signal_handler_find(
-            instance: Object,
-            match: SignalMatch,
-        ): number | bigint | object | null
+        signal_handler_find<Instance extends Object>(
+            instance: Instance,
+            match: SignalMatch<Instance>,
+        ): number
 
         /**
          * Blocks all handlers on an instance that match certain selection criteria.
          * The criteria are passed as properties of a match object.
-         * The match object has to have at least `func` for successful matches.
          * If no handlers were found, 0 is returned, the number of blocked handlers
          * otherwise.
          *
          * @param instance the instance owning the signal handler to be found.
-         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
+         * @param match a properties object indicating whether to match by signal name, detail, or callback function.
          * @returns The number of handlers that matched.
          */
-        signal_handlers_block_matched(
-            instance: Object,
-            match: SignalMatch,
+        signal_handlers_block_matched<Instance extends Object>(
+            instance: Instance,
+            match: SignalMatch<Instance>,
         ): number
 
         /**
          * Unblocks all handlers on an instance that match certain selection
          * criteria.
          * The criteria are passed as properties of a match object.
-         * The match object has to have at least `func` for successful matches.
          * If no handlers were found, 0 is returned, the number of unblocked
          * handlers otherwise.
          * The match criteria should not apply to any handlers that are not
          * currently blocked.
          *
          * @param instance the instance owning the signal handler to be found.
-         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
+         * @param match a properties object indicating whether to match by signal name, detail, or callback function.
          * @returns The number of handlers that matched.
          */
-        signal_handlers_unblock_matched(
-            instance: Object,
-            match: SignalMatch,
+        signal_handlers_unblock_matched<Instance extends Object>(
+            instance: Instance,
+            match: SignalMatch<Instance>,
         ): number
 
         /**
          * Disconnects all handlers on an instance that match certain selection
          * criteria.
          * The criteria are passed as properties of a match object.
-         * The match object has to have at least `func` for successful matches.
          * If no handlers were found, 0 is returned, the number of disconnected
          * handlers otherwise.
          *
          * @param instance the instance owning the signal handler to be found.
-         * @param match a properties object indicating whether to match by signal ID, detail, or callback function.
+         * @param match a properties object indicating whether to match by signal name, detail, or callback function.
          * @returns The number of handlers that matched.
          */
-        signal_handlers_disconnect_matched(
-            instance: Object,
-            match: SignalMatch,
+        signal_handlers_disconnect_matched<Instance extends Object>(
+            instance: Instance,
+            match: SignalMatch<Instance>,
         ): number
 
         /**
@@ -1071,6 +1172,18 @@ namespace GObject {
          * @returns The number of handlers that matched.
          */
         signal_handlers_block_by_func(instance: Object, func: Function): number
+
+        /**
+         * Unblocks all handlers on an instance that match `func`.
+         *
+         * @param instance the instance to unblock handlers from.
+         * @param func the callback function the handler will invoke.
+         * @returns The number of handlers that matched.
+         */
+        signal_handlers_unblock_by_func(
+            instance: Object,
+            func: Function,
+        ): number
 
         /**
          * Disconnects all handlers on an instance that match `func`.
@@ -1146,8 +1259,11 @@ namespace GObject {
         UChar: PrimitiveConstructor<number>
         TYPE_UCHAR: GType<number>
 
-        UniChar: PrimitiveConstructor<never>
-        TYPE_UNICHAR: GType<never>
+        Unichar: {
+            $gtype: GType<number>
+            (v: unknown): string
+        }
+        TYPE_UNICHAR: GType<number>
 
         Boolean: globalThis.BooleanConstructor
         TYPE_BOOLEAN: GType<boolean>

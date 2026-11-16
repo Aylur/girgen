@@ -1,4 +1,30 @@
 /// <reference lib="es2015" />
+/// <reference path="./GLib-2.0.d.ts" />
+
+interface TextDecoderConstructor {
+    readonly prototype: TextDecoder
+
+    /**
+     * The `TextDecoder()` constructor returns a newly created `TextDecoder` object for
+     * the encoding specified in parameter.
+     *
+     * If the value for `utfLabel` is unknown, or is one of the two values leading to a
+     * 'replacement' decoding algorithm ("iso-2022-cn" or "iso-2022-cn-ext"), a
+     * `RangeError` is thrown. Labels are matched case-insensitively.
+     *
+     * @param utfLabel Optional string, defaulting to `"utf-8"`, containing the label of the encoder.
+     * @param options Optional dictionary with the `Boolean` properties `fatal` and `ignoreBOM`,
+     * corresponding to the {@link TextDecoder.fatal} and {@link TextDecoder.ignoreBOM} properties.
+     * @returns A newly created `TextDecoder` object.
+     */
+    new <Label extends string = "utf-8">(
+        utfLabel?: Label & TextDecoderLabel<Label>,
+        options?: {
+            fatal?: boolean
+            ignoreBOM?: boolean
+        },
+    ): TextDecoder
+}
 
 /**
  * GJS implements the [WHATWG Encoding][https://encoding.spec.whatwg.org/] specification.
@@ -9,26 +35,9 @@
  *
  * @version GJS 1.70
  */
-declare class TextDecoder {
-    /**
-     * The `TextDecoder()` constructor returns a newly created `TextDecoder` object for
-     * the encoding specified in parameter.
-     *
-     * If the value for `utfLabel` is unknown, or is one of the two values leading to a
-     * 'replacement' decoding algorithm ("iso-2022-cn" or "iso-2022-cn-ext"), a
-     * `RangeError` is thrown.
-     *
-     * @param utfLabel Optional string, defaulting to `"utf-8"`, containing the label of the encoder.
-     * @param options Optional dictionary with the `Boolean` property `fatal`, corresponding to the {@link TextDecoder.fatal} property.
-     * @returns A newly created `TextDecoder` object.
-     */
-    constructor(
-        utfLabel?: TextDecoderEncoding,
-        options?: {
-            fatal?: boolean
-        },
-    )
+declare var TextDecoder: TextDecoderConstructor
 
+interface TextDecoder {
     /**
      * The `TextDecoder.encoding` read-only property returns a string containing the
      * name of the decoding algorithm used by the specific decoder.
@@ -54,18 +63,34 @@ declare class TextDecoder {
      * The `TextDecoder.decode()` method returns a string containing the text, given in
      * parameters, decoded with the specific method for that `TextDecoder` object.
      *
-     * @param buffer Optional `ArrayBuffer`, a `TypedArray` or a `DataView` object containing the text to decode.
+     * @param buffer Optional `ArrayBuffer`, a `TypedArray`, a `DataView` or a {@link GLib.Bytes} object containing the text to decode.
      * @param options Optional dictionary indicating that additional data will follow in subsequent calls to
      * `decode()`. Set to `true` if processing the data in chunks, and `false` for the final chunk or if the
      * data is not chunked. It defaults to `false`.
      * @returns A string result.
      */
     decode(
-        buffer?: ArrayBuffer | ArrayBufferView | DataView | null,
+        buffer?:
+            | ArrayBuffer
+            | ArrayBufferView
+            | DataView
+            | import("gi://GLib?version=2.0").default.Bytes,
         options?: {
             stream?: boolean
         },
     ): string
+}
+
+interface TextEncoderConstructor {
+    readonly prototype: TextEncoder
+
+    /**
+     * The `TextEncoder()` constructor returns a newly created `TextEncoder` object
+     * that will generate a byte stream with UTF-8 encoding.
+     *
+     * @returns A newly created `TextEncoder` object.
+     */
+    new (): TextEncoder
 }
 
 /**
@@ -74,15 +99,9 @@ declare class TextDecoder {
  *
  * @version GJS 1.70
  */
-declare class TextEncoder {
-    /**
-     * The `TextEncoder()` constructor returns a newly created `TextEncoder` object
-     * that will generate a byte stream with UTF-8 encoding.
-     *
-     * @returns A newly created `TextEncoder` object.
-     */
-    constructor()
+declare var TextEncoder: TextEncoderConstructor
 
+interface TextEncoder {
     /**
      * The `TextEncoder.encoding` read-only property returns a string containing the
      * name of the encoding algorithm used by the specific encoder.
@@ -120,6 +139,10 @@ declare class TextEncoder {
         output: Uint8Array,
     ): { read: number; written: number }
 }
+
+/** Accepts any casing of a {@link TextDecoderEncoding} label. */
+type TextDecoderLabel<Label extends string> =
+    Lowercase<Label> extends TextDecoderEncoding ? Label : TextDecoderEncoding
 
 // https://gitlab.gnome.org/GNOME/gjs/-/blob/1.73.2/modules/esm/_encoding/encodingMap.js#L7-232
 type TextDecoderEncoding =
@@ -311,6 +334,7 @@ type TextDecoderEncoding =
     | "cn-big5"
     | "csbig5"
     | "x-x-big5"
+    | "big5-hkscs"
     | "cseucpkdfmtjapanese"
     | "euc-jp"
     | "x-euc-jp"

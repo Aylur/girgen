@@ -418,7 +418,6 @@ namespace GLib {
          * ```
          */
         new (sig: S, value: $ParseDeepVariant<S>): Variant<S>
-        new (copy: Variant<S>): Variant<S>
 
         /**
          * Creates a new GVariant with the specified type signature and value.
@@ -540,8 +539,7 @@ namespace GLib {
         new_fixed_array<C extends string = "a?">(
             element_type: VariantType<C>,
             elements:
-                | Variant<$VariantTypeToString<typeof element_type>>[]
-                | null,
+                Variant<$VariantTypeToString<typeof element_type>>[] | null,
             n_elements: number,
             element_size: number,
         ): Variant<`a${C}`>
@@ -2006,11 +2004,54 @@ namespace GLib {
     }
 
     interface ErrorStruct {
-        new (domain: Quark, code: number, message: string): Error
+        /**
+         * @param domain An error domain quark, or an error domain class such as `Gio.IOErrorEnum`
+         * @param code The error code
+         * @param message The error message
+         */
+        new (
+            domain: Quark | { $gtype: GObject.GType<Error> },
+            code: number,
+            message: string,
+        ): Error
     }
 
     interface Error {
-        matches(domain: { $gtype: GObject.GType<Error> }, code: number): boolean
+        matches(
+            domain: Quark | { $gtype: GObject.GType<Error> },
+            code: number,
+        ): boolean
+
+        /** Stack trace captured when the error was created in JS. */
+        stack: string
+        /** File in which the error was created in JS. */
+        fileName: string
+        /** Line on which the error was created in JS. */
+        lineNumber: number
+        /** Column on which the error was created in JS. */
+        columnNumber: number
+    }
+
+    interface VariantDict {
+        /**
+         * Looks up a value in the dictionary and unpacks it.
+         *
+         * @param key The key to look up
+         * @param variantType The expected type of the value, as a type string or {@link VariantType}
+         * @param deep Whether to deep unpack the value
+         * @returns The unpacked value, or `null` if the key is not present or the type does not match
+         */
+        lookup<S extends string>(
+            key: string,
+            variantType: S | VariantType<S>,
+            deep: true,
+        ): $ParseDeepVariant<S> | null
+        lookup<S extends string>(
+            key: string,
+            variantType: S | VariantType<S>,
+            deep?: false,
+        ): $ParseVariant<S> | null
+        lookup(key: string, variantType?: null, deep?: boolean): unknown
     }
 
     type LogWriterFunc = (
@@ -2042,6 +2083,20 @@ namespace GLib {
         ): void
 
         log_set_writer_func(writer_func: LogWriterFunc): void
+
+        /**
+         * Like {@link log_set_writer_func}, but `writer_func` receives the
+         * fields as an unconverted `a{sms}` variant, which is cheaper.
+         */
+        log_set_writer_func_variant(
+            writer_func: (
+                logLevel: LogLevelFlags,
+                fields: Variant<"a{sms}">,
+            ) => LogWriterOutput,
+        ): void
+
+        /** Restores the default log writer, undoing {@link log_set_writer_func}. */
+        log_set_writer_default(): void
 
         idle_add_once(priority: number, callback: () => void): number
 

@@ -29,6 +29,10 @@ pub const GJS_LIBS: &[GjsLib] = &[
         content: include_str!("gjs.d.ts"),
     },
     GjsLib {
+        name: "legacy",
+        content: include_str!("legacy.d.ts"),
+    },
+    GjsLib {
         name: "logging",
         content: include_str!("logging.d.ts"),
     },

@@ -27,7 +27,7 @@ declare global {
      * @param id The identifier of the interval you want to cancel.
      * @version GJS 1.72
      */
-    function clearInterval(id: GLib.Source): void
+    function clearInterval(id?: GLib.Source | null): void
 
     /**
      * Schedules a timeout to run `handler` after `timeout` milliseconds. Any `arguments`
@@ -53,5 +53,5 @@ declare global {
      * @param id The identifier of the timeout you want to cancel.
      * @version GJS 1.72
      */
-    function clearTimeout(id: GLib.Source): void
+    function clearTimeout(id?: GLib.Source | null): void
 }

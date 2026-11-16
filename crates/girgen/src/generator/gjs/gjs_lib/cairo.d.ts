@@ -2,28 +2,141 @@ import type GObject from "gi://GObject?version=2.0"
 import Cairo from "gi://cairo?version=1.0"
 
 declare namespace cairo {
-    export import Status = Cairo.Status
-    export import Content = Cairo.Content
-    export import Operator = Cairo.Operator
-    export import Antialias = Cairo.Antialias
-    export import FillRule = Cairo.FillRule
-    export import LineCap = Cairo.LineCap
-    export import LineJoin = Cairo.LineJoin
-    export import TextClusterFlags = Cairo.TextClusterFlags
-    export import FontSlant = Cairo.FontSlant
-    export import FontWeight = Cairo.FontWeight
-    export import SubpixelOrder = Cairo.SubpixelOrder
-    export import HintStyle = Cairo.HintStyle
-    export import HintMetrics = Cairo.HintMetrics
-    export import FontType = Cairo.FontType
-    export import PathDataType = Cairo.PathDataType
-    export import DeviceType = Cairo.DeviceType
-    export import SurfaceType = Cairo.SurfaceType
-    export import Format = Cairo.Format
-    export import PatternType = Cairo.PatternType
-    export import Extend = Cairo.Extend
-    export import Filter = Cairo.Filter
-    export import RegionOverlap = Cairo.RegionOverlap
+    export const Antialias: {
+        readonly DEFAULT: 0
+        readonly NONE: 1
+        readonly GRAY: 2
+        readonly SUBPIXEL: 3
+    }
+    export type Antialias = (typeof Antialias)[keyof typeof Antialias]
+
+    export const Content: {
+        readonly COLOR: 0x1000
+        readonly ALPHA: 0x2000
+        readonly COLOR_ALPHA: 0x3000
+    }
+    export type Content = (typeof Content)[keyof typeof Content]
+
+    export const Extend: {
+        readonly NONE: 0
+        readonly REPEAT: 1
+        readonly REFLECT: 2
+        readonly PAD: 3
+    }
+    export type Extend = (typeof Extend)[keyof typeof Extend]
+
+    export const FillRule: {
+        readonly WINDING: 0
+        readonly EVEN_ODD: 1
+    }
+    export type FillRule = (typeof FillRule)[keyof typeof FillRule]
+
+    export const Filter: {
+        readonly FAST: 0
+        readonly GOOD: 1
+        readonly BEST: 2
+        readonly NEAREST: 3
+        readonly BILINEAR: 4
+        readonly GAUSSIAN: 5
+    }
+    export type Filter = (typeof Filter)[keyof typeof Filter]
+
+    export const FontSlant: {
+        readonly NORMAL: 0
+        readonly ITALIC: 1
+        readonly OBLIQUE: 2
+    }
+    export type FontSlant = (typeof FontSlant)[keyof typeof FontSlant]
+
+    export const FontWeight: {
+        readonly NORMAL: 0
+        readonly BOLD: 1
+    }
+    export type FontWeight = (typeof FontWeight)[keyof typeof FontWeight]
+
+    export const Format: {
+        readonly ARGB32: 0
+        readonly RGB24: 1
+        readonly A8: 2
+        readonly A1: 3
+        readonly RGB16_565: 4
+    }
+    export type Format = (typeof Format)[keyof typeof Format]
+
+    export const LineCap: {
+        readonly BUTT: 0
+        readonly ROUND: 1
+        readonly SQUARE: 2
+        /** @deprecated Historical typo of {@link LineCap.SQUARE}, kept for compatibility reasons */
+        readonly SQUASH: 2
+    }
+    export type LineCap = (typeof LineCap)[keyof typeof LineCap]
+
+    export const LineJoin: {
+        readonly MITER: 0
+        readonly ROUND: 1
+        readonly BEVEL: 2
+    }
+    export type LineJoin = (typeof LineJoin)[keyof typeof LineJoin]
+
+    export const Operator: {
+        readonly CLEAR: 0
+        readonly SOURCE: 1
+        readonly OVER: 2
+        readonly IN: 3
+        readonly OUT: 4
+        readonly ATOP: 5
+        readonly DEST: 6
+        readonly DEST_OVER: 7
+        readonly DEST_IN: 8
+        readonly DEST_OUT: 9
+        readonly DEST_ATOP: 10
+        readonly XOR: 11
+        readonly ADD: 12
+        readonly SATURATE: 13
+        readonly MULTIPLY: 14
+        readonly SCREEN: 15
+        readonly OVERLAY: 16
+        readonly DARKEN: 17
+        readonly LIGHTEN: 18
+        readonly COLOR_DODGE: 19
+        readonly COLOR_BURN: 20
+        readonly HARD_LIGHT: 21
+        readonly SOFT_LIGHT: 22
+        readonly DIFFERENCE: 23
+        readonly EXCLUSION: 24
+        readonly HSL_HUE: 25
+        readonly HSL_SATURATION: 26
+        readonly HSL_COLOR: 27
+        readonly HSL_LUMINOSITY: 28
+    }
+    export type Operator = (typeof Operator)[keyof typeof Operator]
+
+    export const PatternType: {
+        readonly SOLID: 0
+        readonly SURFACE: 1
+        readonly LINEAR: 2
+        readonly RADIAL: 3
+    }
+    export type PatternType = (typeof PatternType)[keyof typeof PatternType]
+
+    export const SurfaceType: {
+        readonly IMAGE: 0
+        readonly PDF: 1
+        readonly PS: 2
+        readonly XLIB: 3
+        readonly XCB: 4
+        readonly GLITZ: 5
+        readonly QUARTZ: 6
+        readonly WIN32: 7
+        readonly BEOS: 8
+        readonly DIRECTFB: 9
+        readonly SVG: 10
+        readonly OS2: 11
+        readonly WIN32_PRINTING: 12
+        readonly QUARTZ_IMAGE: 13
+    }
+    export type SurfaceType = (typeof SurfaceType)[keyof typeof SurfaceType]
 
     /**
      * Describes the metrics of a string of text
@@ -41,6 +154,53 @@ declare namespace cairo {
         xAdvance: number
         /** The distance to advance vertically after drawing the text */
         yAdvance: number
+    }
+
+    /**
+     * Describes the metrics of a font
+     * @since 1.89.1
+     */
+    export interface FontExtents {
+        /** The distance that the font extends above the baseline */
+        ascent: number
+        /** The distance that the font extends below the baseline */
+        descent: number
+        /** The recommended vertical distance between baselines */
+        height: number
+        /** The maximum distance in the X direction that the origin is advanced for any glyph */
+        maxXAdvance: number
+        /** The maximum distance in the Y direction that the origin is advanced for any glyph */
+        maxYAdvance: number
+    }
+
+    /**
+     * An affine transformation, as used by {@link Context.getFontMatrix} and
+     * {@link Context.setFontMatrix}
+     * @since 1.89.1
+     */
+    export interface FontMatrix {
+        /** xx component of the affine transformation */
+        xx: number
+        /** yx component of the affine transformation */
+        yx: number
+        /** xy component of the affine transformation */
+        xy: number
+        /** yy component of the affine transformation */
+        yy: number
+        /** X translation component of the affine transformation */
+        x0: number
+        /** Y translation component of the affine transformation */
+        y0: number
+    }
+
+    /**
+     * An integer rectangle, as used by {@link Region}
+     */
+    export interface RectangleInt {
+        x: number
+        y: number
+        width: number
+        height: number
     }
 
     /**
@@ -563,6 +723,42 @@ declare namespace cairo {
         textExtents(utf8: string): TextExtents
 
         /**
+         * Gets the font extents for the currently selected font
+         * @since 1.89.1
+         * @returns The font extents
+         */
+        fontExtents(): FontExtents
+
+        /**
+         * Adds closed paths for text to the current path
+         * @since 1.89.1
+         * @param utf8 A string of text
+         */
+        textPath(utf8: string): void
+
+        /**
+         * Gets the current font matrix
+         * @since 1.89.1
+         * @returns The current font matrix
+         */
+        getFontMatrix(): FontMatrix
+
+        /**
+         * Sets the current font matrix
+         * @since 1.89.1
+         * @param matrix A matrix describing the transformation from font space to user space
+         */
+        setFontMatrix(matrix: FontMatrix): void
+
+        /**
+         * Gets the current destination surface for the context. This is either
+         * the original target surface or the target surface for the current
+         * group as started by the most recent call to {@link Context.pushGroup}.
+         * @returns The target surface
+         */
+        getGroupTarget(): Surface
+
+        /**
          * Translates the current transformation matrix
          * @param tx Translation in the X direction
          * @param ty Translation in the Y direction
@@ -590,6 +786,13 @@ declare namespace cairo {
          * @returns A copy of the current path
          */
         copyPath(): Path
+
+        /**
+         * Creates a copy of the current path with all curves replaced by
+         * piecewise-linear approximations
+         * @returns A flattened copy of the current path
+         */
+        copyPathFlat(): Path
 
         /**
          * Appends a path to the current path
@@ -637,6 +840,18 @@ declare namespace cairo {
          * Finishes the surface and drops all references to external resources
          */
         finish(): void
+
+        /**
+         * Gets the type of the surface
+         * @returns The type of the surface
+         */
+        getType(): SurfaceType
+
+        /**
+         * Writes the contents of the surface to a PNG file
+         * @param filename Path to the PNG file to write
+         */
+        writeToPNG(filename: string): void
     }
 
     /**
@@ -677,10 +892,10 @@ declare namespace cairo {
         getHeight(): number
 
         /**
-         * Writes the contents of the surface to a PNG file
-         * @param filename Path to the PNG file to write
+         * Gets the stride of the surface in bytes
+         * @returns The stride of the surface
          */
-        writeToPNG(filename: string): void
+        getStride(): number
     }
 
     /**
@@ -725,12 +940,18 @@ declare namespace cairo {
     /**
      * Base class for all Cairo patterns
      */
-    export class Pattern extends Cairo.Pattern {}
+    export abstract class Pattern extends Cairo.Pattern {
+        /**
+         * Gets the type of the pattern
+         * @returns The type of the pattern
+         */
+        getType(): PatternType
+    }
 
     /**
      * Base class for all gradient patterns
      */
-    export class Gradient extends Pattern {
+    export abstract class Gradient extends Pattern {
         /**
          * Adds a color stop to the gradient at the given offset
          * @param offset Offset position of the stop, between 0 and 1
@@ -808,12 +1029,36 @@ declare namespace cairo {
          * @param surface The surface to use
          */
         constructor(surface: Surface)
+
+        /**
+         * Sets the mode used for drawing outside the area of the surface
+         * @param extend How the area outside of the surface is drawn
+         */
+        setExtend(extend: Extend): void
+
+        /**
+         * Gets the mode used for drawing outside the area of the surface
+         * @returns How the area outside of the surface is drawn
+         */
+        getExtend(): Extend
+
+        /**
+         * Sets the filter used when resizing the surface
+         * @param filter The filter to use
+         */
+        setFilter(filter: Filter): void
+
+        /**
+         * Gets the filter used when resizing the surface
+         * @returns The filter in use
+         */
+        getFilter(): Filter
     }
 
     /**
      * A pattern for solid colors
      */
-    export class SolidPattern extends Pattern {
+    export abstract class SolidPattern extends Pattern {
         /**
          * Creates a new solid pattern with an opaque color
          * @param red Red component, between 0 and 1
@@ -839,57 +1084,81 @@ declare namespace cairo {
         ): SolidPattern
     }
 
-    export class Path extends Cairo.Path {}
-
     /**
-     * A rectangle
+     * A path, as returned by {@link Context.copyPath}
      */
-    export class Rectangle extends Cairo.Rectangle {}
-
-    /**
-     * A rectangle integer
-     */
-    export class RectangleInt extends Cairo.RectangleInt {}
+    export abstract class Path extends Cairo.Path {}
 
     /**
      * A region object used for representing a set of pixels
      */
-    export class Region extends Cairo.Region {}
+    export class Region extends Cairo.Region {
+        /**
+         * Creates a new empty region
+         */
+        constructor()
 
-    /**
-     * A matrix object used for transforming coordinates
-     */
-    export class Matrix extends Cairo.Matrix {}
+        /**
+         * Computes the union of this region with `other`, storing the result in this region
+         * @param other Another region
+         */
+        union(other: Region): void
 
-    /**
-     * A font face object used for storing and manipulating font faces
-     */
-    export class FontFace extends Cairo.FontFace {}
+        /**
+         * Subtracts `other` from this region, storing the result in this region
+         * @param other Another region
+         */
+        subtract(other: Region): void
 
-    /**
-     * A scaled font object used for storing and manipulating scaled fonts
-     */
-    export class ScaledFont extends Cairo.ScaledFont {}
+        /**
+         * Computes the intersection of this region with `other`, storing the result in this region
+         * @param other Another region
+         */
+        intersect(other: Region): void
 
-    /**
-     * A glyph object used for storing and manipulating glyphs
-     */
-    export class Glyph extends Cairo.Glyph {}
+        /**
+         * Computes the exclusive difference of this region with `other`, storing the result in this region
+         * @param other Another region
+         */
+        xor(other: Region): void
 
-    /**
-     * A text cluster object used for storing and manipulating text clusters
-     */
-    export class TextCluster extends Cairo.TextCluster {}
+        /**
+         * Computes the union of this region with `rect`, storing the result in this region
+         * @param rect A rectangle
+         */
+        unionRectangle(rect: RectangleInt): void
 
-    /**
-     * A font options object used for storing and manipulating font options
-     */
-    export class FontOptions extends Cairo.FontOptions {}
+        /**
+         * Subtracts `rect` from this region, storing the result in this region
+         * @param rect A rectangle
+         */
+        subtractRectangle(rect: RectangleInt): void
 
-    /**
-     * A device object used for storing and manipulating devices
-     */
-    export class Device extends Cairo.Device {}
+        /**
+         * Computes the intersection of this region with `rect`, storing the result in this region
+         * @param rect A rectangle
+         */
+        intersectRectangle(rect: RectangleInt): void
+
+        /**
+         * Computes the exclusive difference of this region with `rect`, storing the result in this region
+         * @param rect A rectangle
+         */
+        xorRectangle(rect: RectangleInt): void
+
+        /**
+         * Gets the number of rectangles contained in this region
+         * @returns The number of rectangles
+         */
+        numRectangles(): number
+
+        /**
+         * Gets the `nth` rectangle from this region
+         * @param nth A number indicating which rectangle should be returned
+         * @returns The location of the rectangle
+         */
+        getRectangle(nth: number): RectangleInt
+    }
 }
 
 export default cairo

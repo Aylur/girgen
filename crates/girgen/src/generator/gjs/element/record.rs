@@ -1,4 +1,4 @@
-use super::super::render;
+use super::super::{overrides, render};
 use super::{callable, doc, gtype};
 use crate::element;
 use std::sync::LazyLock;
@@ -17,8 +17,18 @@ pub struct FieldContext {
     writable: bool,
 }
 
+fn omitted<'a>(ctx: &render::Context, name: &str) -> &'a [&'a str] {
+    overrides::OVERRIDES
+        .iter()
+        .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version)
+        .and_then(|o| o.types.iter().find(|c| c.name == name))
+        .map(|c| c.methods)
+        .unwrap_or_default()
+}
+
 macro_rules! ctx {
     ($ns:expr, $self:expr, $name:expr, $ctx:expr) => {{
+        let omitted = omitted($ctx, &$name);
         let jsdoc = doc::jsdoc(&$self.info_elements, &$self.info)?;
 
         let fields: Vec<FieldContext> = $self
@@ -50,6 +60,7 @@ macro_rules! ctx {
                 .methods
                 .iter()
                 .map(callable::CallableElement::Method)
+                .filter(|m| !omitted.contains(&m.name()))
                 .collect::<Vec<_>>(),
         );
 
@@ -60,6 +71,7 @@ macro_rules! ctx {
                 .constructors
                 .iter()
                 .map(callable::CallableElement::Constructor)
+                .filter(|m| !omitted.contains(&m.name()))
                 .collect::<Vec<_>>(),
         );
 
@@ -70,6 +82,7 @@ macro_rules! ctx {
                 .functions
                 .iter()
                 .map(callable::CallableElement::Function)
+                .filter(|m| !omitted.contains(&m.name()))
                 .collect::<Vec<_>>(),
         );
 
@@ -119,7 +132,13 @@ impl render::Renderable<RecordContext> for element::Record {
         let mut zero_arg_ctor: Option<&element::Constructor> = None;
         let mut default_ctor: Option<&element::Constructor> = None;
 
-        for ctor in self.constructors.iter() {
+        let omitted = omitted(ctx, &self.name);
+
+        for ctor in self
+            .constructors
+            .iter()
+            .filter(|c| !omitted.contains(&callable::CallableElement::Constructor(c).name()))
+        {
             if first_ctor.is_none() {
                 first_ctor = Some(ctor);
             }

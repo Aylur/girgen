@@ -58,7 +58,7 @@ declare module "gettext" {
          *
          * @param domainName A translation domain.
          */
-        function textdomain(domainName: string): string
+        function textdomain(domainName: string): void
 
         /**
          * Specify `dirName` as the directory that contains translations for `domainName`.
@@ -66,7 +66,7 @@ declare module "gettext" {
          * @param domainName A translation domain.
          * @param dirName A directory path.
          */
-        function bindtextdomain(domainName: string, dirName: string): string
+        function bindtextdomain(domainName: string, dirName: string): void
 
         /**
          * A wrapper of {@link Gettext.dgettext} which does not translate the message if the

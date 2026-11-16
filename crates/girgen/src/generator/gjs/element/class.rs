@@ -145,7 +145,7 @@ impl render::Renderable<ClassContext> for element::Class {
         let overrides = overrides::OVERRIDES
             .iter()
             .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version)
-            .and_then(|o| o.classes.iter().find(|c| c.name == self.name));
+            .and_then(|o| o.types.iter().find(|c| c.name == self.name));
 
         let methods = callable::render_member_elements(
             ctx,
@@ -154,8 +154,8 @@ impl render::Renderable<ClassContext> for element::Class {
             &self
                 .methods
                 .iter()
-                .filter(|m| overrides.is_none_or(|o| !o.methods.iter().any(|o| o == &m.attrs.name)))
                 .map(callable::CallableElement::Method)
+                .filter(|m| overrides.is_none_or(|o| !o.methods.contains(&m.name())))
                 .collect::<Vec<_>>(),
         );
 
@@ -298,7 +298,7 @@ impl render::Renderable<ClassContext> for element::Interface {
         let overrides = overrides::OVERRIDES
             .iter()
             .find(|o| o.namespace == ctx.namespace.name && o.version == ctx.namespace.version)
-            .and_then(|o| o.classes.iter().find(|c| c.name == self.name));
+            .and_then(|o| o.types.iter().find(|c| c.name == self.name));
 
         let methods = callable::render_member_elements(
             ctx,
@@ -307,8 +307,8 @@ impl render::Renderable<ClassContext> for element::Interface {
             &self
                 .methods
                 .iter()
-                .filter(|m| overrides.is_none_or(|o| !o.methods.iter().any(|o| o == &m.attrs.name)))
                 .map(callable::CallableElement::Method)
+                .filter(|m| overrides.is_none_or(|o| !o.methods.contains(&m.name())))
                 .collect::<Vec<_>>(),
         );
 

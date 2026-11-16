@@ -39,16 +39,15 @@ declare namespace format {
      *
      * @example
      * ```ts
-     * format.format("Hello %s, you have %d items", "User", 5);
+     * format.format.call("Hello %s, you have %d items", "User", 5);
      * // Returns: "Hello User, you have 5 items"
      * ```
      *
-     * @param fmt The format string
      * @param args The arguments to format the string with
      * @returns The formatted string
      */
     export function format(
-        fmt: string,
+        this: string,
         ...args: (string | number | boolean | null | undefined)[]
     ): string
 }
