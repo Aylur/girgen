@@ -8,12 +8,22 @@ importers:
 
   .: {}
 
+  packages/darwin-arm64: {}
+
+  packages/darwin-x64: {}
+
   packages/girgen:
     devDependencies:
       '@types/node':
         specifier: latest
         version: 26.6.5
     optionalDependencies:
+      '@girgen/darwin-arm64':
+        specifier: workspace:*
+        version: link:../darwin-arm64
+      '@girgen/darwin-x64':
+        specifier: workspace:*
+        version: link:../darwin-x64
       '@girgen/linux-arm64':
         specifier: workspace:*
         version: link:../linux-arm64

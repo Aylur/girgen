@@ -1,6 +1,6 @@
 {
     "name": "girgen",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "type": "module",
     "author": "Aylur",
     "license": "MIT",
@@ -19,6 +19,8 @@
         "@types/node": "latest"
     },
     "optionalDependencies": {
+        "@girgen/darwin-arm64": "workspace:*",
+        "@girgen/darwin-x64": "workspace:*",
         "@girgen/linux-arm64": "workspace:*",
         "@girgen/linux-x64": "workspace:*"
     },

@@ -4,7 +4,8 @@ GIR Parser and type generator.
 
 ## Install
 
-There are pre built binaries for `linux-x64` and `linux-arm64` published on NPM.
+There are pre built binaries for `linux-x64`, `linux-arm64`, `darwin-x64` and
+`darwin-arm64` published on NPM.
 
 ```sh
 npm install girgen -D

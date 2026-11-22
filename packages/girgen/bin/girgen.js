@@ -4,7 +4,12 @@ import { arch, platform, argv, exit } from "node:process"
 import { spawnSync } from "node:child_process"
 import { chmod } from "node:fs/promises"
 
-const supportedPlatforms = ["linux-x64", "linux-arm64"]
+const supportedPlatforms = [
+    "linux-x64",
+    "linux-arm64",
+    "darwin-x64",
+    "darwin-arm64",
+]
 const target = `${platform}-${arch}`
 
 if (!supportedPlatforms.includes(target)) {
