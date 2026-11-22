@@ -378,7 +378,7 @@ namespace GLib {
      * serialized while preserving type information. Comparable to JSON, but with strong typing
      * and support for special values like file handles.
      *
-     * GVariant is used throughout the GNOME Platform including GDBus, GSettings, GAction,
+     * {@link GLib.Variant} is used throughout the GNOME Platform including GDBus, GSettings, GAction,
      * GMenu and many other APIs.
      *
      * @example
@@ -407,9 +407,9 @@ namespace GLib {
         readonly $gtype: GObject.GType<Variant>
 
         /**
-         * Creates a new GVariant with the specified type signature and value.
+         * Creates a new {@link GLib.Variant} with the specified type signature and value.
          *
-         * @param sig The GVariant type signature
+         * @param sig The {@link GLib.Variant} type signature
          * @param value The JavaScript value to pack into the variant
          * @example
          * ```typescript
@@ -420,9 +420,9 @@ namespace GLib {
         new (sig: S, value: $ParseDeepVariant<S>): Variant<S>
 
         /**
-         * Creates a new GVariant with the specified type signature and value.
+         * Creates a new {@link GLib.Variant} with the specified type signature and value.
          *
-         * @param sig The GVariant type signature
+         * @param sig The {@link GLib.Variant} type signature
          * @param value The JavaScript value to pack into the variant
          * @example
          * ```typescript
@@ -433,25 +433,25 @@ namespace GLib {
         "new"<S extends string>(sig: S, value: $ParseDeepVariant<S>): Variant<S>
 
         /**
-         * Creates a new #GVariant array from `children`.
+         * Creates a new {@link GLib.Variant} array from `children`.
          *
-         *  `child_type` must be non-%NULL if `n_children` is zero.  Otherwise, the
+         * `child_type` must be non-`null` if `n_children` is zero. Otherwise, the
          * child type is determined by inspecting the first element of the
-         *  `children` array.  If `child_type` is non-%NULL then it must be a
+         * `children` array. If `child_type` is non-`null` then it must be a
          * definite type.
          *
-         * The items of the array are taken from the `children` array.  No entry
-         * in the `children` array may be %NULL.
+         * The items of the array are taken from the `children` array. No entry
+         * in the `children` array may be `null`.
          *
          * All items in the array must have the same type, which must be the
          * same as `child_type`, if given.
          *
-         * If the `children` are floating references (see g_variant_ref_sink()), the
-         * new instance takes ownership of them as if via g_variant_ref_sink().
+         * If the `children` are floating references (see `g_variant_ref_sink()`), the
+         * new instance takes ownership of them as if via `g_variant_ref_sink()`.
          * @since 2.24
          * @param child_type the element type of the new array
-         * @param children an array of            #GVariant pointers, the children
-         * @returns a floating reference to a new #GVariant array
+         * @param children an array of {@link GLib.Variant} pointers, the children
+         * @returns a floating reference to a new {@link GLib.Variant} array
          */
         new_array<C extends string = "a?">(
             child_type: VariantType<C> | null,
@@ -461,80 +461,80 @@ namespace GLib {
         ): Variant<`a${C}`>
 
         /**
-         * Creates a new boolean #GVariant instance -- either %TRUE or %FALSE.
+         * Creates a new boolean {@link GLib.Variant} instance -- either `true` or `false`.
          * @since 2.24
-         * @param value a #gboolean value
-         * @returns a floating reference to a new boolean #GVariant instance
+         * @param value a `boolean` value
+         * @returns a floating reference to a new boolean {@link GLib.Variant} instance
          */
         new_boolean(value: boolean): Variant<"b">
         /**
-         * Creates a new byte #GVariant instance.
+         * Creates a new byte {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #guint8 value
-         * @returns a floating reference to a new byte #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new byte {@link GLib.Variant} instance
          */
         new_byte(value: number): Variant<"y">
         /**
-         * Creates an array-of-bytes #GVariant with the contents of `string`.
-         * This function is just like g_variant_new_string() except that the
+         * Creates an array-of-bytes {@link GLib.Variant} with the contents of `string`.
+         * This function is just like {@link GLib.Variant.new_string} except that the
          * string need not be valid UTF-8.
          *
          * The nul terminator character at the end of the string is stored in
          * the array.
          * @since 2.26
-         * @param string a normal          nul-terminated string in no particular encoding
-         * @returns a floating reference to a new bytestring #GVariant instance
+         * @param string a normal nul-terminated string in no particular encoding
+         * @returns a floating reference to a new bytestring {@link GLib.Variant} instance
          */
         new_bytestring(string: Uint8Array | string): Variant<"ay">
         /**
-         * Constructs an array of bytestring #GVariant from the given array of
+         * Constructs an array of bytestring {@link GLib.Variant} from the given array of
          * strings.
          *
-         * If `length` is -1 then `strv` is %NULL-terminated.
+         * If `length` is -1 then `strv` is `null`-terminated.
          * @since 2.26
          * @param strv an array of strings
-         * @returns a new floating #GVariant instance
+         * @returns a new floating {@link GLib.Variant} instance
          */
         new_bytestring_array(strv: string[]): Variant<"aay">
         /**
-         * Creates a new dictionary entry #GVariant. `key` and `value` must be
-         * non-%NULL. `key` must be a value of a basic type (ie: not a container).
+         * Creates a new dictionary entry {@link GLib.Variant}. `key` and `value` must be
+         * non-`null`. `key` must be a value of a basic type (ie: not a container).
          *
-         * If the `key` or `value` are floating references (see g_variant_ref_sink()),
-         * the new instance takes ownership of them as if via g_variant_ref_sink().
+         * If the `key` or `value` are floating references (see `g_variant_ref_sink()`),
+         * the new instance takes ownership of them as if via `g_variant_ref_sink()`.
          * @since 2.24
-         * @param key a basic #GVariant, the key
-         * @param value a #GVariant, the value
-         * @returns a floating reference to a new dictionary entry #GVariant
+         * @param key a basic {@link GLib.Variant}, the key
+         * @param value a {@link GLib.Variant}, the value
+         * @returns a floating reference to a new dictionary entry {@link GLib.Variant}
          */
         new_dict_entry(key: Variant, value: Variant): Variant<"{vv}">
         /**
-         * Creates a new double #GVariant instance.
+         * Creates a new double {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #gdouble floating point value
-         * @returns a floating reference to a new double #GVariant instance
+         * @param value a `number` floating point value
+         * @returns a floating reference to a new double {@link GLib.Variant} instance
          */
         new_double(value: number): Variant<"d">
         /**
-         * Constructs a new array #GVariant instance, where the elements are
+         * Constructs a new array {@link GLib.Variant} instance, where the elements are
          * of `element_type` type.
          *
-         *  `elements` must be an array with fixed-sized elements.  Numeric types are
+         * `elements` must be an array with fixed-sized elements. Numeric types are
          * fixed-size as are tuples containing only other fixed-sized types.
          *
-         *  `element_size` must be the size of a single element in the array.
+         * `element_size` must be the size of a single element in the array.
          * For example, if calling this function for an array of 32-bit integers,
          * you might say sizeof(gint32). This value isn't used except for the purpose
          * of a double-check that the form of the serialized data matches the caller's
          * expectation.
          *
-         *  `n_elements` must be the length of the `elements` array.
+         * `n_elements` must be the length of the `elements` array.
          * @since 2.32
-         * @param element_type the #GVariantType of each element
+         * @param element_type the {@link GLib.VariantType} of each element
          * @param elements a pointer to the fixed array of contiguous elements
          * @param n_elements the number of elements
          * @param element_size the size of each element
-         * @returns a floating reference to a new array #GVariant instance
+         * @returns a floating reference to a new array {@link GLib.Variant} instance
          */
         new_fixed_array<C extends string = "a?">(
             element_type: VariantType<C>,
@@ -544,7 +544,7 @@ namespace GLib {
             element_size: number,
         ): Variant<`a${C}`>
         /**
-         * Constructs a new serialized-mode #GVariant instance.  This is the
+         * Constructs a new serialized-mode {@link GLib.Variant} instance. This is the
          * inner interface for creation of new serialized values that gets
          * called from various functions in gvariant.c.
          *
@@ -554,10 +554,10 @@ namespace GLib {
          * Otherwise this function will internally create a copy of the memory (since
          * GLib 2.60) or (in older versions) fail and exit the process.
          * @since 2.36
-         * @param type a #GVariantType
-         * @param bytes a #GBytes
+         * @param type a {@link GLib.VariantType}
+         * @param bytes a {@link GLib.Bytes}
          * @param trusted if the contents of `bytes` are trusted
-         * @returns a new #GVariant with a floating reference
+         * @returns a new {@link GLib.Variant} with a floating reference
          */
         new_from_bytes<C extends string>(
             type: VariantType<C>,
@@ -565,42 +565,42 @@ namespace GLib {
             trusted: boolean,
         ): Variant<C>
         /**
-         * Creates a new #GVariant instance from serialized data.
+         * Creates a new {@link GLib.Variant} instance from serialized data.
          *
-         *  `type` is the type of #GVariant instance that will be constructed.
+         * `type` is the type of {@link GLib.Variant} instance that will be constructed.
          * The interpretation of `data` depends on knowing the type.
          *
-         *  `data` is not modified by this function and must remain valid with an
+         * `data` is not modified by this function and must remain valid with an
          * unchanging value until such a time as `notify` is called with
-         *  `user_data`.  If the contents of `data` change before that time then
+         * `user_data`. If the contents of `data` change before that time then
          * the result is undefined.
          *
          * If `data` is trusted to be serialized data in normal form then
-         *  `trusted` should be %TRUE.  This applies to serialized data created
+         * `trusted` should be `true`. This applies to serialized data created
          * within this process or read from a trusted location on the disk (such
-         * as a file installed in /usr/lib alongside your application).  You
-         * should set trusted to %FALSE if `data` is read from the network, a
+         * as a file installed in /usr/lib alongside your application). You
+         * should set trusted to `false` if `data` is read from the network, a
          * file in the user's home directory, etc.
          *
          * If `data` was not stored in this machine's native endianness, any multi-byte
          * numeric values in the returned variant will also be in non-native
-         * endianness. g_variant_byteswap() can be used to recover the original values.
+         * endianness. {@link GLib.Variant.byteswap} can be used to recover the original values.
          *
-         *  `notify` will be called with `user_data` when `data` is no longer
-         * needed.  The exact time of this call is unspecified and might even be
+         * `notify` will be called with `user_data` when `data` is no longer
+         * needed. The exact time of this call is unspecified and might even be
          * before this function returns.
          *
          * Note: `data` must be backed by memory that is aligned appropriately for the
-         *  `type` being loaded. Otherwise this function will internally create a copy of
+         * `type` being loaded. Otherwise this function will internally create a copy of
          * the memory (since GLib 2.60) or (in older versions) fail and exit the
          * process.
          * @since 2.24
-         * @param type a definite #GVariantType
+         * @param type a definite {@link GLib.VariantType}
          * @param data the serialized data
-         * @param trusted %TRUE if `data` is definitely in normal form
+         * @param trusted `true` if `data` is definitely in normal form
          * @param notify function to call when `data` is no longer needed
          * @param user_data data for `notify`
-         * @returns a new floating #GVariant of type `type`
+         * @returns a new floating {@link GLib.Variant} of type `type`
          */
         new_from_data<C extends string>(
             type: VariantType<C>,
@@ -609,121 +609,121 @@ namespace GLib {
             user_data: null,
         ): Variant<C>
         /**
-         * Creates a new handle #GVariant instance.
+         * Creates a new handle {@link GLib.Variant} instance.
          *
          * By convention, handles are indexes into an array of file descriptors
-         * that are sent alongside a D-Bus message.  If you're not interacting
+         * that are sent alongside a D-Bus message. If you're not interacting
          * with D-Bus, you probably don't need them.
          * @since 2.24
-         * @param value a #gint32 value
-         * @returns a floating reference to a new handle #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new handle {@link GLib.Variant} instance
          */
         new_handle(value: number): Variant<"h">
         /**
-         * Creates a new int16 #GVariant instance.
+         * Creates a new int16 {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #gint16 value
-         * @returns a floating reference to a new int16 #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new int16 {@link GLib.Variant} instance
          */
         new_int16(value: number): Variant<"n">
         /**
-         * Creates a new int32 #GVariant instance.
+         * Creates a new int32 {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #gint32 value
-         * @returns a floating reference to a new int32 #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new int32 {@link GLib.Variant} instance
          */
         new_int32(value: number): Variant<"i">
         /**
-         * Creates a new int64 #GVariant instance.
+         * Creates a new int64 {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #gint64 value
-         * @returns a floating reference to a new int64 #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new int64 {@link GLib.Variant} instance
          */
         new_int64(value: number): Variant<"x">
         /**
-         * Depending on if `child` is %NULL, either wraps `child` inside of a
+         * Depending on if `child` is `null`, either wraps `child` inside of a
          * maybe container or creates a Nothing instance for the given `type`.
          *
-         * At least one of `child_type` and `child` must be non-%NULL.
-         * If `child_type` is non-%NULL then it must be a definite type.
-         * If they are both non-%NULL then `child_type` must be the type
+         * At least one of `child_type` and `child` must be non-`null`.
+         * If `child_type` is non-`null` then it must be a definite type.
+         * If they are both non-`null` then `child_type` must be the type
          * of `child`.
          *
-         * If `child` is a floating reference (see g_variant_ref_sink()), the new
+         * If `child` is a floating reference (see `g_variant_ref_sink()`), the new
          * instance takes ownership of `child`.
          * @since 2.24
-         * @param child_type the #GVariantType of the child, or %NULL
-         * @param child the child value, or %NULL
-         * @returns a floating reference to a new #GVariant maybe instance
+         * @param child_type the {@link GLib.VariantType} of the child, or `null`
+         * @param child the child value, or `null`
+         * @returns a floating reference to a new {@link GLib.Variant} maybe instance
          */
         new_maybe(
             child_type: VariantType | null,
             child: Variant | null,
         ): Variant<"mv">
         /**
-         * Creates a D-Bus object path #GVariant with the contents of `object_path`.
-         *  `object_path` must be a valid D-Bus object path.  Use
-         * g_variant_is_object_path() if you're not sure.
+         * Creates a D-Bus object path {@link GLib.Variant} with the contents of `object_path`.
+         * `object_path` must be a valid D-Bus object path. Use
+         * {@link GLib.Variant.is_object_path} if you're not sure.
          * @since 2.24
          * @param object_path a normal C nul-terminated string
-         * @returns a floating reference to a new object path #GVariant instance
+         * @returns a floating reference to a new object path {@link GLib.Variant} instance
          */
         new_object_path(object_path: string): Variant<"o">
         /**
-         * Constructs an array of object paths #GVariant from the given array of
+         * Constructs an array of object paths {@link GLib.Variant} from the given array of
          * strings.
          *
-         * Each string must be a valid #GVariant object path; see
-         * g_variant_is_object_path().
+         * Each string must be a valid {@link GLib.Variant} object path; see
+         * {@link GLib.Variant.is_object_path}.
          *
-         * If `length` is -1 then `strv` is %NULL-terminated.
+         * If `length` is -1 then `strv` is `null`-terminated.
          * @since 2.30
          * @param strv an array of strings
-         * @returns a new floating #GVariant instance
+         * @returns a new floating {@link GLib.Variant} instance
          */
         new_objv(strv: string[]): Variant<"ao">
         /**
-         * Creates a D-Bus type signature #GVariant with the contents of
-         *  `string`.  `string` must be a valid D-Bus type signature.  Use
-         * g_variant_is_signature() if you're not sure.
+         * Creates a D-Bus type signature {@link GLib.Variant} with the contents of
+         * `string`. `string` must be a valid D-Bus type signature. Use
+         * {@link GLib.Variant.is_signature} if you're not sure.
          * @since 2.24
          * @param signature a normal C nul-terminated string
-         * @returns a floating reference to a new signature #GVariant instance
+         * @returns a floating reference to a new signature {@link GLib.Variant} instance
          */
         new_signature(signature: string): Variant<"g">
         /**
-         * Creates a string #GVariant with the contents of `string`.
+         * Creates a string {@link GLib.Variant} with the contents of `string`.
          *
-         *  `string` must be valid UTF-8, and must not be %NULL. To encode
-         * potentially-%NULL strings, use g_variant_new() with `ms` as the
+         * `string` must be valid UTF-8, and must not be `null`. To encode
+         * potentially-`null` strings, use {@link GLib.Variant.new} with `ms` as the
          * [format string](gvariant-format-strings.html#maybe-types).
          * @since 2.24
          * @param string a normal UTF-8 nul-terminated string
-         * @returns a floating reference to a new string #GVariant instance
+         * @returns a floating reference to a new string {@link GLib.Variant} instance
          */
         new_string(string: string): Variant<"s">
         /**
-         * Constructs an array of strings #GVariant from the given array of
+         * Constructs an array of strings {@link GLib.Variant} from the given array of
          * strings.
          *
-         * If `length` is -1 then `strv` is %NULL-terminated.
+         * If `length` is -1 then `strv` is `null`-terminated.
          * @since 2.24
          * @param strv an array of strings
-         * @returns a new floating #GVariant instance
+         * @returns a new floating {@link GLib.Variant} instance
          */
         new_strv(strv: string[]): Variant<"as">
         /**
-         * Creates a new tuple #GVariant out of the items in `children`.  The
-         * type is determined from the types of `children`.  No entry in the
-         *  `children` array may be %NULL.
+         * Creates a new tuple {@link GLib.Variant} out of the items in `children`. The
+         * type is determined from the types of `children`. No entry in the
+         * `children` array may be `null`.
          *
          * If `n_children` is 0 then the unit tuple is constructed.
          *
-         * If the `children` are floating references (see g_variant_ref_sink()), the
-         * new instance takes ownership of them as if via g_variant_ref_sink().
+         * If the `children` are floating references (see `g_variant_ref_sink()`), the
+         * new instance takes ownership of them as if via `g_variant_ref_sink()`.
          * @since 2.24
          * @param children the items to make the tuple out of
-         * @returns a floating reference to a new #GVariant tuple
+         * @returns a floating reference to a new {@link GLib.Variant} tuple
          */
         new_tuple<
             Items extends ReadonlyArray<VariantType> | readonly [VariantType],
@@ -731,106 +731,106 @@ namespace GLib {
             children: Items,
         ): Variant<`(${$ToTuple<Items>})`>
         /**
-         * Creates a new uint16 #GVariant instance.
+         * Creates a new uint16 {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #guint16 value
-         * @returns a floating reference to a new uint16 #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new uint16 {@link GLib.Variant} instance
          */
         new_uint16(value: number): Variant<"q">
         /**
-         * Creates a new uint32 #GVariant instance.
+         * Creates a new uint32 {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #guint32 value
-         * @returns a floating reference to a new uint32 #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new uint32 {@link GLib.Variant} instance
          */
         new_uint32(value: number): Variant<"u">
         /**
-         * Creates a new uint64 #GVariant instance.
+         * Creates a new uint64 {@link GLib.Variant} instance.
          * @since 2.24
-         * @param value a #guint64 value
-         * @returns a floating reference to a new uint64 #GVariant instance
+         * @param value a `number` value
+         * @returns a floating reference to a new uint64 {@link GLib.Variant} instance
          */
         new_uint64(value: number): Variant<"t">
         /**
-         * Boxes `value`.  The result is a #GVariant instance representing a
+         * Boxes `value`. The result is a {@link GLib.Variant} instance representing a
          * variant containing the original value.
          *
-         * If `child` is a floating reference (see g_variant_ref_sink()), the new
+         * If `child` is a floating reference (see `g_variant_ref_sink()`), the new
          * instance takes ownership of `child`.
          * @since 2.24
-         * @param value a #GVariant instance
-         * @returns a floating reference to a new variant #GVariant instance
+         * @param value a {@link GLib.Variant} instance
+         * @returns a floating reference to a new variant {@link GLib.Variant} instance
          */
         new_variant(value: Variant): Variant<"v">
         /**
-         * Determines if a given string is a valid D-Bus object path.  You
+         * Determines if a given string is a valid D-Bus object path. You
          * should ensure that a string is a valid D-Bus object path before
-         * passing it to g_variant_new_object_path().
+         * passing it to {@link GLib.Variant.new_object_path}.
          *
          * A valid object path starts with `/` followed by zero or more
-         * sequences of characters separated by `/` characters.  Each sequence
-         * must contain only the characters `[A-Z][a-z][0-9]_`.  No sequence
+         * sequences of characters separated by `/` characters. Each sequence
+         * must contain only the characters `[A-Z][a-z][0-9]_`. No sequence
          * (including the one following the final `/` character) may be empty.
          * @since 2.24
          * @param string a normal C nul-terminated string
-         * @returns %TRUE if `string` is a D-Bus object path
+         * @returns `true` if `string` is a D-Bus object path
          */
         is_object_path(string: string): boolean
         /**
-         * Determines if a given string is a valid D-Bus type signature.  You
+         * Determines if a given string is a valid D-Bus type signature. You
          * should ensure that a string is a valid D-Bus type signature before
-         * passing it to g_variant_new_signature().
+         * passing it to {@link GLib.Variant.new_signature}.
          *
-         * D-Bus type signatures consist of zero or more definite #GVariantType
+         * D-Bus type signatures consist of zero or more definite {@link GLib.VariantType}
          * strings in sequence.
          * @since 2.24
          * @param string a normal C nul-terminated string
-         * @returns %TRUE if `string` is a D-Bus type signature
+         * @returns `true` if `string` is a D-Bus type signature
          */
         is_signature(string: string): boolean
         /**
-         * Parses a #GVariant from a text representation.
+         * Parses a {@link GLib.Variant} from a text representation.
          *
-         * A single #GVariant is parsed from the content of `text`.
+         * A single {@link GLib.Variant} is parsed from the content of `text`.
          *
          * The format is described [here](gvariant-text-format.html).
          *
          * The memory at `limit` will never be accessed and the parser behaves as
-         * if the character at `limit` is the nul terminator.  This has the
+         * if the character at `limit` is the nul terminator. This has the
          * effect of bounding `text`.
          *
-         * If `endptr` is non-%NULL then `text` is permitted to contain data
+         * If `endptr` is non-`null` then `text` is permitted to contain data
          * following the value that this function parses and `endptr` will be
          * updated to point to the first character past the end of the text
-         * parsed by this function.  If `endptr` is %NULL and there is extra data
+         * parsed by this function. If `endptr` is `null` and there is extra data
          * then an error is returned.
          *
-         * If `type` is non-%NULL then the value will be parsed to have that
-         * type.  This may result in additional parse errors (in the case that
+         * If `type` is non-`null` then the value will be parsed to have that
+         * type. This may result in additional parse errors (in the case that
          * the parsed value doesn't fit the type) but may also result in fewer
          * errors (in the case that the type would have been ambiguous, such as
          * with empty arrays).
          *
-         * In the event that the parsing is successful, the resulting #GVariant
+         * In the event that the parsing is successful, the resulting {@link GLib.Variant}
          * is returned. It is never floating, and must be freed with
-         * [method@GLib.Variant.unref].
+         * {@link GLib.Variant.unref}.
          *
-         * In case of any error, %NULL will be returned.  If `error` is non-%NULL
+         * In case of any error, `null` will be returned. If `error` is non-`null`
          * then it will be set to reflect the error that occurred.
          *
          * Officially, the language understood by the parser is “any string
-         * produced by [method@GLib.Variant.print]”. This explicitly includes
-         * `g_variant_print()`’s annotated types like `int64 -1000`.
+         * produced by {@link GLib.Variant.print}”. This explicitly includes
+         * {@link GLib.Variant.print}’s annotated types like `int64 -1000`.
          *
          * There may be implementation specific restrictions on deeply nested values,
-         * which would result in a %G_VARIANT_PARSE_ERROR_RECURSION error. #GVariant is
+         * which would result in a {@link GLib.VariantParseError.RECURSION} error. {@link GLib.Variant} is
          * guaranteed to handle nesting up to at least 64 levels.
          * @throws {GLib.Error}
-         * @param type a #GVariantType, or %NULL
-         * @param text a string containing a GVariant in text form
-         * @param limit a pointer to the end of `text`, or %NULL
-         * @param endptr a location to store the end pointer, or %NULL
-         * @returns a non-floating reference to a #GVariant, or %NULL
+         * @param type a {@link GLib.VariantType}, or `null`
+         * @param text a string containing a {@link GLib.Variant} in text form
+         * @param limit a pointer to the end of `text`, or `null`
+         * @param endptr a location to store the end pointer, or `null`
+         * @returns a non-floating reference to a {@link GLib.Variant}, or `null`
          */
         parse(
             type: VariantType | null,
@@ -839,7 +839,7 @@ namespace GLib {
             endptr: string | null,
         ): Variant
         /**
-         * Pretty-prints a message showing the context of a #GVariant parse
+         * Pretty-prints a message showing the context of a {@link GLib.Variant} parse
          * error within the string for which parsing was attempted.
          *
          * The resulting string is suitable for output to the console or other
@@ -858,18 +858,18 @@ namespace GLib {
          * |[
          * unable to find a common type:
          *   [1, 2, 3, 'str']
-         *    ^        ^^^^^
+         *    ^ ^^^^^
          * ]|
          *
          * The format of the message may change in a future version.
          *
-         *  `error` must have come from a failed attempt to g_variant_parse() and
-         *  `source_str` must be exactly the same string that caused the error.
+         * `error` must have come from a failed attempt to {@link GLib.Variant.parse} and
+         * `source_str` must be exactly the same string that caused the error.
          * If `source_str` was not nul-terminated when you passed it to
-         * g_variant_parse() then you must add nul termination before using this
+         * {@link GLib.Variant.parse} then you must add nul termination before using this
          * function.
          * @since 2.40
-         * @param error a #GError from the #GVariantParseError domain
+         * @param error a {@link GLib.Error} from the {@link GLib.VariantParseError} domain
          * @param source_str the string that was given to the parser
          * @returns the printed message
          */
@@ -877,27 +877,27 @@ namespace GLib {
 
         parse_error_quark(): Quark
         /**
-         * Same as g_variant_error_quark().
-         * @deprecated Use g_variant_parse_error_quark() instead.
+         * Same as `g_variant_error_quark()`.
+         * @deprecated Use {@link GLib.Variant.parse_error_quark} instead.
          */
         parser_get_error_quark(): Quark
     }
 
     interface Variant<S extends string = any> {
         /**
-         * Performs a byteswapping operation on the contents of `value`.  The
+         * Performs a byteswapping operation on the contents of `value`. The
          * result is that all multi-byte numeric data contained in `value` is
-         * byteswapped.  That includes 16, 32, and 64bit signed and unsigned
+         * byteswapped. That includes 16, 32, and 64bit signed and unsigned
          * integers as well as file handles and double precision floating point
          * values.
          *
          * This function is an identity mapping on any value that does not
-         * contain multi-byte numeric data.  That include strings, booleans,
+         * contain multi-byte numeric data. That include strings, booleans,
          * bytes and containers containing only these things (recursively).
          *
          * While this function can safely handle untrusted, non-normal data, it is
          * recommended to check whether the input is in normal form beforehand, using
-         * g_variant_is_normal_form(), and to reject non-normal inputs if your
+         * {@link GLib.Variant.is_normal_form}, and to reject non-normal inputs if your
          * application can be strict about what inputs it rejects.
          *
          * The returned value is always in normal form and is marked as trusted.
@@ -907,163 +907,163 @@ namespace GLib {
          */
         byteswap(): Variant
         /**
-         * Checks if calling g_variant_get() with `format_string` on `value` would
-         * be valid from a type-compatibility standpoint.  `format_string` is
+         * Checks if calling `g_variant_get()` with `format_string` on `value` would
+         * be valid from a type-compatibility standpoint. `format_string` is
          * assumed to be a valid format string (from a syntactic standpoint).
          *
-         * If `copy_only` is %TRUE then this function additionally checks that it
-         * would be safe to call g_variant_unref() on `value` immediately after
-         * the call to g_variant_get() without invalidating the result.  This is
+         * If `copy_only` is `true` then this function additionally checks that it
+         * would be safe to call `g_variant_unref()` on `value` immediately after
+         * the call to `g_variant_get()` without invalidating the result. This is
          * only possible if deep copies are made (ie: there are no pointers to
-         * the data inside of the soon-to-be-freed #GVariant instance).  If this
-         * check fails then a g_critical() is printed and %FALSE is returned.
+         * the data inside of the soon-to-be-freed {@link GLib.Variant} instance). If this
+         * check fails then a `g_critical()` is printed and `false` is returned.
          *
          * This function is meant to be used by functions that wish to provide
-         * varargs accessors to #GVariant values of uncertain values (eg:
-         * g_variant_lookup() or g_menu_model_get_item_attribute()).
+         * varargs accessors to {@link GLib.Variant} values of uncertain values (eg:
+         * `g_variant_lookup()` or `g_menu_model_get_item_attribute()`).
          * @since 2.34
-         * @param format_string a valid #GVariant format string
-         * @param copy_only %TRUE to ensure the format string makes deep copies
-         * @returns %TRUE if `format_string` is safe to use
+         * @param format_string a valid {@link GLib.Variant} format string
+         * @param copy_only `true` to ensure the format string makes deep copies
+         * @returns `true` if `format_string` is safe to use
          */
         check_format_string(format_string: string, copy_only: boolean): boolean
         /**
          * Classifies `value` according to its top-level type.
          * @since 2.24
-         * @returns the #GVariantClass of `value`
+         * @returns the {@link GLib.VariantClass} of `value`
          */
         classify(): VariantClass
         /**
          * Compares `one` and `two`.
          *
-         * The types of `one` and `two` are #gconstpointer only to allow use of
-         * this function with #GTree, #GPtrArray, etc.  They must each be a
-         * #GVariant.
+         * The types of `one` and `two` are `gconstpointer` only to allow use of
+         * this function with {@link GLib.Tree}, {@link GLib.PtrArray}, etc. They must each be a
+         * {@link GLib.Variant}.
          *
          * Comparison is only defined for basic types (ie: booleans, numbers,
-         * strings).  For booleans, %FALSE is less than %TRUE.  Numbers are
-         * ordered in the usual way.  Strings are in ASCII lexographical order.
+         * strings). For booleans, `false` is less than `true`. Numbers are
+         * ordered in the usual way. Strings are in ASCII lexographical order.
          *
          * It is a programmer error to attempt to compare container values or
-         * two values that have types that are not exactly equal.  For example,
+         * two values that have types that are not exactly equal. For example,
          * you cannot compare a 32-bit signed integer with a 32-bit unsigned
-         * integer.  Also note that this function is not particularly
+         * integer. Also note that this function is not particularly
          * well-behaved when it comes to comparison of doubles; in particular,
          * the handling of incomparable values (ie: NaN) is undefined.
          *
-         * If you only require an equality comparison, g_variant_equal() is more
+         * If you only require an equality comparison, {@link GLib.Variant.equal} is more
          * general.
          * @since 2.26
-         * @param two a #GVariant instance of the same type
-         * @returns negative value if a < b;          zero if a = b;          positive value if a > b.
+         * @param two a {@link GLib.Variant} instance of the same type
+         * @returns negative value if a < b; zero if a = b; positive value if a > b.
          */
         compare(two: Variant): number
         /**
-         * Similar to g_variant_get_bytestring() except that instead of
+         * Similar to {@link GLib.Variant.get_bytestring} except that instead of
          * returning a constant string, the string is duplicated.
          *
-         * The return value must be freed using g_free().
+         * The return value must be freed using `g_free()`.
          * @since 2.26
-         * @returns           a newly allocated string, a pointer to a #gsize, to store          the length (not including the nul terminator)
+         * @returns a newly allocated string, a pointer to a `number`, to store the length (not including the nul terminator)
          */
         dup_bytestring(): Uint8Array
         /**
-         * Gets the contents of an array of array of bytes #GVariant.  This call
+         * Gets the contents of an array of array of bytes {@link GLib.Variant}. This call
          * makes a deep copy; the return result should be released with
-         * g_strfreev().
+         * `g_strfreev()`.
          *
-         * If `length` is non-%NULL then the number of elements in the result is
-         * stored there.  In any case, the resulting array will be
-         * %NULL-terminated.
+         * If `length` is non-`null` then the number of elements in the result is
+         * stored there. In any case, the resulting array will be
+         * `null`-terminated.
          *
          * For an empty array, `length` will be set to 0 and a pointer to a
-         * %NULL pointer will be returned.
+         * `null` pointer will be returned.
          * @since 2.26
-         * @returns an array of strings, the length of the result, or %NULL
+         * @returns an array of strings, the length of the result, or `null`
          */
         dup_bytestring_array(): string[]
         /**
-         * Gets the contents of an array of object paths #GVariant.  This call
+         * Gets the contents of an array of object paths {@link GLib.Variant}. This call
          * makes a deep copy; the return result should be released with
-         * g_strfreev().
+         * `g_strfreev()`.
          *
-         * If `length` is non-%NULL then the number of elements in the result
-         * is stored there.  In any case, the resulting array will be
-         * %NULL-terminated.
+         * If `length` is non-`null` then the number of elements in the result
+         * is stored there. In any case, the resulting array will be
+         * `null`-terminated.
          *
          * For an empty array, `length` will be set to 0 and a pointer to a
-         * %NULL pointer will be returned.
+         * `null` pointer will be returned.
          * @since 2.30
-         * @returns an array of strings, the length of the result, or %NULL
+         * @returns an array of strings, the length of the result, or `null`
          */
         dup_objv(): string[]
         /**
-         * Similar to g_variant_get_string() except that instead of returning
+         * Similar to {@link GLib.Variant.get_string} except that instead of returning
          * a constant string, the string is duplicated.
          *
          * The string will always be UTF-8 encoded.
          *
-         * The return value must be freed using g_free().
+         * The return value must be freed using `g_free()`.
          * @since 2.24
-         * @returns a newly allocated string, UTF-8 encoded, a pointer to a #gsize, to store the length
+         * @returns a newly allocated string, UTF-8 encoded, a pointer to a `number`, to store the length
          */
         dup_string(): [string, number]
         /**
-         * Gets the contents of an array of strings #GVariant.  This call
+         * Gets the contents of an array of strings {@link GLib.Variant}. This call
          * makes a deep copy; the return result should be released with
-         * g_strfreev().
+         * `g_strfreev()`.
          *
-         * If `length` is non-%NULL then the number of elements in the result
-         * is stored there.  In any case, the resulting array will be
-         * %NULL-terminated.
+         * If `length` is non-`null` then the number of elements in the result
+         * is stored there. In any case, the resulting array will be
+         * `null`-terminated.
          *
          * For an empty array, `length` will be set to 0 and a pointer to a
-         * %NULL pointer will be returned.
+         * `null` pointer will be returned.
          * @since 2.24
-         * @returns an array of strings, the length of the result, or %NULL
+         * @returns an array of strings, the length of the result, or `null`
          */
         dup_strv(): string[]
         /**
          * Checks if `one` and `two` have the same type and value.
          *
-         * The types of `one` and `two` are #gconstpointer only to allow use of
-         * this function with #GHashTable.  They must each be a #GVariant.
+         * The types of `one` and `two` are `gconstpointer` only to allow use of
+         * this function with {@link GLib.HashTable}. They must each be a {@link GLib.Variant}.
          * @since 2.24
-         * @param two a #GVariant instance
-         * @returns %TRUE if `one` and `two` are equal
+         * @param two a {@link GLib.Variant} instance
+         * @returns `true` if `one` and `two` are equal
          */
         equal(two: Variant): boolean
         /**
          * Returns the boolean value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_BOOLEAN.
+         * other than `"b"`.
          * @since 2.24
-         * @returns %TRUE or %FALSE
+         * @returns `true` or `false`
          */
         get_boolean(): boolean
         /**
          * Returns the byte value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_BYTE.
+         * other than `"y"`.
          * @since 2.24
-         * @returns a #guint8
+         * @returns a `number`
          */
         get_byte(): number
         /**
-         * Returns the string value of a #GVariant instance with an
-         * array-of-bytes type.  The string has no particular encoding.
+         * Returns the string value of a {@link GLib.Variant} instance with an
+         * array-of-bytes type. The string has no particular encoding.
          *
          * If the array does not end with a nul terminator character, the empty
-         * string is returned.  For this reason, you can always trust that a
-         * non-%NULL nul-terminated string will be returned by this function.
+         * string is returned. For this reason, you can always trust that a
+         * non-`null` nul-terminated string will be returned by this function.
          *
          * If the array contains a nul terminator character somewhere other than
          * the last byte then the returned string is the string, up to the first
          * such nul character.
          *
-         * g_variant_get_fixed_array() should be used instead if the array contains
+         * `g_variant_get_fixed_array()` should be used instead if the array contains
          * arbitrary data that could not be nul-terminated or could contain nul bytes.
          *
          * It is an error to call this function with a `value` that is not an
@@ -1071,45 +1071,45 @@ namespace GLib {
          *
          * The return value remains valid as long as `value` exists.
          * @since 2.26
-         * @returns           the constant string
+         * @returns the constant string
          */
         get_bytestring(): Uint8Array
         /**
-         * Gets the contents of an array of array of bytes #GVariant.  This call
+         * Gets the contents of an array of array of bytes {@link GLib.Variant}. This call
          * makes a shallow copy; the return result should be released with
-         * g_free(), but the individual strings must not be modified.
+         * `g_free()`, but the individual strings must not be modified.
          *
-         * If `length` is non-%NULL then the number of elements in the result is
-         * stored there.  In any case, the resulting array will be
-         * %NULL-terminated.
+         * If `length` is non-`null` then the number of elements in the result is
+         * stored there. In any case, the resulting array will be
+         * `null`-terminated.
          *
          * For an empty array, `length` will be set to 0 and a pointer to a
-         * %NULL pointer will be returned.
+         * `null` pointer will be returned.
          * @since 2.26
-         * @returns an array of constant strings, the length of the result, or %NULL
+         * @returns an array of constant strings, the length of the result, or `null`
          */
         get_bytestring_array(): string[]
         /**
-         * Reads a child item out of a container #GVariant instance.  This
+         * Reads a child item out of a container {@link GLib.Variant} instance. This
          * includes variants, maybes, arrays, tuples and dictionary
-         * entries.  It is an error to call this function on any other type of
-         * #GVariant.
+         * entries. It is an error to call this function on any other type of
+         * {@link GLib.Variant}.
          *
          * It is an error if `index_` is greater than the number of child items
-         * in the container.  See g_variant_n_children().
+         * in the container. See {@link GLib.Variant.n_children}.
          *
-         * The returned value is never floating.  You should free it with
-         * g_variant_unref() when you're done with it.
+         * The returned value is never floating. You should free it with
+         * `g_variant_unref()` when you're done with it.
          *
          * Note that values borrowed from the returned child are not guaranteed to
          * still be valid after the child is freed even if you still hold a reference
          * to `value`, if `value` has not been serialized at the time this function is
          * called. To avoid this, you can serialize `value` by calling
-         * g_variant_get_data() and optionally ignoring the return value.
+         * {@link GLib.Variant.get_data} and optionally ignoring the return value.
          *
          * There may be implementation specific restrictions on deeply nested values,
          * which would result in the unit tuple being returned as the child value,
-         * instead of further nested children. #GVariant is guaranteed to handle
+         * instead of further nested children. {@link GLib.Variant} is guaranteed to handle
          * nesting up to at least 64 levels.
          *
          * This function is O(1).
@@ -1119,155 +1119,155 @@ namespace GLib {
          */
         get_child_value(index_: number): Variant
         /**
-         * Returns a pointer to the serialized form of a #GVariant instance.
+         * Returns a pointer to the serialized form of a {@link GLib.Variant} instance.
          * The returned data may not be in fully-normalised form if read from an
-         * untrusted source.  The returned data must not be freed; it remains
+         * untrusted source. The returned data must not be freed; it remains
          * valid for as long as `value` exists.
          *
          * If `value` is a fixed-sized value that was deserialized from a
-         * corrupted serialized container then %NULL may be returned.  In this
+         * corrupted serialized container then `null` may be returned. In this
          * case, the proper thing to do is typically to use the appropriate
-         * number of nul bytes in place of `value`.  If `value` is not fixed-sized
-         * then %NULL is never returned.
+         * number of nul bytes in place of `value`. If `value` is not fixed-sized
+         * then `null` is never returned.
          *
          * In the case that `value` is already in serialized form, this function
-         * is O(1).  If the value is not already in serialized form,
+         * is O(1). If the value is not already in serialized form,
          * serialization occurs implicitly and is approximately O(n) in the size
          * of the result.
          *
          * To deserialize the data returned by this function, in addition to the
-         * serialized data, you must know the type of the #GVariant, and (if the
+         * serialized data, you must know the type of the {@link GLib.Variant}, and (if the
          * machine might be different) the endianness of the machine that stored
          * it. As a result, file formats or network messages that incorporate
-         * serialized #GVariants must include this information either
+         * serialized {@link GLib.Variant}s must include this information either
          * implicitly (for instance "the file always contains a
-         * %G_VARIANT_TYPE_VARIANT and it is always in little-endian order") or
+         * `"v"` and it is always in little-endian order") or
          * explicitly (by storing the type and/or endianness in addition to the
          * serialized data).
          * @since 2.24
-         * @returns the serialized form of `value`, or %NULL
+         * @returns the serialized form of `value`, or `null`
          */
         get_data(): never | null
         /**
-         * Returns a pointer to the serialized form of a #GVariant instance.
+         * Returns a pointer to the serialized form of a {@link GLib.Variant} instance.
          * The semantics of this function are exactly the same as
-         * g_variant_get_data(), except that the returned #GBytes holds
+         * {@link GLib.Variant.get_data}, except that the returned {@link GLib.Bytes} holds
          * a reference to the variant data.
          * @since 2.36
-         * @returns A new #GBytes representing the variant data
+         * @returns A new {@link GLib.Bytes} representing the variant data
          */
         get_data_as_bytes(): Bytes
         /**
          * Returns the double precision floating point value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_DOUBLE.
+         * other than `"d"`.
          * @since 2.24
-         * @returns a #gdouble
+         * @returns a `number`
          */
         get_double(): number
         /**
          * Returns the 32-bit signed integer value of `value`.
          *
          * It is an error to call this function with a `value` of any type other
-         * than %G_VARIANT_TYPE_HANDLE.
+         * than `"h"`.
          *
          * By convention, handles are indexes into an array of file descriptors
-         * that are sent alongside a D-Bus message.  If you're not interacting
+         * that are sent alongside a D-Bus message. If you're not interacting
          * with D-Bus, you probably don't need them.
          * @since 2.24
-         * @returns a #gint32
+         * @returns a `number`
          */
         get_handle(): number
         /**
          * Returns the 16-bit signed integer value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_INT16.
+         * other than `"n"`.
          * @since 2.24
-         * @returns a #gint16
+         * @returns a `number`
          */
         get_int16(): number
         /**
          * Returns the 32-bit signed integer value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_INT32.
+         * other than `"i"`.
          * @since 2.24
-         * @returns a #gint32
+         * @returns a `number`
          */
         get_int32(): number
         /**
          * Returns the 64-bit signed integer value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_INT64.
+         * other than `"x"`.
          * @since 2.24
-         * @returns a #gint64
+         * @returns a `number`
          */
         get_int64(): number
         /**
-         * Given a maybe-typed #GVariant instance, extract its value.  If the
-         * value is Nothing, then this function returns %NULL.
+         * Given a maybe-typed {@link GLib.Variant} instance, extract its value. If the
+         * value is Nothing, then this function returns `null`.
          * @since 2.24
-         * @returns the contents of `value`, or %NULL
+         * @returns the contents of `value`, or `null`
          */
         get_maybe(): Variant | null
         /**
-         * Gets a #GVariant instance that has the same value as `value` and is
+         * Gets a {@link GLib.Variant} instance that has the same value as `value` and is
          * trusted to be in normal form.
          *
          * If `value` is already trusted to be in normal form then a new
          * reference to `value` is returned.
          *
          * If `value` is not already trusted, then it is scanned to check if it
-         * is in normal form.  If it is found to be in normal form then it is
+         * is in normal form. If it is found to be in normal form then it is
          * marked as trusted and a new reference to it is returned.
          *
          * If `value` is found not to be in normal form then a new trusted
-         * #GVariant is created with the same value as `value`. The non-normal parts of
-         *  `value` will be replaced with default values which are guaranteed to be in
+         * {@link GLib.Variant} is created with the same value as `value`. The non-normal parts of
+         * `value` will be replaced with default values which are guaranteed to be in
          * normal form.
          *
-         * It makes sense to call this function if you've received #GVariant
+         * It makes sense to call this function if you've received {@link GLib.Variant}
          * data from untrusted sources and you want to ensure your serialized
          * output is definitely in normal form.
          *
          * If `value` is already in normal form, a new reference will be returned
          * (which will be floating if `value` is floating). If it is not in normal form,
-         * the newly created #GVariant will be returned with a single non-floating
-         * reference. Typically, g_variant_take_ref() should be called on the return
+         * the newly created {@link GLib.Variant} will be returned with a single non-floating
+         * reference. Typically, `g_variant_take_ref()` should be called on the return
          * value from this function to guarantee ownership of a single non-floating
          * reference to it.
          * @since 2.24
-         * @returns a trusted #GVariant
+         * @returns a trusted {@link GLib.Variant}
          */
         get_normal_form(): Variant
         /**
-         * Gets the contents of an array of object paths #GVariant.  This call
+         * Gets the contents of an array of object paths {@link GLib.Variant}. This call
          * makes a shallow copy; the return result should be released with
-         * g_free(), but the individual strings must not be modified.
+         * `g_free()`, but the individual strings must not be modified.
          *
-         * If `length` is non-%NULL then the number of elements in the result
-         * is stored there.  In any case, the resulting array will be
-         * %NULL-terminated.
+         * If `length` is non-`null` then the number of elements in the result
+         * is stored there. In any case, the resulting array will be
+         * `null`-terminated.
          *
          * For an empty array, `length` will be set to 0 and a pointer to a
-         * %NULL pointer will be returned.
+         * `null` pointer will be returned.
          * @since 2.30
-         * @returns an array of constant strings, the length of the result, or %NULL
+         * @returns an array of constant strings, the length of the result, or `null`
          */
         get_objv(): string[]
         /**
          * Determines the number of bytes that would be required to store `value`
-         * with g_variant_store().
+         * with `g_variant_store()`.
          *
          * If `value` has a fixed-sized type then this function always returned
          * that fixed size.
          *
          * In the case that `value` is already in serialized form or the size has
          * already been calculated (ie: this function has been called before)
-         * then this function is O(1).  Otherwise, the size is calculated, an
+         * then this function is O(1). Otherwise, the size is calculated, an
          * operation which is approximately O(n) in the number of values
          * involved.
          * @since 2.24
@@ -1275,18 +1275,18 @@ namespace GLib {
          */
         get_size(): number
         /**
-         * Returns the string value of a #GVariant instance with a string
-         * type.  This includes the types %G_VARIANT_TYPE_STRING,
-         * %G_VARIANT_TYPE_OBJECT_PATH and %G_VARIANT_TYPE_SIGNATURE.
+         * Returns the string value of a {@link GLib.Variant} instance with a string
+         * type. This includes the types `"s"`,
+         * `"o"` and `"g"`.
          *
-         * The string will always be UTF-8 encoded, will never be %NULL, and will never
+         * The string will always be UTF-8 encoded, will never be `null`, and will never
          * contain nul bytes.
          *
-         * If `length` is non-%NULL then the length of the string (in bytes) is
-         * returned there.  For trusted values, this information is already
-         * known.  Untrusted values will be validated and, if valid, a strlen() will be
+         * If `length` is non-`null` then the length of the string (in bytes) is
+         * returned there. For trusted values, this information is already
+         * known. Untrusted values will be validated and, if valid, a strlen() will be
          * performed. If invalid, a default value will be returned — for
-         * %G_VARIANT_TYPE_OBJECT_PATH, this is `"/"`, and for other types it is the
+         * `"o"`, this is `"/"`, and for other types it is the
          * empty string.
          *
          * It is an error to call this function with a `value` of any type
@@ -1294,22 +1294,22 @@ namespace GLib {
          *
          * The return value remains valid as long as `value` exists.
          * @since 2.24
-         * @returns the constant string, UTF-8 encoded, a pointer to a #gsize,          to store the length
+         * @returns the constant string, UTF-8 encoded, a pointer to a `number`, to store the length
          */
         get_string(): string
         /**
-         * Gets the contents of an array of strings #GVariant.  This call
+         * Gets the contents of an array of strings {@link GLib.Variant}. This call
          * makes a shallow copy; the return result should be released with
-         * g_free(), but the individual strings must not be modified.
+         * `g_free()`, but the individual strings must not be modified.
          *
-         * If `length` is non-%NULL then the number of elements in the result
-         * is stored there.  In any case, the resulting array will be
-         * %NULL-terminated.
+         * If `length` is non-`null` then the number of elements in the result
+         * is stored there. In any case, the resulting array will be
+         * `null`-terminated.
          *
          * For an empty array, `length` will be set to 0 and a pointer to a
-         * %NULL pointer will be returned.
+         * `null` pointer will be returned.
          * @since 2.24
-         * @returns an array of constant strings, the length of the result, or %NULL
+         * @returns an array of constant strings, the length of the result, or `null`
          */
         get_strv(): string[]
         /**
@@ -1318,13 +1318,13 @@ namespace GLib {
          * The return value is valid for the lifetime of `value` and must not
          * be freed.
          * @since 2.24
-         * @returns a #GVariantType
+         * @returns a {@link GLib.VariantType}
          */
         get_type(): VariantType<S>
         /**
-         * Returns the type string of `value`.  Unlike the result of calling
-         * g_variant_type_peek_string(), this string is nul-terminated.  This
-         * string belongs to #GVariant and must not be freed.
+         * Returns the type string of `value`. Unlike the result of calling
+         * `g_variant_type_peek_string()`, this string is nul-terminated. This
+         * string belongs to {@link GLib.Variant} and must not be freed.
          * @since 2.24
          * @returns the type string for the type of `value`
          */
@@ -1333,46 +1333,46 @@ namespace GLib {
          * Returns the 16-bit unsigned integer value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_UINT16.
+         * other than `"q"`.
          * @since 2.24
-         * @returns a #guint16
+         * @returns a `number`
          */
         get_uint16(): number
         /**
          * Returns the 32-bit unsigned integer value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_UINT32.
+         * other than `"u"`.
          * @since 2.24
-         * @returns a #guint32
+         * @returns a `number`
          */
         get_uint32(): number
         /**
          * Returns the 64-bit unsigned integer value of `value`.
          *
          * It is an error to call this function with a `value` of any type
-         * other than %G_VARIANT_TYPE_UINT64.
+         * other than `"t"`.
          * @since 2.24
-         * @returns a #guint64
+         * @returns a `number`
          */
         get_uint64(): number
         /**
-         * Unboxes `value`.  The result is the #GVariant instance that was
+         * Unboxes `value`. The result is the {@link GLib.Variant} instance that was
          * contained in `value`.
          * @since 2.24
          * @returns the item contained in the variant
          */
         get_variant(): Variant
         /**
-         * Generates a hash value for a #GVariant instance.
+         * Generates a hash value for a {@link GLib.Variant} instance.
          *
          * The output of this function is guaranteed to be the same for a given
-         * value only per-process.  It may change between different processor
-         * architectures or even different versions of GLib.  Do not use this
+         * value only per-process. It may change between different processor
+         * architectures or even different versions of GLib. Do not use this
          * function as a basis for building protocols or file formats.
          *
-         * The type of `value` is #gconstpointer only to allow use of this
-         * function with #GHashTable.  `value` must be a #GVariant.
+         * The type of `value` is `gconstpointer` only to allow use of this
+         * function with {@link GLib.HashTable}. `value` must be a {@link GLib.Variant}.
          * @since 2.24
          * @returns a hash value corresponding to `value`
          */
@@ -1380,7 +1380,7 @@ namespace GLib {
         /**
          * Checks if `value` is a container.
          * @since 2.24
-         * @returns %TRUE if `value` is a container
+         * @returns `true` if `value` is a container
          */
         is_container(): boolean
         /**
@@ -1388,10 +1388,10 @@ namespace GLib {
          *
          * This function should only ever be used to assert that a given variant
          * is or is not floating, or for debug purposes. To acquire a reference
-         * to a variant that might be floating, always use g_variant_ref_sink()
-         * or g_variant_take_ref().
+         * to a variant that might be floating, always use `g_variant_ref_sink()`
+         * or `g_variant_take_ref()`.
          *
-         * See g_variant_ref_sink() for more information about floating reference
+         * See `g_variant_ref_sink()` for more information about floating reference
          * counts.
          * @since 2.26
          * @returns whether `value` is floating
@@ -1401,29 +1401,29 @@ namespace GLib {
          * Checks if `value` is in normal form.
          *
          * The main reason to do this is to detect if a given chunk of
-         * serialized data is in normal form: load the data into a #GVariant
-         * using g_variant_new_from_data() and then use this function to
+         * serialized data is in normal form: load the data into a {@link GLib.Variant}
+         * using {@link GLib.Variant.new_from_data} and then use this function to
          * check.
          *
          * If `value` is found to be in normal form then it will be marked as
-         * being trusted.  If the value was already marked as being trusted then
-         * this function will immediately return %TRUE.
+         * being trusted. If the value was already marked as being trusted then
+         * this function will immediately return `true`.
          *
          * There may be implementation specific restrictions on deeply nested values.
-         * GVariant is guaranteed to handle nesting up to at least 64 levels.
+         * {@link GLib.Variant} is guaranteed to handle nesting up to at least 64 levels.
          * @since 2.24
-         * @returns %TRUE if `value` is in normal form
+         * @returns `true` if `value` is in normal form
          */
         is_normal_form(): boolean
         /**
          * Checks if a value has a type matching the provided type.
          * @since 2.24
-         * @param type a #GVariantType
-         * @returns %TRUE if the type of `value` matches `type`
+         * @param type a {@link GLib.VariantType}
+         * @returns `true` if the type of `value` matches `type`
          */
         is_of_type(type: VariantType): boolean
         /**
-         * Looks up a value in a dictionary #GVariant.
+         * Looks up a value in a dictionary {@link GLib.Variant}.
          *
          * This function works with dictionaries of the type a{s*} (and equally
          * well with type a{o*}, but we only further discuss the string case
@@ -1432,34 +1432,37 @@ namespace GLib {
          * In the event that `dictionary` has the type a{sv}, the `expected_type`
          * string specifies what type of value is expected to be inside of the
          * variant. If the value inside the variant has a different type then
-         * %NULL is returned. In the event that `dictionary` has a value type other
+         * `null` is returned. In the event that `dictionary` has a value type other
          * than v then `expected_type` must directly match the value type and it is
          * used to unpack the value directly or an error occurs.
          *
-         * In either case, if `key` is not found in `dictionary`, %NULL is returned.
+         * In either case, if `key` is not found in `dictionary`, `null` is returned.
          *
          * If the key is found and the value has the correct type, it is
-         * returned.  If `expected_type` was specified then any non-%NULL return
+         * returned. If `expected_type` was specified then any non-`null` return
          * value will have this type.
          *
-         * This function is currently implemented with a linear scan.  If you
-         * plan to do many lookups then #GVariantDict may be more efficient.
+         * This function is currently implemented with a linear scan. If you
+         * plan to do many lookups then {@link GLib.VariantDict} may be more efficient.
          * @since 2.28
          * @param key the key to look up in the dictionary
-         * @param expected_type a #GVariantType, or %NULL
-         * @returns the value of the dictionary key, or %NULL
+         * @param expected_type a {@link GLib.VariantType}, or `null`
+         * @returns the value of the dictionary key, or `null`
          */
-        lookup_value(key: string, expected_type: VariantType | null): Variant
+        lookup_value(
+            key: string,
+            expected_type: VariantType | null,
+        ): Variant | null
         /**
-         * Determines the number of children in a container #GVariant instance.
+         * Determines the number of children in a container {@link GLib.Variant} instance.
          * This includes variants, maybes, arrays, tuples and dictionary
-         * entries.  It is an error to call this function on any other type of
-         * #GVariant.
+         * entries. It is an error to call this function on any other type of
+         * {@link GLib.Variant}.
          *
-         * For variants, the return value is always 1.  For values with maybe
-         * types, it is always zero or one.  For arrays, it is the length of the
-         * array.  For tuples it is the number of tuple items (which depends
-         * only on the type).  For dictionary entries, it is always 2
+         * For variants, the return value is always 1. For values with maybe
+         * types, it is always zero or one. For arrays, it is the length of the
+         * array. For tuples it is the number of tuple items (which depends
+         * only on the type). For dictionary entries, it is always 2
          *
          * This function is O(1).
          * @since 2.24
@@ -1467,14 +1470,14 @@ namespace GLib {
          */
         n_children(): number
         /**
-         * Pretty-prints `value` in the format understood by g_variant_parse().
+         * Pretty-prints `value` in the format understood by {@link GLib.Variant.parse}.
          *
          * The format is described [here](gvariant-text-format.html).
          *
-         * If `type_annotate` is %TRUE, then type information is included in
+         * If `type_annotate` is `true`, then type information is included in
          * the output.
          * @since 2.24
-         * @param type_annotate %TRUE if type information should be included in                 the output
+         * @param type_annotate `true` if type information should be included in the output
          * @returns a newly-allocated string holding the result.
          */
         print(type_annotate: boolean): string
@@ -1573,7 +1576,7 @@ namespace GLib {
     }
 
     /**
-     * A utility class for building complex GVariant structures incrementally.
+     * A utility class for building complex {@link GLib.Variant} structures incrementally.
      *
      * VariantBuilder is useful when you need to construct variants dynamically
      * or when dealing with complex nested structures. It provides a way to
@@ -1604,18 +1607,18 @@ namespace GLib {
         new (copy: VariantBuilder<S>): VariantBuilder<S>
 
         /**
-         * Allocates and initialises a new #GVariantBuilder.
+         * Allocates and initialises a new {@link GLib.VariantBuilder}.
          *
-         * You should call g_variant_builder_unref() on the return value when it
-         * is no longer needed.  The memory will not be automatically freed by
+         * You should call `g_variant_builder_unref()` on the return value when it
+         * is no longer needed. The memory will not be automatically freed by
          * any other call.
          *
-         * In most cases it is easier to place a #GVariantBuilder directly on
+         * In most cases it is easier to place a {@link GLib.VariantBuilder} directly on
          * the stack of the calling function and initialise it with
-         * g_variant_builder_init_static().
+         * `g_variant_builder_init_static()`.
          * @since 2.24
          * @param type a container type
-         * @returns a #GVariantBuilder
+         * @returns a {@link GLib.VariantBuilder}
          */
         "new"<S extends string = "a*">(type: VariantType<S>): VariantBuilder<S>
     }
@@ -1625,18 +1628,18 @@ namespace GLib {
          * Adds `value` to `builder`.
          *
          * It is an error to call this function in any way that would create an
-         * inconsistent value to be constructed.  Some examples of this are
+         * inconsistent value to be constructed. Some examples of this are
          * putting different types of items into an array, putting the wrong
          * types or number of items in a tuple, putting more than one value into
          * a variant, etc.
          *
          * @since 2.24
-         * @param value a #GVariant
+         * @param value a {@link GLib.Variant}
          */
         add_value(value: $ElementSig<$ParseDeepVariant<S>>): void
         /**
          * Closes the subcontainer inside the given `builder` that was opened by
-         * the most recent call to g_variant_builder_open().
+         * the most recent call to {@link GLib.VariantBuilder.open}.
          *
          * It is an error to call this function in any way that would create an
          * inconsistent value to be constructed (ie: too few values added to the
@@ -1650,7 +1653,7 @@ namespace GLib {
          * It is an error to call this function in any way that would create an
          * inconsistent value to be constructed (ie: insufficient number of
          * items added to a container with a specific number of children
-         * required).  It is also an error to call this function if the builder
+         * required). It is also an error to call this function if the builder
          * was created with an indefinite array or maybe type and no children
          * have been added; in this case it is impossible to infer the type of
          * the empty array.
@@ -1659,8 +1662,8 @@ namespace GLib {
          */
         end(): Variant<S>
         /**
-         * Opens a subcontainer inside the given `builder`.  When done adding
-         * items to the subcontainer, g_variant_builder_close() must be called. `type`
+         * Opens a subcontainer inside the given `builder`. When done adding
+         * items to the subcontainer, {@link GLib.VariantBuilder.close} must be called. `type`
          * is the type of the container: so to build a tuple of several values, `type`
          * must include the tuple itself.
          *
@@ -1669,7 +1672,7 @@ namespace GLib {
          * a value of an incorrect type).
          *
          * @since 2.24
-         * @param type the #GVariantType of the container
+         * @param type the {@link GLib.VariantType} of the container
          */
         open(type: VariantType): void
     }
@@ -1681,21 +1684,21 @@ namespace GLib {
         new (copy: VariantType<S>): VariantType<S>
 
         /**
-         * Creates a new [type@GLib.VariantType] corresponding to the type string given
+         * Creates a new {@link GLib.VariantType} corresponding to the type string given
          * by `type_string`.
          *
          * It is a programmer error to call this function with an invalid type
-         * string.  Use [func@GLib.VariantType.string_is_valid] if you are unsure.
+         * string. Use {@link GLib.VariantType.string_is_valid} if you are unsure.
          * @since 2.24
-         * @param type_string a valid [GVariant type string](./struct.VariantType.html#gvariant-type-strings)
-         * @returns a new [type@GLib.VariantType]
+         * @param type_string a valid [GVariant type string](https://docs.gtk.org/glib/struct.VariantType.html#gvariant-type-strings)
+         * @returns a new {@link GLib.VariantType}
          */
         "new"<S extends string>(type_string: S): VariantType<S>
         /**
          * Constructs the type corresponding to an array of elements of the
          * type `type`.
          *
-         * It is appropriate to call [method@GLib.VariantType.first] on the return value.
+         * It is appropriate to call {@link GLib.VariantType.first} on the return value.
          * @param element an element type
          * @returns a new array type Since 2.24
          */
@@ -1706,7 +1709,7 @@ namespace GLib {
          * Constructs the type corresponding to a dictionary entry with a key
          * of type `key` and a value of type `value`.
          *
-         * It is appropriate to call [method@GLib.VariantType.free] on the return value.
+         * It is appropriate to call {@link GLib.VariantType.free} on the return value.
          * @param key a basic type to use for the key
          * @param value a type to use for the value
          * @returns a new dictionary entry type Since 2.24
@@ -1719,7 +1722,7 @@ namespace GLib {
          * Constructs the type corresponding to a ‘maybe’ instance containing
          * type `type` or `Nothing`.
          *
-         * It is appropriate to call [method@GLib.VariantType.free] on the return value.
+         * It is appropriate to call {@link GLib.VariantType.free} on the return value.
          * @param element an element type
          * @returns a new ‘maybe’ type Since 2.24
          */
@@ -1729,10 +1732,10 @@ namespace GLib {
         /**
          * Constructs a new tuple type, from `items`.
          *
-         *  `length` is the number of items in `items`, or `-1` to indicate that
-         *  `items` is `NULL`-terminated.
+         * `length` is the number of items in `items`, or `-1` to indicate that
+         * `items` is `null`-terminated.
          *
-         * It is appropriate to call [method@GLib.VariantType.free] on the return value.
+         * It is appropriate to call {@link GLib.VariantType.free} on the return value.
          * @param items an array of types, one for each item
          * @returns a new tuple type Since 2.24
          */
@@ -1743,29 +1746,29 @@ namespace GLib {
         ): VariantType<`(${$ToTuple<Items>})`>
         /**
          * Checks if `type_string` is a valid
-         * [GVariant type string](./struct.VariantType.html#gvariant-type-strings).
+         * [GVariant type string](https://docs.gtk.org/glib/struct.VariantType.html#gvariant-type-strings).
          *
-         * This call is equivalent to calling [func@GLib.VariantType.string_scan] and
+         * This call is equivalent to calling {@link GLib.VariantType.string_scan} and
          * confirming that the following character is a nul terminator.
          * @param type_string a pointer to any string
          * @returns true if `type_string` is exactly one valid type string Since 2.24
          */
         string_is_valid(type_string: string): boolean
         /**
-         * Scan for a single complete and valid GVariant type string in `string`.
+         * Scan for a single complete and valid {@link GLib.Variant} type string in `string`.
          *
          * The memory pointed to by `limit` (or bytes beyond it) is never
          * accessed.
          *
          * If a valid type string is found, `endptr` is updated to point to the
-         * first character past the end of the string that was found and %TRUE
+         * first character past the end of the string that was found and `true`
          * is returned.
          *
          * If there is no valid type string starting at `string`, or if the type
-         * string does not end before `limit` then %FALSE is returned.
+         * string does not end before `limit` then `false` is returned.
          *
          * For the simple case of checking if a string is a valid type string,
-         * see [func@GLib.VariantType.string_is_valid].
+         * see {@link GLib.VariantType.string_is_valid}.
          * @since 2.24
          * @param string a pointer to any string
          * @param limit the end of `string`
@@ -1776,18 +1779,18 @@ namespace GLib {
 
     interface VariantType<S extends string = any> {
         /**
-         * Makes a copy of a [type@GLib.VariantType].
+         * Makes a copy of a {@link GLib.VariantType}.
          *
-         * It is appropriate to call [method@GLib.VariantType.free] on the return value.
-         *  `type` may not be `NULL`.
-         * @returns a new [type@GLib.VariantType] Since 2.24
+         * It is appropriate to call {@link GLib.VariantType.free} on the return value.
+         * `type` may not be `null`.
+         * @returns a new {@link GLib.VariantType} Since 2.24
          */
         copy(): VariantType<S>
         /**
          * Returns a newly-allocated copy of the type string corresponding to `type`.
          *
-         * The returned string is nul-terminated.  It is appropriate to call
-         * [func@GLib.free] on the return value.
+         * The returned string is nul-terminated. It is appropriate to call
+         * {@link GLib.free} on the return value.
          * @returns the corresponding type string Since 2.24
          */
         dup_string(): string
@@ -1801,14 +1804,14 @@ namespace GLib {
         /**
          * Compares `type1` and `type2` for equality.
          *
-         * Only returns true if the types are exactly equal.  Even if one type
+         * Only returns true if the types are exactly equal. Even if one type
          * is an indefinite type and the other is a subtype of it, false will
-         * be returned if they are not exactly equal.  If you want to check for
-         * subtypes, use [method@GLib.VariantType.is_subtype_of].
+         * be returned if they are not exactly equal. If you want to check for
+         * subtypes, use {@link GLib.VariantType.is_subtype_of}.
          *
          * The argument types of `type1` and `type2` are only `gconstpointer` to
-         * allow use with [type@GLib.HashTable] without function pointer casting.  For
-         * both arguments, a valid [type@GLib.VariantType] must be provided.
+         * allow use with {@link GLib.HashTable} without function pointer casting. For
+         * both arguments, a valid {@link GLib.VariantType} must be provided.
          * @param type2 another type to compare
          * @returns true if `type1` and `type2` are exactly equal Since 2.24
          */
@@ -1824,19 +1827,19 @@ namespace GLib {
          * In the case of a dictionary entry type, this returns the type of
          * the key.
          *
-         * `NULL` is returned in case of `type` being `G_VARIANT_TYPE_UNIT`.
+         * `null` is returned in case of `type` being `"()"`.
          *
-         * This call, together with [method@GLib.VariantType.next] provides an iterator
+         * This call, together with {@link GLib.VariantType.next} provides an iterator
          * interface over tuple and dictionary entry types.
-         * @returns the first item type of `type`, or `NULL`   if the type has no item types Since 2.24
+         * @returns the first item type of `type`, or `null` if the type has no item types Since 2.24
          */
         first(): VariantType | null
         /**
-         * Frees a [type@GLib.VariantType] that was allocated with
-         * [method@GLib.VariantType.copy], [ctor@GLib.VariantType.new] or one of the
+         * Frees a {@link GLib.VariantType} that was allocated with
+         * {@link GLib.VariantType.copy}, {@link GLib.VariantType.new} or one of the
          * container type constructor functions.
          *
-         * In the case that `type` is `NULL`, this function does nothing.
+         * In the case that `type` is `null`, this function does nothing.
          *
          * Since 2.24
          */
@@ -1845,7 +1848,7 @@ namespace GLib {
          * Returns the length of the type string corresponding to the given `type`.
          *
          * This function must be used to determine the valid extent of
-         * the memory region returned by [method@GLib.VariantType.peek_string].
+         * the memory region returned by {@link GLib.VariantType.peek_string}.
          * @returns the length of the corresponding type string Since 2.24
          */
         get_string_length(): number
@@ -1853,8 +1856,8 @@ namespace GLib {
          * Hashes `type`.
          *
          * The argument type of `type` is only `gconstpointer` to allow use with
-         * [type@GLib.HashTable] without function pointer casting.  A valid
-         * [type@GLib.VariantType] must be provided.
+         * {@link GLib.HashTable} without function pointer casting. A valid
+         * {@link GLib.VariantType} must be provided.
          * @returns the hash value Since 2.24
          */
         hash(): number
@@ -1877,7 +1880,7 @@ namespace GLib {
          *
          * Only a basic type may be used as the key of a dictionary entry.
          *
-         * This function returns `FALSE` for all indefinite types except
+         * This function returns `false` for all indefinite types except
          * `G_VARIANT_TYPE_BASIC`.
          * @returns true if `type` is a basic type Since 2.24
          */
@@ -1900,11 +1903,11 @@ namespace GLib {
          * A type is definite if its type string does not contain any indefinite
          * type characters (`*`, `?`, or `r`).
          *
-         * A [type@GLib.Variant] instance may not have an indefinite type, so calling
-         * this function on the result of [method@GLib.Variant.get_type] will always
-         * result in true being returned.  Calling this function on an
+         * A {@link GLib.Variant} instance may not have an indefinite type, so calling
+         * this function on the result of {@link GLib.Variant.get_type} will always
+         * result in true being returned. Calling this function on an
          * indefinite type like `G_VARIANT_TYPE_ARRAY`, however, will result in
-         * `FALSE` being returned.
+         * `false` being returned.
          * @returns true if `type` is definite Since 2.24
          */
         is_definite(): boolean
@@ -1933,8 +1936,8 @@ namespace GLib {
         /**
          * Checks if `type` is a subtype of `supertype`.
          *
-         * This function returns true if `type` is a subtype of `supertype`.  All
-         * types are considered to be subtypes of themselves.  Aside from that,
+         * This function returns true if `type` is a subtype of `supertype`. All
+         * types are considered to be subtypes of themselves. Aside from that,
          * only indefinite types can have subtypes.
          * @param supertype type of potential supertype
          * @returns true if `type` is a subtype of `supertype` Since 2.24
@@ -1960,9 +1963,9 @@ namespace GLib {
         /**
          * Determines the key type of a dictionary entry type.
          *
-         * This function may only be used with a dictionary entry type.  Other
+         * This function may only be used with a dictionary entry type. Other
          * than the additional restriction, this call is equivalent to
-         * [method@GLib.VariantType.first].
+         * {@link GLib.VariantType.first}.
          * @returns the key type of the dictionary entry Since 2.24
          */
         key(): VariantType
@@ -1983,15 +1986,15 @@ namespace GLib {
          * Determines the next item type of a tuple or dictionary entry
          * type.
          *
-         *  `type` must be the result of a previous call to
-         * [method@GLib.VariantType.first] or [method@GLib.VariantType.next].
+         * `type` must be the result of a previous call to
+         * {@link GLib.VariantType.first} or {@link GLib.VariantType.next}.
          *
          * If called on the key type of a dictionary entry then this call
-         * returns the value type.  If called on the value type of a dictionary
-         * entry then this call returns `NULL`.
+         * returns the value type. If called on the value type of a dictionary
+         * entry then this call returns `null`.
          *
-         * For tuples, `NULL` is returned when `type` is the last item in the tuple.
-         * @returns the next type after `type`, or `NULL` if   there are no further types Since 2.24
+         * For tuples, `null` is returned when `type` is the last item in the tuple.
+         * @returns the next type after `type`, or `null` if there are no further types Since 2.24
          */
         next(): VariantType | null
         /**
@@ -2086,12 +2089,14 @@ namespace GLib {
 
         /**
          * Like {@link log_set_writer_func}, but `writer_func` receives the
-         * fields as an unconverted `a{sms}` variant, which is cheaper.
+         * fields as an unconverted `a{sv}` variant, which is cheaper.
+         * Each value is a `may` holding the field's bytes, or an empty `ms`
+         * for a field without a value.
          */
         log_set_writer_func_variant(
             writer_func: (
                 logLevel: LogLevelFlags,
-                fields: Variant<"a{sms}">,
+                fields: Variant<"a{sv}">,
             ) => LogWriterOutput,
         ): void
 

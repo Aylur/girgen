@@ -290,14 +290,14 @@ namespace GObject {
          *
          * @since 2.26
          * @param source_property the property on `source` to bind
-         * @param target the target #GObject
+         * @param target the target {@link GObject.Object}
          * @param target_property the property on `target` to bind
-         * @param flags flags to pass to #GBinding
-         * @param transform_to a #GClosure wrapping the transformation function
-            from the `source` to the `target`, or %NULL to use the default
-         * @param transform_from a #GClosure wrapping the transformation function
-            from the @target to the `source`, or %NULL to use the default
-         * @returns the #GBinding instance representing the     binding between the two #GObject instances. The binding is released     whenever the #GBinding reference count reaches zero.
+         * @param flags flags to pass to {@link GObject.Binding}
+         * @param transform_to a {@link GObject.Closure} wrapping the transformation function
+            from the `source` to the `target`, or `null` to use the default
+         * @param transform_from a {@link GObject.Closure} wrapping the transformation function
+            from the `target` to the `source`, or `null` to use the default
+         * @returns the {@link GObject.Binding} instance representing the binding between the two {@link GObject.Object} instances. The binding is released whenever the {@link GObject.Binding} reference count reaches zero.
          */
         bind_property_full(
             source_property: string,
@@ -312,21 +312,21 @@ namespace GObject {
     interface BindingGroup {
         /**
          * Creates a binding between `source_property` on the source object and
-         * `target_property` on @target, allowing you to set the transformation
+         * `target_property` on `target`, allowing you to set the transformation
          * functions to be used by the binding. The binding flag
-         * %G_BINDING_SYNC_CREATE is automatically specified.
+         * {@link GObject.BindingFlags.SYNC_CREATE} is automatically specified.
          *
          * @since 2.72
          * @param source_property the property on the source to bind
-         * @param target the target #GObject
-         * @param target_property the property on @target to bind
-         * @param flags the flags used to create the #GBinding
-         * @param transform_to a #GClosure wrapping the
-            transformation function from the source object to the @target,
-            or %NULL to use the default
-         * @param transform_from a #GClosure wrapping the
-            transformation function from the @target to the source object,
-            or %NULL to use the default
+         * @param target the target {@link GObject.Object}
+         * @param target_property the property on `target` to bind
+         * @param flags the flags used to create the {@link GObject.Binding}
+         * @param transform_to a {@link GObject.Closure} wrapping the
+            transformation function from the source object to the `target`,
+            or `null` to use the default
+         * @param transform_from a {@link GObject.Closure} wrapping the
+            transformation function from the `target` to the source object,
+            or `null` to use the default
          */
         bind_full(
             source_property: string,
@@ -365,33 +365,33 @@ namespace GObject {
         readonly owner_type: GType
 
         /**
-         * Get the short description of a `GParamSpec`.
-         * @returns the short description of @pspec.
+         * Get the short description of a {@link GObject.ParamSpec}.
+         * @returns the short description of `pspec`.
          */
         get_blurb(): string | null
         /**
-         * Gets the default value of `pspec` as a pointer to a `GValue`.
+         * Gets the default value of `pspec` as a pointer to a {@link GObject.Value}.
          *
-         * The `GValue` will remain valid for the life of `pspec`.
-         * @returns a pointer to a `GValue` which must not be modified
+         * The {@link GObject.Value} will remain valid for the life of `pspec`.
+         * @returns a pointer to a {@link GObject.Value} which must not be modified
          */
         get_default_value(): unknown
         /**
-         * Get the name of a `GParamSpec`.
+         * Get the name of a {@link GObject.ParamSpec}.
          *
-         * The name is always an "interned" string (as per g_intern_string()).
+         * The name is always an "interned" string (as per `g_intern_string()`).
          * This allows for pointer-value comparisons.
-         * @returns the name of @pspec.
+         * @returns the name of `pspec`.
          */
         get_name(): string
         /**
-         * Gets the GQuark for the name.
-         * @returns the GQuark for @pspec->name.
+         * Gets the {@link GLib.Quark} for the name.
+         * @returns the {@link GLib.Quark} for `pspec.name`.
          */
         get_name_quark(): GLib.Quark
         /**
-         * Get the nickname of a `GParamSpec`.
-         * @returns the nickname of @pspec.
+         * Get the nickname of a {@link GObject.ParamSpec}.
+         * @returns the nickname of `pspec`.
          */
         get_nick(): string
         /**
@@ -400,14 +400,14 @@ namespace GObject {
          * providing a new implementation of a property in a derived
          * type while preserving all the properties from the parent
          * type. Redirection is established by creating a property
-         * of type `GParamSpecOverride`. See g_object_class_override_property()
+         * of type {@link GObject.ParamSpecOverride}. See `g_object_class_override_property()`
          * for an example of the use of this capability.
-         * @returns paramspec to which requests on this          paramspec should be redirected, or %NULL if none.
+         * @returns paramspec to which requests on this paramspec should be redirected, or `null` if none.
          */
         get_redirect_target(): ParamSpec | null
         /**
-         * The initial reference count of a newly created `GParamSpec` is 1,
-         * even though no one has explicitly called g_param_spec_ref() on it
+         * The initial reference count of a newly created {@link GObject.ParamSpec} is 1,
+         * even though no one has explicitly called `g_param_spec_ref()` on it
          * yet. So the initial reference count is flagged as "floating", until
          * someone calls `g_param_spec_ref (pspec); g_param_spec_sink
          * (pspec);` in sequence on it, taking over the initial
@@ -451,7 +451,7 @@ namespace GObject {
             oclass: GType<T> | { $gtype: GType<T> },
         ): ParamSpec<OverridableProperties<T>[Name]>
         /**
-         * Creates a new GParamSpecChar instance specifying a G_TYPE_CHAR property.
+         * Creates a new {@link GObject.ParamSpecChar} instance specifying a {@link GObject.TYPE_CHAR} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -470,7 +470,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecUChar instance specifying a G_TYPE_UCHAR property.
+         * Creates a new {@link GObject.ParamSpecUChar} instance specifying a {@link GObject.TYPE_UCHAR} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -489,7 +489,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecInt instance specifying a G_TYPE_INT property.
+         * Creates a new {@link GObject.ParamSpecInt} instance specifying a {@link GObject.TYPE_INT} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -508,7 +508,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecUInt instance specifying a G_TYPE_UINT property.
+         * Creates a new {@link GObject.ParamSpecUInt} instance specifying a {@link GObject.TYPE_UINT} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -527,7 +527,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecLong instance specifying a G_TYPE_LONG property.
+         * Creates a new {@link GObject.ParamSpecLong} instance specifying a {@link GObject.TYPE_LONG} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -546,7 +546,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecULong instance specifying a G_TYPE_ULONG property.
+         * Creates a new {@link GObject.ParamSpecULong} instance specifying a {@link GObject.TYPE_ULONG} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -565,7 +565,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecInt64 instance specifying a G_TYPE_INT64 property.
+         * Creates a new {@link GObject.ParamSpecInt64} instance specifying a {@link GObject.TYPE_INT64} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -584,7 +584,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecUInt64 instance specifying a G_TYPE_UINT64 property.
+         * Creates a new {@link GObject.ParamSpecUInt64} instance specifying a {@link GObject.TYPE_UINT64} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -603,7 +603,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecFloat instance specifying a G_TYPE_FLOAT property.
+         * Creates a new {@link GObject.ParamSpecFloat} instance specifying a {@link GObject.TYPE_FLOAT} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -622,7 +622,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecBoolean instance specifying a G_TYPE_BOOLEAN property. In many cases, it may be more appropriate to use an enum with g_param_spec_enum(), both to improve code clarity by using explicitly named values, and to allow for more values to be added in future without breaking API.
+         * Creates a new {@link GObject.ParamSpecBoolean} instance specifying a {@link GObject.TYPE_BOOLEAN} property. In many cases, it may be more appropriate to use an enum with {@link GObject.ParamSpec.enum}, both to improve code clarity by using explicitly named values, and to allow for more values to be added in future without breaking API.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -637,7 +637,7 @@ namespace GObject {
             defaultValue?: boolean,
         ): ParamSpec<boolean>
         /**
-         * Creates a new GParamSpecEnum instance specifying a G_TYPE_ENUM property.
+         * Creates a new {@link GObject.ParamSpecEnum} instance specifying a {@link GObject.TYPE_ENUM} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -654,7 +654,7 @@ namespace GObject {
             defaultValue?: any,
         ): ParamSpec<T>
         /**
-         * Creates a new GParamSpecFlags instance specifying a G_TYPE_FLAGS property.
+         * Creates a new {@link GObject.ParamSpecFlags} instance specifying a {@link GObject.TYPE_FLAGS} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -671,7 +671,7 @@ namespace GObject {
             defaultValue?: any,
         ): ParamSpec<T>
         /**
-         * Creates a new GParamSpecDouble instance specifying a G_TYPE_DOUBLE property.
+         * Creates a new {@link GObject.ParamSpecDouble} instance specifying a {@link GObject.TYPE_DOUBLE} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -690,7 +690,7 @@ namespace GObject {
             defaultValue?: number,
         ): ParamSpec<number>
         /**
-         * Creates a new GParamSpecString instance specifying a G_TYPE_STRING property.
+         * Creates a new {@link GObject.ParamSpecString} instance specifying a {@link GObject.TYPE_STRING} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -705,7 +705,7 @@ namespace GObject {
             defaultValue?: string | null,
         ): ParamSpec<string>
         /**
-         * Creates a new GParamSpecBoxed instance specifying a G_TYPE_BOXED derived property.
+         * Creates a new {@link GObject.ParamSpecBoxed} instance specifying a {@link GObject.TYPE_BOXED} derived property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -720,7 +720,7 @@ namespace GObject {
             boxedType: GType<T> | { $gtype: GType<T> },
         ): ParamSpec<T>
         /**
-         * Creates a new GParamSpecObject instance specifying a property holding object references.
+         * Creates a new {@link GObject.ParamSpecObject} instance specifying a property holding object references.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -735,7 +735,7 @@ namespace GObject {
             objectType?: GType<T> | { $gtype: GType<T> },
         ): ParamSpec<T>
         /**
-         * Creates a new GParamSpecParam instance specifying a G_TYPE_PARAM property.
+         * Creates a new {@link GObject.ParamSpecParam} instance specifying a {@link GObject.TYPE_PARAM} property.
          * @param name The name of the property
          * @param nick A human readable name for the property (can be null)
          * @param blurb A longer description of the property (can be null)
@@ -853,7 +853,7 @@ namespace GObject {
          * a `Value` of type `dest_type`.
          * @param src_type source type to be copied.
          * @param dest_type destination type for copying.
-         * @returns `true` if g_value_copy() is possible with `src_type` and `dest_type`.
+         * @returns `true` if {@link GObject.Value.copy} is possible with `src_type` and `dest_type`.
          */
         type_compatible(
             src_type: GObject.GType | { $gtype: GObject.GType },
@@ -861,7 +861,7 @@ namespace GObject {
         ): boolean
 
         /**
-         * Check whether g_value_transform() is able to transform values
+         * Check whether {@link GObject.Value.transform} is able to transform values
          * of type `src_type` into values of type `dest_type`. Note that for
          * the types to be transformable, they must be compatible or a
          * transformation function must be registered.
@@ -878,7 +878,7 @@ namespace GObject {
     interface Value<T = any> {
         /**
          * Copies the value of `src_value` into `dest_value`.
-         * @param dest_value An initialized `GValue` structure of the same type as `src_value`.
+         * @param dest_value An initialized {@link GObject.Value} structure of the same type as `src_value`.
          */
         copy(dest_value: Value<T>): void
         /**
@@ -927,8 +927,8 @@ namespace GObject {
          */
         get_object(): T extends Object ? T : never
         /**
-         * Get the contents of a %G_TYPE_PARAM `GValue`.
-         * @returns `GParamSpec` content of `this`
+         * Get the contents of a {@link GObject.TYPE_PARAM} {@link GObject.Value}.
+         * @returns {@link GObject.ParamSpec} content of `this`
          */
         get_param(): T extends ParamSpec ? T : never
         /**
@@ -1016,7 +1016,7 @@ namespace GObject {
          */
         set_object(v_object: T extends Object ? T | null : never): void
         /**
-         * @param param the `GParamSpec` to be set
+         * @param param the {@link GObject.ParamSpec} to be set
          */
         set_param(param: T extends ParamSpec ? T | null : never): void
         /**
@@ -1025,7 +1025,7 @@ namespace GObject {
          */
         set_schar(v_char: T extends number ? T : never): void
         /**
-         * @param v_string caller-owned string to be duplicated for the `GValue`
+         * @param v_string caller-owned string to be duplicated for the {@link GObject.Value}
          */
         set_string(v_string: T extends string ? T | null : never): void
         /**
@@ -1046,25 +1046,25 @@ namespace GObject {
         set_ulong(v_ulong: T extends number ? T : never): void
         /**
          * @since 2.26
-         * @param variant a `GVariant`, or `null`
+         * @param variant a {@link GLib.Variant}, or `null`
          */
         set_variant(variant: T extends GLib.Variant ? T | null : never): void
         /**
          * Tries to cast the contents of `src_value` into a type appropriate
-         * to store in `dest_value`, e.g. to transform a %G_TYPE_INT value
-         * into a %G_TYPE_FLOAT value. Performing transformations between
+         * to store in `dest_value`, e.g. to transform a {@link GObject.TYPE_INT} value
+         * into a {@link GObject.TYPE_FLOAT} value. Performing transformations between
          * value types might incur precision lossage. Especially
          * transformations into strings might reveal seemingly arbitrary
          * results and shouldn't be relied upon for production code (such
          * as rcfile value or object property serialization).
          * @param dest_value Target value.
-         * @returns Whether a transformation rule was found and could be applied.  Upon failing transformations, `dest_value` is left untouched.
+         * @returns Whether a transformation rule was found and could be applied. Upon failing transformations, `dest_value` is left untouched.
          */
         transform(dest_value: Value): boolean
         /**
          * Clears the current value in `this` (if any) and "unsets" the type,
          * this releases all resources associated with this GValue. An unset
-         * value is the same as an uninitialized (zero-filled) GValue
+         * value is the same as an uninitialized (zero-filled) {@link GObject.Value}
          * structure.
          */
         unset(): void
@@ -1076,12 +1076,12 @@ namespace GObject {
      * If this is the `transform_to` function of a binding, then `from_value`
      * is the `source_property` on the `source` object, and `to_value` is the
      * `target_property` on the `target` object. If this is the
-     * `transform_from` function of a %G_BINDING_BIDIRECTIONAL binding,
+     * `transform_from` function of a {@link GObject.BindingFlags.BIDIRECTIONAL} binding,
      * then those roles are reversed.
      * @since 2.26
-     * @param binding a #GBinding
-     * @param from_value the #GValue containing the value to transform
-     * @returns tuple `%TRUE` if the transformation was successful, and `false` otherwise, the #GValue in which to store the transformed value
+     * @param binding a {@link GObject.Binding}
+     * @param from_value the {@link GObject.Value} containing the value to transform
+     * @returns tuple `true` if the transformation was successful, and `false` otherwise, the {@link GObject.Value} in which to store the transformed value
      */
     type BindingTransformFunc = (
         binding: Binding,
